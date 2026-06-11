@@ -1,0 +1,1694 @@
+<!DOCTYPE html>
+<!-- saved from url=(0046)file:///Users/pallavi/Downloads/planner_9.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Planner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com/">
+<link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+<link href="./planner_files/css2" rel="stylesheet">
+<link rel="stylesheet" href="./planner_files/tabler-icons.min.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+:root{
+  --parch:#f8f5f0;--parch2:#f2ede6;--parch3:#ece5da;
+  --ink:#2d2520;--ink2:#7a6a5a;--ink3:#b0a090;
+  --rule:rgba(45,37,32,.09);--rule2:rgba(45,37,32,.05);
+  --gym-bg:#fce0cc;--gym-fg:#7a3818;--gym-acc:#c1714a;
+  --work-bg:#ccead8;--work-fg:#1a4e2e;--work-acc:#4a9e6a;
+  --health-bg:#ecdce8;--health-fg:#5a2850;--health-acc:#9a5890;
+  --sky-bg:#d0e8f0;--sky-fg:#1a4458;--sky-acc:#4a8aaa;
+  --amber-bg:#faebd0;--amber-fg:#6a4010;--amber-acc:#c48a30;
+  --open-bg:#f0ece8;--open-fg:#a89080;
+  --done-bg:#d8ecda;--done-fg:#256030;
+  --r:6px;--r-md:10px;--r-lg:14px;
+  --slot-h:40px;
+  --sans:'Nunito Sans',system-ui,sans-serif;
+  --display:'Nunito',system-ui,sans-serif;
+}
+body{font-family:var(--sans);background:var(--parch);color:var(--ink);font-size:13px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.shell{display:grid;grid-template-rows:52px 1fr;height:100vh}
+
+/* ── TOP BAR ── */
+.topbar{display:flex;align-items:center;padding:0 20px;gap:12px;border-bottom:1px solid var(--rule);background:var(--parch);z-index:20}
+.logo{display:flex;align-items:center;gap:7px;text-decoration:none}
+.logo-mark{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,#c1714a 0%,#9a5890 60%,#4a8aaa 100%);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.logo-mark svg{width:16px;height:16px;fill:none;stroke:white;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.logo-text{font-family:var(--display);font-size:16px;font-weight:800;color:var(--ink);letter-spacing:-.4px;line-height:1}
+.logo-text em{font-style:normal;color:var(--gym-acc)}
+.topbar-date{font-size:12px;color:var(--ink2)}
+.spacer{flex:1}
+.nav-pills{display:flex;gap:3px}
+.npill{padding:5px 12px;border-radius:20px;font-size:12px;font-weight:500;color:var(--ink2);cursor:pointer;border:none;background:none;font-family:var(--sans);display:flex;align-items:center;gap:5px;transition:all .12s}
+.npill:hover{background:var(--parch2);color:var(--ink)}
+.npill.active{background:var(--ink);color:var(--parch)}
+.npill i{font-size:13px}
+
+/* ── LAYOUT ── */
+.body{display:grid;grid-template-columns:280px 1fr 270px;overflow:hidden;height:100%}
+.col{overflow-y:auto;padding:18px 16px}
+.col-left{border-right:1px solid var(--rule);background:var(--parch)}
+.col-centre{background:var(--parch);padding:0;display:flex;flex-direction:column;overflow:hidden}
+.col-right{border-left:1px solid var(--rule);background:var(--parch)}
+.slabel{font-size:10px;font-weight:600;letter-spacing:.9px;text-transform:uppercase;color:var(--ink3);margin-bottom:10px;margin-top:2px}
+
+/* ── CHECKLIST (left sidebar) ── */
+.checklist-wrap{display:flex;flex-direction:column;gap:3px;margin-bottom:14px}
+.check-row{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:var(--r-md);background:var(--parch2);border:1.5px solid var(--rule);transition:all .15s;cursor:grab;user-select:none}
+.check-row:hover{border-color:var(--gym-acc)}
+.check-row:active{cursor:grabbing}
+.check-row.dragging{opacity:.35;border-style:dashed}
+.check-row.reorder-over{border-top:2px solid var(--gym-acc)}
+.check-row.done{background:var(--done-bg);border-color:rgba(37,96,48,.2)}
+.check-row.done .check-label{text-decoration:line-through;color:var(--ink3)}
+.custom-cb{width:16px;height:16px;border-radius:5px;border:2px solid var(--ink3);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;background:white}
+.check-row.done .custom-cb{background:var(--done-fg);border-color:var(--done-fg)}
+.custom-cb svg{width:9px;height:9px;stroke:white;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;fill:none;opacity:0}
+.check-row.done .custom-cb svg{opacity:1}
+.check-label{flex:1;font-size:12px;font-weight:500;color:var(--ink)}
+
+.prog-wrap{background:var(--parch3);border-radius:4px;height:5px;margin-bottom:5px;overflow:hidden}
+.prog-bar{height:5px;border-radius:4px;background:var(--done-fg);transition:width .4s ease}
+.prog-lbl{font-size:11px;color:var(--ink3);margin-bottom:14px}
+
+.div{height:1px;background:var(--rule2);margin:14px 0}
+
+/* ── DAY NOTES ── */
+.notes-ta{width:100%;height:74px;border:1px solid var(--rule);border-radius:var(--r-md);padding:8px 10px;font-size:11px;background:var(--parch2);color:var(--ink);font-family:var(--sans);resize:none;outline:none;line-height:1.5}
+.notes-ta:focus{border-color:var(--gym-acc)}
+.notes-ta::placeholder{color:var(--ink3)}
+.notes-ta.dirty{border-color:var(--amber-acc)}
+.notes-save-btn{padding:3px 9px;border-radius:20px;font-size:10px;font-weight:600;font-family:var(--sans);border:1.5px solid var(--rule);background:var(--parch2);color:var(--ink2);cursor:pointer;display:flex;align-items:center;gap:4px;transition:all .12s}
+.notes-save-btn:hover{background:var(--gym-acc);color:white;border-color:var(--gym-acc)}
+.notes-save-btn.dirty{border-color:var(--amber-acc);color:var(--amber-fg);background:var(--amber-bg)}
+.notes-save-hint{font-size:10px;color:var(--done-fg);margin-top:4px;transition:opacity .3s}
+
+/* ── STALE BANNER ── */
+.stale-banner{display:none;align-items:center;gap:8px;padding:8px 14px;background:var(--amber-bg);border-bottom:1px solid var(--amber-acc);font-size:12px;color:var(--amber-fg);flex-shrink:0}
+.stale-banner.show{display:flex}
+.stale-banner i{font-size:14px;color:var(--amber-acc)}
+.sb-spacer{flex:1}
+.reschedule-btn{padding:5px 14px;border-radius:20px;background:var(--amber-acc);color:white;border:none;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--sans);display:flex;align-items:center;gap:4px;transition:opacity .12s}
+.reschedule-btn:hover{opacity:.85}
+.reschedule-btn.loading{opacity:.6;pointer-events:none}
+
+/* ── CENTRE HEADER ── */
+.centre-hdr{padding:14px 20px 10px;border-bottom:1px solid var(--rule);flex-shrink:0;background:var(--parch)}
+.centre-title{font-family:var(--display);font-size:22px;font-weight:700;letter-spacing:-.4px;color:var(--ink);line-height:1.1}
+.centre-sub{font-size:11px;color:var(--ink2);margin-top:2px}
+.centre-hdr-row{display:flex;align-items:flex-start;justify-content:space-between}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:var(--r-md);border:1px solid var(--rule);background:var(--parch2);color:var(--ink);font-size:11px;font-weight:500;cursor:pointer;font-family:var(--sans);transition:all .1s}
+.btn:hover{background:var(--parch3)}
+.btn-primary{background:var(--gym-acc);color:white;border-color:var(--gym-acc)}
+.btn-primary:hover{opacity:.88}
+
+/* ── CALENDAR GRID ── */
+.time-scroll{flex:1;overflow-y:auto;padding:0}
+.cal-grid{display:flex;padding:12px 20px 40px;gap:0;position:relative}
+.time-gutter{width:64px;flex-shrink:0;position:relative}
+.gutter-slot{height:var(--slot-h);display:flex;align-items:flex-start;padding-top:2px;justify-content:flex-end;padding-right:10px}
+.gutter-label{font-size:10px;color:var(--ink3);font-variant-numeric:tabular-nums;white-space:nowrap;transform:translateY(-6px)}
+.cal-main{flex:1;position:relative;min-width:0}
+.cal-line{position:absolute;left:0;right:0;border-top:1px solid var(--rule2);pointer-events:none}
+.cal-line.hour{border-top-color:var(--rule)}
+.cal-empty{position:absolute;left:0;right:0;cursor:pointer;z-index:1;transition:background .1s}
+.cal-empty:hover{background:rgba(193,113,74,.06)}
+.cal-empty:hover::after{content:'+ add';position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:10px;color:var(--ink3);font-style:italic;font-family:var(--sans)}
+
+/* ── DROP ZONE highlight ── */
+.cal-empty.drag-over{background:rgba(193,113,74,.15)!important;border:1.5px dashed var(--gym-acc)}
+
+/* ── BLOCK CARDS ── */
+.bc{position:absolute;left:2px;right:2px;border-radius:var(--r-md);padding:6px 10px;cursor:pointer;overflow:hidden;z-index:2;display:flex;flex-direction:column;justify-content:space-between;transition:opacity .1s,box-shadow .15s;min-height:24px}
+.bc:hover{opacity:.9;box-shadow:0 2px 8px rgba(45,37,32,.12)}
+.bc.gym    {background:var(--gym-bg);   color:var(--gym-fg);   border-left:3px solid var(--gym-acc)}
+.bc.work   {background:var(--work-bg);  color:var(--work-fg);  border-left:3px solid var(--work-acc)}
+.bc.health {background:var(--health-bg);color:var(--health-fg);border-left:3px solid var(--health-acc)}
+.bc.sky    {background:var(--sky-bg);   color:var(--sky-fg);   border-left:3px solid var(--sky-acc)}
+.bc.amber  {background:var(--amber-bg); color:var(--amber-fg); border-left:3px solid var(--amber-acc)}
+.bc.open   {background:var(--open-bg);  color:var(--open-fg);  border:1.5px dashed var(--parch3);border-left:3px solid var(--parch3)}
+.bc-top{display:flex;align-items:flex-start;gap:6px}
+.bc-label{font-size:12px;font-weight:600;flex:1;line-height:1.3}
+.bc-label.chk{text-decoration:line-through;opacity:.5}
+.bc-time-lbl{font-size:10px;opacity:.65;white-space:nowrap;margin-top:1px}
+.bc-check{width:14px;height:14px;accent-color:currentColor;cursor:pointer;flex-shrink:0;margin-top:1px}
+.bc-dur{font-size:10px;opacity:.5;margin-top:auto;padding-top:4px}
+.bc-todo-badge{font-size:9px;font-weight:700;opacity:.6;margin-top:1px;letter-spacing:.3px;text-transform:uppercase}
+
+/* ── NOW LINE ── */
+.now-line{position:absolute;left:0;right:0;z-index:10;pointer-events:none}
+.now-line::before{content:'';position:absolute;left:-5px;top:-4px;width:9px;height:9px;border-radius:50%;background:var(--gym-acc)}
+.now-line::after{content:'';position:absolute;left:0;right:0;top:-1px;height:2px;background:var(--gym-acc)}
+.now-label-el{position:absolute;right:4px;top:-9px;font-size:9px;color:var(--gym-acc);font-weight:700;background:var(--parch);padding:0 3px;border-radius:3px;font-family:var(--sans)}
+
+/* ── RIGHT COLUMN: TODO ── */
+.todo-section{margin-bottom:4px}
+.todo-row{display:flex;align-items:flex-start;gap:9px;padding:8px 10px;border-radius:var(--r-md);border:1.5px solid var(--rule);margin-bottom:4px;cursor:grab;transition:all .15s;user-select:none;position:relative}
+.todo-row:hover{box-shadow:0 1px 4px rgba(45,37,32,.1)}
+.todo-row:active{cursor:grabbing}
+.todo-row.dragging{opacity:.35;border-style:dashed}
+.todo-row.reorder-over{border-top:2px solid var(--gym-acc)}
+/* category tints */
+.todo-row.cat-gym   {background:var(--gym-bg);   color:var(--gym-fg);   border-color:rgba(193,113,74,.3)}
+.todo-row.cat-work  {background:var(--work-bg);  color:var(--work-fg);  border-color:rgba(74,158,106,.3)}
+.todo-row.cat-health{background:var(--health-bg);color:var(--health-fg);border-color:rgba(154,88,144,.3)}
+.todo-row.cat-sky   {background:var(--sky-bg);   color:var(--sky-fg);   border-color:rgba(74,138,170,.3)}
+.todo-row.cat-amber {background:var(--amber-bg); color:var(--amber-fg); border-color:rgba(196,138,48,.3)}
+.todo-row.cat-none  {background:var(--parch2);   color:var(--ink2);     border-color:var(--rule)}
+.todo-row.linked    {border-left:3px solid var(--work-acc)}
+.todo-row.done-item{opacity:.55}
+.todo-row.done-item .todo-txt{text-decoration:line-through}
+.todo-cb{width:14px;height:14px;accent-color:var(--gym-acc);cursor:pointer;margin-top:2px;flex-shrink:0}
+.todo-txt{flex:1;font-size:12px;line-height:1.4;word-break:break-word}
+.todo-del{font-size:12px;color:var(--ink3);cursor:pointer;padding:2px 3px;border-radius:3px;opacity:0;flex-shrink:0;transition:opacity .1s}
+.todo-row:hover .todo-del{opacity:1}
+.todo-del:hover{color:var(--gym-acc)}
+.drag-hint{font-size:10px;color:var(--ink3);margin-bottom:8px;display:flex;align-items:center;gap:4px}
+.drag-hint i{font-size:11px}
+.add-todo-row{display:flex;gap:6px;margin-top:8px}
+.add-todo-inp{flex:1;border:none;border-bottom:1.5px solid var(--rule);background:transparent;padding:5px 0;font-size:12px;color:var(--ink);outline:none;font-family:var(--sans)}
+.add-todo-inp:focus{border-bottom-color:var(--gym-acc)}
+.add-todo-inp::placeholder{color:var(--ink3)}
+.icon-btn{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--rule);background:var(--parch2);color:var(--ink2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;transition:all .12s;flex-shrink:0}
+.icon-btn:hover{background:var(--ink);color:var(--parch);border-color:var(--ink)}
+
+/* ── SHORT ITEMS ── */
+.sug-row{display:flex;align-items:center;gap:6px;padding:7px 10px;border-radius:var(--r-md);border:1.5px solid var(--rule);margin-bottom:4px;cursor:grab;transition:all .12s;user-select:none}
+.sug-row:active{cursor:grabbing}
+.sug-row.dragging{opacity:.35}
+.sug-row.reorder-over{border-top:2px solid var(--amber-acc)}
+.sug-row.cat-gym   {background:var(--gym-bg);   color:var(--gym-fg);   border-color:rgba(193,113,74,.3)}
+.sug-row.cat-work  {background:var(--work-bg);  color:var(--work-fg);  border-color:rgba(74,158,106,.3)}
+.sug-row.cat-health{background:var(--health-bg);color:var(--health-fg);border-color:rgba(154,88,144,.3)}
+.sug-row.cat-sky   {background:var(--sky-bg);   color:var(--sky-fg);   border-color:rgba(74,138,170,.3)}
+.sug-row.cat-amber {background:var(--amber-bg); color:var(--amber-fg); border-color:rgba(196,138,48,.3)}
+.sug-row.cat-none  {background:var(--parch2);   color:var(--ink2);     border-color:var(--rule)}
+.sug-row.done-item{opacity:.55}
+.sug-row.done-item .sug-txt{text-decoration:line-through}
+.sug-txt{flex:1;font-size:11px}
+.sug-est{font-size:10px;color:inherit;opacity:.6;white-space:nowrap}
+.sug-add{width:20px;height:20px;border-radius:50%;border:1px solid rgba(45,37,32,.15);background:rgba(255,255,255,.5);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:10px;color:inherit;flex-shrink:0;transition:all .1s}
+.sug-add:hover{background:var(--amber-acc);color:white;border-color:var(--amber-acc)}
+
+/* ── MODAL ── */
+.overlay{display:none;position:fixed;inset:0;background:rgba(45,37,32,.35);z-index:200;align-items:center;justify-content:center}
+.overlay.open{display:flex}
+.modal{background:var(--parch);border-radius:var(--r-lg);padding:22px;width:360px;max-width:calc(100vw - 32px);border:1px solid var(--rule);box-shadow:0 8px 32px rgba(45,37,32,.18)}
+.modal h3{font-family:var(--display);font-size:17px;font-weight:700;margin-bottom:14px;color:var(--ink)}
+.mfield{width:100%;border:1px solid var(--rule);border-radius:var(--r-md);padding:7px 10px;font-size:12px;background:var(--parch);color:var(--ink);font-family:var(--sans);margin-bottom:9px;outline:none}
+.mfield:focus{border-color:var(--gym-acc)}
+.mfooter{display:flex;justify-content:flex-end;gap:8px;margin-top:4px}
+.mlabel{font-size:10px;font-weight:600;letter-spacing:.7px;text-transform:uppercase;color:var(--ink3);margin-bottom:4px;display:block}
+
+/* ── PLAN PAGE ── */
+.plan-page{display:none;overflow-y:auto;padding:24px 32px;height:100%}
+.plan-page.active{display:block}
+.plan-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:860px}
+.plan-card{background:var(--parch2);border:1px solid var(--rule);border-radius:var(--r-lg);padding:20px}
+.plan-card h3{font-family:var(--display);font-size:15px;font-weight:700;color:var(--ink);margin-bottom:4px}
+.plan-card .plan-sub{font-size:11px;color:var(--ink2);margin-bottom:14px}
+.ghost-inp{flex:1;border:1.5px dashed var(--rule);border-radius:20px;padding:0 12px;height:28px;font-size:11px;background:transparent;color:var(--ink);outline:none;font-family:var(--sans)}
+.ghost-inp:focus{border-color:var(--gym-acc)}
+.ghost-inp::placeholder{color:var(--ink3)}
+.add-row{display:flex;gap:6px;margin-top:10px}
+.rule-item{display:flex;align-items:flex-start;gap:8px;padding:7px 10px;background:var(--parch);border-radius:var(--r-md);margin-bottom:5px;border:1px solid var(--rule)}
+.rule-icon{width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;margin-top:1px}
+.rule-text{flex:1;font-size:11px;color:var(--ink);line-height:1.4}
+.rule-del{font-size:11px;color:var(--ink3);cursor:pointer;padding:2px;border-radius:3px;flex-shrink:0}
+.rule-del:hover{color:var(--gym-acc)}
+.plan-chip-row{display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--parch);border-radius:var(--r-md);margin-bottom:5px;border:1px solid var(--rule)}
+.plan-chip-label{flex:1;font-size:12px;color:var(--ink)}
+.plan-chip-del{font-size:11px;color:var(--ink3);cursor:pointer;flex-shrink:0}
+.plan-chip-del:hover{color:var(--gym-acc)}
+
+/* ── PLACEHOLDER PAGES ── */
+.ph-page{display:none;align-items:center;justify-content:center;flex-direction:column;gap:12px;height:100%;color:var(--ink3);padding:40px}
+.ph-page.active{display:flex}
+.ph-page i{font-size:44px;color:var(--parch3)}
+.ph-page h2{font-family:var(--display);font-size:22px;color:var(--ink2);font-weight:700}
+.ph-page p{font-size:13px;text-align:center;max-width:280px;color:var(--ink2)}
+.ph-tag{background:var(--amber-bg);color:var(--amber-fg);font-size:11px;font-weight:600;padding:4px 12px;border-radius:20px;display:inline-flex;align-items:center;gap:5px}
+
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--parch3);border-radius:4px}
+
+/* ════════════ BOOK CHROME (full-bleed) ════════════ */
+:root{
+  --desk1:#4a3829;--desk2:#241a11;
+  --leather1:#8a3f1e;--leather2:#5d2810;--leather-edge:#3c1b09;
+  --ribbon:#c1714a;--bind-w:20px;
+}
+html,body{background:var(--desk2)}
+.app{position:fixed;inset:0;overflow:hidden;perspective:2800px;
+  background:radial-gradient(130% 100% at 50% 30%,var(--desk1),var(--desk2) 82%)}
+.topbar{display:none!important}      /* old in-page bar moved to the top tabs */
+.nav-pills{display:none!important}
+
+/* ── OPEN BOOK ── */
+.book{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--parch)}
+.book-top{flex-shrink:0;background:linear-gradient(180deg,#2f2217,#241a11);padding:7px 14px 0;
+  border-bottom:1px solid rgba(0,0,0,.4)}
+.tabbar{display:flex;align-items:flex-end;gap:10px}
+.brand{display:flex;align-items:center;gap:7px;text-decoration:none;padding-bottom:7px;flex-shrink:0}
+.brand .logo-mark{width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,#c1714a,#9a5890 60%,#4a8aaa)}
+.brand .logo-mark svg{width:14px;height:14px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.brand-text{font-family:var(--display);font-size:15px;font-weight:800;color:#f3e6d8;letter-spacing:-.3px}
+.brand-text em{font-style:normal;color:#e3a37e}
+.tabs{display:flex;align-items:flex-end;gap:4px;flex:1;min-width:0;overflow:hidden}
+.tab{position:relative;padding:9px 17px 8px;border:none;cursor:pointer;white-space:nowrap;
+  border-radius:10px 10px 0 0;background:#cbb7a0;color:#5a4a3a;border-top:3px solid transparent;
+  font-family:var(--display);font-size:12.5px;font-weight:700;display:flex;align-items:center;gap:6px;
+  transition:background .14s,color .14s,transform .14s;box-shadow:inset 0 -7px 10px -8px rgba(0,0,0,.4)}
+.tab i{font-size:13px}
+.tab:hover{background:#ddcab2;color:#3a2c20}
+.tab.active{background:var(--parch);color:var(--ink);transform:translateY(1px);box-shadow:0 -2px 8px rgba(0,0,0,.14);z-index:3}
+.tab.t-today{border-top-color:#c1714a}.tab.t-habits{border-top-color:#4a9e6a}
+.tab.t-calendar{border-top-color:#4a8aaa}.tab.t-short{border-top-color:#c48a30}
+.tab.t-long{border-top-color:#9a5890}.tab.t-plan{border-top-color:#6a5848}
+.top-actions{display:flex;align-items:center;gap:12px;padding-bottom:7px;flex-shrink:0}
+.book-date{font-size:11.5px;color:#cbb7a3;font-variant-numeric:tabular-nums;white-space:nowrap}
+.sync-dot{font-size:10px;color:#b0a090;cursor:pointer;transition:color .3s;line-height:1}
+.closebook-btn{display:flex;align-items:center;gap:5px;border:1px solid rgba(255,255,255,.16);
+  background:rgba(255,255,255,.06);color:#e8d7c5;border-radius:18px;padding:5px 12px;cursor:pointer;
+  font-family:var(--sans);font-size:11px;font-weight:600;transition:background .14s}
+.closebook-btn:hover{background:rgba(255,255,255,.13)}
+.closebook-btn i{font-size:13px}
+
+/* ── date sub-tabs (decades) — daily view only ── */
+.subtabbar{display:flex;align-items:center;gap:14px;background:var(--parch);padding:7px 16px;border-bottom:1px solid var(--rule)}
+.subtabbar.hide{display:none}
+.month-nav{display:flex;align-items:center;gap:4px}
+.month-nav button{width:24px;height:24px;border-radius:7px;border:1px solid var(--rule);background:var(--parch2);
+  color:var(--ink2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px}
+.month-nav button:hover{background:var(--parch3);color:var(--ink)}
+.month-label{font-family:var(--display);font-size:13px;font-weight:700;color:var(--ink);min-width:108px;text-align:center}
+.decades{display:flex;gap:5px}
+.dtab{padding:4px 13px;border-radius:18px;border:1.5px solid var(--rule);background:var(--parch2);color:var(--ink2);
+  font-size:11px;font-weight:600;cursor:pointer;font-family:var(--sans);transition:all .12s}
+.dtab:hover{border-color:var(--gym-acc);color:var(--ink)}
+.dtab.active{background:var(--gym-acc);border-color:var(--gym-acc);color:#fff}
+
+/* ── book body: thin binding + page ── */
+.book-body{flex:1;display:flex;min-height:0;position:relative}
+.binding{width:var(--bind-w);flex-shrink:0;position:relative;
+  background:linear-gradient(90deg,var(--leather-edge),var(--leather1) 45%,var(--leather2));
+  box-shadow:inset -6px 0 9px -6px rgba(0,0,0,.55)}
+.ribbon{position:absolute;top:-1px;left:50%;transform:translateX(-50%);width:11px;height:calc(100% + 32px);z-index:6;
+  background:linear-gradient(90deg,#a3552f,var(--ribbon) 45%,#d68a63);box-shadow:0 1px 4px rgba(0,0,0,.3);
+  clip-path:polygon(0 0,100% 0,100% calc(100% - 11px),50% 100%,0 calc(100% - 11px))}
+.page-area{position:relative;flex:1;min-width:0;overflow:hidden;background:var(--parch);perspective:2400px}
+.spine-shadow{position:absolute;top:0;bottom:0;left:0;width:30px;z-index:16;pointer-events:none;
+  background:linear-gradient(90deg,rgba(45,37,32,.16),rgba(45,37,32,0))}
+.page{position:absolute;inset:0;overflow:hidden;z-index:1;
+  background:repeating-linear-gradient(0deg,rgba(45,37,32,.02) 0 1px,transparent 1px 30px),var(--parch)}
+.page .shell{height:100%;grid-template-rows:1fr}
+
+/* ── turning leaf ── */
+.flip-leaf{position:absolute;inset:0;z-index:30;display:none;align-items:center;justify-content:center;
+  transform-origin:left center;backface-visibility:hidden;box-shadow:0 0 0 1px rgba(45,37,32,.05);
+  background:linear-gradient(105deg,rgba(0,0,0,.1),rgba(0,0,0,0) 40%),
+    repeating-linear-gradient(0deg,rgba(45,37,32,.025) 0 1px,transparent 1px 30px),var(--parch)}
+.flip-leaf .leaf-mark{width:54px;height:54px;border-radius:15px;opacity:.18;
+  background:linear-gradient(135deg,#c1714a,#9a5890 60%,#4a8aaa)}
+.flip-leaf.go{animation:pageTurn .54s cubic-bezier(.5,.05,.35,1) forwards}
+@keyframes pageTurn{
+  0%{transform:rotateY(0);box-shadow:6px 0 22px rgba(0,0,0,0)}
+  35%{box-shadow:34px 14px 44px rgba(0,0,0,.32)}
+  100%{transform:rotateY(-178deg);box-shadow:0 0 22px rgba(0,0,0,0)}}
+.daynav-btn{padding:5px 8px}
+
+/* ── CLOSED COVER ── */
+.cover{position:absolute;inset:0;z-index:60;cursor:pointer;transform-origin:left center;backface-visibility:hidden;
+  display:flex;align-items:center;justify-content:center;transition:transform .82s cubic-bezier(.6,.02,.3,1);
+  background:radial-gradient(140% 120% at 30% 25%,#9a4a24 0%,#6e3015 46%,#4e2110 100%);
+  box-shadow:inset 0 0 160px rgba(0,0,0,.5)}
+.cover.open{transform:rotateY(-164deg)}
+.cover::before{content:'';position:absolute;left:0;top:0;bottom:0;width:24px;
+  background:linear-gradient(90deg,#3c1b09,#7a3414 70%,#5d2810);box-shadow:inset -7px 0 10px -6px rgba(0,0,0,.6)}
+.cover::after{content:'';position:absolute;right:-1px;top:10px;bottom:10px;width:14px;
+  background:repeating-linear-gradient(0deg,#efe9df 0 1px,#ded3c2 1px 2.6px);box-shadow:2px 0 7px rgba(0,0,0,.3)}
+.cover-ribbon{position:absolute;top:0;left:46px;width:13px;height:calc(100% + 26px);
+  background:linear-gradient(90deg,#a3552f,var(--ribbon) 45%,#d68a63);
+  clip-path:polygon(0 0,100% 0,100% calc(100% - 12px),50% 100%,0 calc(100% - 12px))}
+.cover-inner{text-align:center;color:#f0d8c4;position:relative;z-index:2;padding:40px 56px;
+  border:1px solid rgba(240,216,196,.22);border-radius:8px;box-shadow:inset 0 0 0 4px rgba(240,216,196,.06)}
+.cover-mark{width:62px;height:62px;border-radius:17px;margin:0 auto 20px;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,#e09a73,#c98aa8 60%,#7cb0c8);box-shadow:0 4px 14px rgba(0,0,0,.35)}
+.cover-mark svg{width:30px;height:30px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.cover-title{font-family:var(--display);font-size:54px;font-weight:800;letter-spacing:-1px;line-height:1;color:#f3ddc9;
+  text-shadow:0 2px 0 rgba(0,0,0,.35),0 -1px 0 rgba(255,255,255,.12)}
+.cover-rule{width:64px;height:2px;margin:16px auto 14px;background:rgba(240,216,196,.4);border-radius:2px}
+.cover-sub{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(240,216,196,.7)}
+
+@media (prefers-reduced-motion:reduce){.flip-leaf.go{animation-duration:.001s}.cover{transition-duration:.001s}.tab{transition:none}}
+@media (max-width:720px){
+  .tabs{gap:2px}.tab{padding:8px 10px;font-size:11px}.tab i{display:none}
+  .brand-text,.book-date{display:none}.subtabbar{gap:8px;flex-wrap:wrap}.cover-title{font-size:40px}
+}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+
+  <!-- CLOSED COVER -->
+  <div class="cover" id="cover" onclick="openBook()" role="button" aria-label="Open planner" style="display: none;">
+    <div class="cover-ribbon"></div>
+    <div class="cover-inner">
+      <div class="cover-mark">
+        <svg viewBox="0 0 16 16"><path d="M3 8h10M8 3v10"></path><circle cx="8" cy="8" r="2.5"></circle></svg>
+      </div>
+      <div class="cover-title">planner</div>
+      <div class="cover-rule"></div>
+      <div class="cover-sub">tap to open</div>
+    </div>
+  </div>
+
+  <!-- OPEN BOOK -->
+  <div class="book" id="book">
+    <div class="book-top">
+      <div class="tabbar">
+        <a class="brand" href="file:///Users/pallavi/Downloads/planner_9.html#" onclick="return false">
+          <span class="logo-mark"><svg viewBox="0 0 16 16"><path d="M3 8h10M8 3v10"></path><circle cx="8" cy="8" r="2.5"></circle></svg></span>
+          <span class="brand-text">pal<em>plan</em></span>
+        </a>
+        <div class="tabs">
+          <button class="tab t-today active" data-view="daily" onclick="goView(&#39;daily&#39;)"><i class="ti ti-calendar-event"></i>Today</button>
+          <button class="tab t-habits" data-view="habits" onclick="goView(&#39;habits&#39;)"><i class="ti ti-repeat"></i>Habits</button>
+          <button class="tab t-calendar" data-view="calendar" onclick="goView(&#39;calendar&#39;)"><i class="ti ti-calendar"></i>Calendar</button>
+          <button class="tab t-short" data-view="short" onclick="goView(&#39;short&#39;)"><i class="ti ti-bolt"></i>Short</button>
+          <button class="tab t-long" data-view="long" onclick="goView(&#39;long&#39;)"><i class="ti ti-rocket"></i>Projects</button>
+          <button class="tab t-plan" data-view="plan" onclick="goView(&#39;plan&#39;)"><i class="ti ti-settings"></i>Plan</button>
+        </div>
+        <div class="top-actions">
+          <span class="sync-dot" id="sync-dot" title="storage" onclick="openConnect()">&#9679;</span>
+          <button class="closebook-btn" id="connect-btn" onclick="openConnect()" style="display:none"><i class="ti ti-plug"></i> Connect Sheet</button>
+          <span class="book-date" id="book-date">Thursday, 11 June 2026</span>
+          <button class="closebook-btn" onclick="closeBook()"><i class="ti ti-book"></i> Close</button>
+        </div>
+      </div>
+      <div class="subtabbar" id="subtabbar">
+        <div class="month-nav">
+          <button onclick="goMonth(-1)" title="Previous month"><i class="ti ti-chevron-left"></i></button>
+          <span class="month-label" id="month-label">June 2026</span>
+          <button onclick="goMonth(1)" title="Next month"><i class="ti ti-chevron-right"></i></button>
+        </div>
+        <div class="decades" id="decade-tabs"><button class="dtab " onclick="goDecade(0)">1–10</button><button class="dtab active" onclick="goDecade(1)">11–20</button><button class="dtab " onclick="goDecade(2)">21–30</button></div>
+      </div>
+    </div>
+    <div class="book-body">
+      <div class="binding"><div class="ribbon"></div></div>
+      <div class="page-area">
+        <div class="flip-leaf" id="flip-leaf"><div class="leaf-mark"></div></div>
+        <div class="spine-shadow"></div>
+        <div class="page">
+<div class="shell">
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <a class="logo" href="file:///Users/pallavi/Downloads/planner_6.html#">
+      <div class="logo-mark">
+        <svg viewBox="0 0 16 16"><path d="M3 8h10M8 3v10"></path><circle cx="8" cy="8" r="2.5"></circle></svg>
+      </div>
+      <span class="logo-text">pal<em>plan</em></span>
+    </a>
+    <span class="topbar-date" id="tb-date">Thursday, 11 June 2026</span>
+    <div class="spacer"></div>
+    <div class="nav-pills">
+      <button class="npill active" data-view="daily" onclick="setView(&#39;daily&#39;)"><i class="ti ti-calendar-event"></i>Today</button>
+      <button class="npill" data-view="habits" onclick="setView(&#39;habits&#39;)"><i class="ti ti-repeat"></i>Habits</button>
+      <button class="npill" data-view="calendar" onclick="setView(&#39;calendar&#39;)"><i class="ti ti-calendar"></i>Calendar</button>
+      <button class="npill" data-view="short" onclick="setView(&#39;short&#39;)"><i class="ti ti-bolt"></i>Short items</button>
+      <button class="npill" data-view="long" onclick="setView(&#39;long&#39;)"><i class="ti ti-rocket"></i>Projects</button>
+      <button class="npill" data-view="plan" onclick="setView(&#39;plan&#39;)"><i class="ti ti-settings"></i>Plan</button>
+    </div>
+  </div>
+
+  <!-- DAILY VIEW -->
+  <div class="body" id="daily-body">
+    <!-- LEFT: checklist + notes -->
+    <div class="col col-left">
+      <div class="slabel">My day checklist</div>
+      <div class="checklist-wrap" id="checklist-wrap">
+    <div class="check-row " data-id="1" draggable="true" ondragstart="listDragStart(event,&#39;checklist&#39;,1)" ondragover="listDragOver(event,&#39;checklist&#39;)" ondragleave="listDragLeave(event)" ondrop="listDrop(event,&#39;checklist&#39;,1)" ondragend="listDragEnd(event)" onclick="toggleChip(1)">
+      <div class="custom-cb">
+        <svg viewBox="0 0 10 8"><polyline points="1,4 4,7 9,1"></polyline></svg>
+      </div>
+      <span class="check-label">Fitness</span>
+    </div>
+    <div class="check-row " data-id="2" draggable="true" ondragstart="listDragStart(event,&#39;checklist&#39;,2)" ondragover="listDragOver(event,&#39;checklist&#39;)" ondragleave="listDragLeave(event)" ondrop="listDrop(event,&#39;checklist&#39;,2)" ondragend="listDragEnd(event)" onclick="toggleChip(2)">
+      <div class="custom-cb">
+        <svg viewBox="0 0 10 8"><polyline points="1,4 4,7 9,1"></polyline></svg>
+      </div>
+      <span class="check-label">Moneymaker</span>
+    </div>
+    <div class="check-row " data-id="3" draggable="true" ondragstart="listDragStart(event,&#39;checklist&#39;,3)" ondragover="listDragOver(event,&#39;checklist&#39;)" ondragleave="listDragLeave(event)" ondrop="listDrop(event,&#39;checklist&#39;,3)" ondragend="listDragEnd(event)" onclick="toggleChip(3)">
+      <div class="custom-cb">
+        <svg viewBox="0 0 10 8"><polyline points="1,4 4,7 9,1"></polyline></svg>
+      </div>
+      <span class="check-label">Vitamin AM</span>
+    </div>
+    <div class="check-row " data-id="4" draggable="true" ondragstart="listDragStart(event,&#39;checklist&#39;,4)" ondragover="listDragOver(event,&#39;checklist&#39;)" ondragleave="listDragLeave(event)" ondrop="listDrop(event,&#39;checklist&#39;,4)" ondragend="listDragEnd(event)" onclick="toggleChip(4)">
+      <div class="custom-cb">
+        <svg viewBox="0 0 10 8"><polyline points="1,4 4,7 9,1"></polyline></svg>
+      </div>
+      <span class="check-label">Vitiligo cream AM</span>
+    </div>
+    <div class="check-row " data-id="5" draggable="true" ondragstart="listDragStart(event,&#39;checklist&#39;,5)" ondragover="listDragOver(event,&#39;checklist&#39;)" ondragleave="listDragLeave(event)" ondrop="listDrop(event,&#39;checklist&#39;,5)" ondragend="listDragEnd(event)" onclick="toggleChip(5)">
+      <div class="custom-cb">
+        <svg viewBox="0 0 10 8"><polyline points="1,4 4,7 9,1"></polyline></svg>
+      </div>
+      <span class="check-label">Sunscreen AM</span>
+    </div>
+    <div class="check-row " data-id="6" draggable="true" ondragstart="listDragStart(event,&#39;checklist&#39;,6)" ondragover="listDragOver(event,&#39;checklist&#39;)" ondragleave="listDragLeave(event)" ondrop="listDrop(event,&#39;checklist&#39;,6)" ondragend="listDragEnd(event)" onclick="toggleChip(6)">
+      <div class="custom-cb">
+        <svg viewBox="0 0 10 8"><polyline points="1,4 4,7 9,1"></polyline></svg>
+      </div>
+      <span class="check-label">Job hunt</span>
+    </div>
+    <div class="check-row done" data-id="8" draggable="true" ondragstart="listDragStart(event,&#39;checklist&#39;,8)" ondragover="listDragOver(event,&#39;checklist&#39;)" ondragleave="listDragLeave(event)" ondrop="listDrop(event,&#39;checklist&#39;,8)" ondragend="listDragEnd(event)" onclick="toggleChip(8)">
+      <div class="custom-cb">
+        <svg viewBox="0 0 10 8"><polyline points="1,4 4,7 9,1"></polyline></svg>
+      </div>
+      <span class="check-label">Vitiligo cream PM</span>
+    </div>
+    <div class="check-row done" data-id="9" draggable="true" ondragstart="listDragStart(event,&#39;checklist&#39;,9)" ondragover="listDragOver(event,&#39;checklist&#39;)" ondragleave="listDragLeave(event)" ondrop="listDrop(event,&#39;checklist&#39;,9)" ondragend="listDragEnd(event)" onclick="toggleChip(9)">
+      <div class="custom-cb">
+        <svg viewBox="0 0 10 8"><polyline points="1,4 4,7 9,1"></polyline></svg>
+      </div>
+      <span class="check-label">Sunscreen PM</span>
+    </div>
+    <div class="check-row done" data-id="10" draggable="true" ondragstart="listDragStart(event,&#39;checklist&#39;,10)" ondragover="listDragOver(event,&#39;checklist&#39;)" ondragleave="listDragLeave(event)" ondrop="listDrop(event,&#39;checklist&#39;,10)" ondragend="listDragEnd(event)" onclick="toggleChip(10)">
+      <div class="custom-cb">
+        <svg viewBox="0 0 10 8"><polyline points="1,4 4,7 9,1"></polyline></svg>
+      </div>
+      <span class="check-label">Mobility</span>
+    </div>
+    <div class="check-row " data-id="11" draggable="true" ondragstart="listDragStart(event,&#39;checklist&#39;,11)" ondragover="listDragOver(event,&#39;checklist&#39;)" ondragleave="listDragLeave(event)" ondrop="listDrop(event,&#39;checklist&#39;,11)" ondragend="listDragEnd(event)" onclick="toggleChip(11)">
+      <div class="custom-cb">
+        <svg viewBox="0 0 10 8"><polyline points="1,4 4,7 9,1"></polyline></svg>
+      </div>
+      <span class="check-label">Clean down</span>
+    </div></div>
+      <div class="prog-wrap"><div class="prog-bar" id="prog-bar" style="width: 30%;"></div></div>
+      <div class="prog-lbl" id="prog-lbl">3 of 10 done</div>
+      <div class="div"></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;margin-top:2px">
+        <div class="slabel" style="margin:0">Day notes</div>
+        <button class="notes-save-btn" id="notes-save-btn" onclick="saveNotes()"><i class="ti ti-device-floppy"></i> Save</button>
+      </div>
+      <textarea class="notes-ta" id="notes-ta" placeholder="Anything to remember today…" oninput="notesDirty()"></textarea>
+      <div class="notes-save-hint" id="notes-hint" style="opacity:0">Saved.</div>
+    </div>
+
+    <!-- CENTRE: time blocks -->
+    <div class="col-centre">
+      <div class="stale-banner show" id="stale-banner">
+        <i class="ti ti-sparkles"></i>
+        <span>You've made changes — want me to re-slot your to-dos?</span>
+        <div class="sb-spacer"></div>
+        <button class="reschedule-btn" id="reschedule-btn" onclick="runAISchedule()"><i class="ti ti-refresh"></i> Re-schedule</button>
+      </div>
+      <div class="centre-hdr">
+        <div class="centre-hdr-row">
+          <div>
+            <div class="centre-title" id="c-title">Thu 11 June</div>
+            <div class="centre-sub" id="c-sub">Gym day · finish gym by 1 pm</div>
+          </div>
+          <div style="display:flex;gap:6px;margin-top:2px;align-items:center">
+            <button class="btn daynav-btn" onclick="goDay(-1)" title="Previous day"><i class="ti ti-chevron-left"></i></button>
+            <button class="btn" id="today-btn" onclick="goToday()" style="display:none">Today</button>
+            <button class="btn daynav-btn" onclick="goDay(1)" title="Next day"><i class="ti ti-chevron-right"></i></button>
+            <button class="btn" onclick="clearDay()"><i class="ti ti-refresh"></i> Reset day</button>
+          </div>
+        </div>
+      </div>
+      <div class="time-scroll" id="time-scroll">
+        <div class="cal-grid">
+          <div class="time-gutter" id="time-gutter" style="height: 1400px;"><div class="gutter-slot" style="height:40px"><span class="gutter-label">8:00 AM</span></div><div class="gutter-slot" style="height:40px"></div><div class="gutter-slot" style="height:40px"><span class="gutter-label">9:00 AM</span></div><div class="gutter-slot" style="height:40px"></div><div class="gutter-slot" style="height:40px"><span class="gutter-label">10:00 AM</span></div><div class="gutter-slot" style="height:40px"></div><div class="gutter-slot" style="height:40px"><span class="gutter-label">11:00 AM</span></div><div class="gutter-slot" style="height:40px"></div><div class="gutter-slot" style="height:40px"><span class="gutter-label">12:00 PM</span></div><div class="gutter-slot" style="height:40px"></div><div class="gutter-slot" style="height:40px"><span class="gutter-label">1:00 PM</span></div><div class="gutter-slot" style="height:40px"></div><div class="gutter-slot" style="height:40px"><span class="gutter-label">2:00 PM</span></div><div class="gutter-slot" style="height:40px"></div><div class="gutter-slot" style="height:40px"><span class="gutter-label">3:00 PM</span></div><div class="gutter-slot" style="height:40px"></div><div class="gutter-slot" style="height:40px"><span class="gutter-label">4:00 PM</span></div><div class="gutter-slot" style="height:40px"></div><div class="gutter-slot" style="height:40px"><span class="gutter-label">5:00 PM</span></div><div class="gutter-slot" style="height:40px"></div><div class="gutter-slot" style="height:40px"><span class="gutter-label">6:00 PM</span></div><div class="gutter-slot" style="height:40px"></div><div class="gutter-slot" style="height:40px"><span class="gutter-label">7:00 PM</span></div><div class="gutter-slot" style="height:40px"></div><div class="gutter-slot" style="height:40px"><span class="gutter-label">8:00 PM</span></div><div class="gutter-slot" style="height:40px"></div><div class="gutter-slot" style="height:40px"><span class="gutter-label">9:00 PM</span></div><div class="gutter-slot" style="height:40px"></div><div class="gutter-slot" style="height:40px"><span class="gutter-label">10:00 PM</span></div><div class="gutter-slot" style="height:40px"></div><div class="gutter-slot" style="height:40px"><span class="gutter-label">11:00 PM</span></div><div class="gutter-slot" style="height:40px"></div><div class="gutter-slot" style="height:40px"><span class="gutter-label">12:00 AM</span></div><div class="gutter-slot" style="height:40px"></div><div class="gutter-slot" style="height:40px"><span class="gutter-label">1:00 AM</span></div><div class="gutter-slot" style="height:40px"></div></div>
+          <div class="cal-main" id="cal-main"><div style="position:relative;height:1400px" id="cal-inner"><div class="cal-line hour" style="top:0px"></div><div class="cal-line " style="top:40px"></div><div class="cal-line hour" style="top:80px"></div><div class="cal-line " style="top:120px"></div><div class="cal-line hour" style="top:160px"></div><div class="cal-line " style="top:200px"></div><div class="cal-line hour" style="top:240px"></div><div class="cal-line " style="top:280px"></div><div class="cal-line hour" style="top:320px"></div><div class="cal-line " style="top:360px"></div><div class="cal-line hour" style="top:400px"></div><div class="cal-line " style="top:440px"></div><div class="cal-line hour" style="top:480px"></div><div class="cal-line " style="top:520px"></div><div class="cal-line hour" style="top:560px"></div><div class="cal-line " style="top:600px"></div><div class="cal-line hour" style="top:640px"></div><div class="cal-line " style="top:680px"></div><div class="cal-line hour" style="top:720px"></div><div class="cal-line " style="top:760px"></div><div class="cal-line hour" style="top:800px"></div><div class="cal-line " style="top:840px"></div><div class="cal-line hour" style="top:880px"></div><div class="cal-line " style="top:920px"></div><div class="cal-line hour" style="top:960px"></div><div class="cal-line " style="top:1000px"></div><div class="cal-line hour" style="top:1040px"></div><div class="cal-line " style="top:1080px"></div><div class="cal-line hour" style="top:1120px"></div><div class="cal-line " style="top:1160px"></div><div class="cal-line hour" style="top:1200px"></div><div class="cal-line " style="top:1240px"></div><div class="cal-line hour" style="top:1280px"></div><div class="cal-line " style="top:1320px"></div><div class="cal-line hour" style="top:1360px"></div><div class="cal-line " style="top:1400px"></div><div class="cal-empty" data-slot="510" style="top:40px;height:40px" onclick="openNewBlock(510)"></div><div class="cal-empty" data-slot="720" style="top:320px;height:40px" onclick="openNewBlock(720)"></div><div class="cal-empty" data-slot="750" style="top:360px;height:40px" onclick="openNewBlock(750)"></div><div class="cal-empty" data-slot="930" style="top:600px;height:40px" onclick="openNewBlock(930)"></div><div class="cal-empty" data-slot="1110" style="top:840px;height:40px" onclick="openNewBlock(1110)"></div><div class="cal-empty" data-slot="1170" style="top:920px;height:40px" onclick="openNewBlock(1170)"></div><div class="cal-empty" data-slot="1200" style="top:960px;height:40px" onclick="openNewBlock(1200)"></div><div class="cal-empty" data-slot="1290" style="top:1080px;height:40px" onclick="openNewBlock(1290)"></div><div class="cal-empty" data-slot="1320" style="top:1120px;height:40px" onclick="openNewBlock(1320)"></div><div class="cal-empty" data-slot="1500" style="top:1360px;height:40px" onclick="openNewBlock(1500)"></div><div class="bc sky" style="top:0px;height:40px" onclick="openBlockEdit(1)">
+      <div class="bc-top">
+        <div style="flex:1;min-width:0">
+          <div class="bc-time-lbl">8:00 AM – 8:30 AM</div>
+          <div class="bc-label ">Wake up + morning routine</div>
+          
+        </div>
+        <input type="checkbox" class="bc-check" onclick="event.stopPropagation()" onchange="toggleBlock(1)">
+      </div>
+      
+    </div><div class="bc gym" style="top:80px;height:160px" onclick="openBlockEdit(2)">
+      <div class="bc-top">
+        <div style="flex:1;min-width:0">
+          <div class="bc-time-lbl">9:00 AM – 11:00 AM</div>
+          <div class="bc-label ">Gym</div>
+          
+        </div>
+        <input type="checkbox" class="bc-check" onclick="event.stopPropagation()" onchange="toggleBlock(2)">
+      </div>
+      <div class="bc-dur">2h</div>
+    </div><div class="bc sky" style="top:400px;height:80px" onclick="openBlockEdit(3)">
+      <div class="bc-top">
+        <div style="flex:1;min-width:0">
+          <div class="bc-time-lbl">1:00 PM – 2:00 PM</div>
+          <div class="bc-label ">Lunch</div>
+          
+        </div>
+        <input type="checkbox" class="bc-check" onclick="event.stopPropagation()" onchange="toggleBlock(3)">
+      </div>
+      <div class="bc-dur">1h</div>
+    </div><div class="bc work" style="top:480px;height:120px" onclick="openBlockEdit(4)">
+      <div class="bc-top">
+        <div style="flex:1;min-width:0">
+          <div class="bc-time-lbl">2:00 PM – 3:30 PM</div>
+          <div class="bc-label ">Moneymaker</div>
+          
+        </div>
+        <input type="checkbox" class="bc-check" onclick="event.stopPropagation()" onchange="toggleBlock(4)">
+      </div>
+      <div class="bc-dur">1h 30m</div>
+    </div><div class="bc work" style="top:640px;height:80px" onclick="openBlockEdit(5)">
+      <div class="bc-top">
+        <div style="flex:1;min-width:0">
+          <div class="bc-time-lbl">4:00 PM – 5:00 PM</div>
+          <div class="bc-label ">Job hunt</div>
+          
+        </div>
+        <input type="checkbox" class="bc-check" onclick="event.stopPropagation()" onchange="toggleBlock(5)">
+      </div>
+      <div class="bc-dur">1h</div>
+    </div><div class="bc open" style="top:720px;height:80px" onclick="openBlockEdit(6)">
+      <div class="bc-top">
+        <div style="flex:1;min-width:0">
+          <div class="bc-time-lbl">5:00 PM – 6:00 PM</div>
+          <div class="bc-label ">Buffer / free</div>
+          
+        </div>
+        <input type="checkbox" class="bc-check" onclick="event.stopPropagation()" onchange="toggleBlock(6)">
+      </div>
+      <div class="bc-dur">1h</div>
+    </div><div class="bc health" style="top:1200px;height:40px" onclick="openBlockEdit(7)">
+      <div class="bc-top">
+        <div style="flex:1;min-width:0">
+          <div class="bc-time-lbl">11:00 PM – 11:30 PM</div>
+          <div class="bc-label chk">Medicine + physio</div>
+          
+        </div>
+        <input type="checkbox" class="bc-check" checked="" onclick="event.stopPropagation()" onchange="toggleBlock(7)">
+      </div>
+      
+    </div><div class="bc health" style="top:1240px;height:40px" onclick="openBlockEdit(8)">
+      <div class="bc-top">
+        <div style="flex:1;min-width:0">
+          <div class="bc-time-lbl">11:30 PM – 12:00 AM</div>
+          <div class="bc-label ">Mobility</div>
+          
+        </div>
+        <input type="checkbox" class="bc-check" onclick="event.stopPropagation()" onchange="toggleBlock(8)">
+      </div>
+      
+    </div><div class="bc health" style="top:1280px;height:40px" onclick="openBlockEdit(9)">
+      <div class="bc-top">
+        <div style="flex:1;min-width:0">
+          <div class="bc-time-lbl">12:00 AM – 12:30 AM</div>
+          <div class="bc-label ">Skin care + clean down</div>
+          
+        </div>
+        <input type="checkbox" class="bc-check" onclick="event.stopPropagation()" onchange="toggleBlock(9)">
+      </div>
+      
+    </div><div class="bc sky" style="top:1320px;height:40px" onclick="openBlockEdit(10)">
+      <div class="bc-top">
+        <div style="flex:1;min-width:0">
+          <div class="bc-time-lbl">12:30 AM – 1:00 AM</div>
+          <div class="bc-label ">Go to bed</div>
+          
+        </div>
+        <input type="checkbox" class="bc-check" onclick="event.stopPropagation()" onchange="toggleBlock(10)">
+      </div>
+      
+    </div><div class="bc work" style="top:880px;height:40px" onclick="openBlockEdit(302)">
+      <div class="bc-top">
+        <div style="flex:1;min-width:0">
+          <div class="bc-time-lbl">7:00 PM – 7:30 PM</div>
+          <div class="bc-label chk">test</div>
+          <div class="bc-todo-badge">to-do</div>
+        </div>
+        <input type="checkbox" class="bc-check" checked="" onclick="event.stopPropagation()" onchange="toggleBlock(302)">
+      </div>
+      
+    </div><div class="bc work" style="top:800px;height:40px" onclick="openBlockEdit(303)">
+      <div class="bc-top">
+        <div style="flex:1;min-width:0">
+          <div class="bc-time-lbl">6:00 PM – 6:30 PM</div>
+          <div class="bc-label chk">Create specific Moneymaker tags/lines</div>
+          <div class="bc-todo-badge">to-do</div>
+        </div>
+        <input type="checkbox" class="bc-check" checked="" onclick="event.stopPropagation()" onchange="toggleBlock(303)">
+      </div>
+      
+    </div><div class="bc work" style="top:1000px;height:40px" onclick="openBlockEdit(304)">
+      <div class="bc-top">
+        <div style="flex:1;min-width:0">
+          <div class="bc-time-lbl">8:30 PM – 9:00 PM</div>
+          <div class="bc-label ">Read remaining Moneymaker docs</div>
+          <div class="bc-todo-badge">to-do</div>
+        </div>
+        <input type="checkbox" class="bc-check" onclick="event.stopPropagation()" onchange="toggleBlock(304)">
+      </div>
+      
+    </div><div class="bc work" style="top:1160px;height:40px" onclick="openBlockEdit(305)">
+      <div class="bc-top">
+        <div style="flex:1;min-width:0">
+          <div class="bc-time-lbl">10:30 PM – 11:00 PM</div>
+          <div class="bc-label ">Oil hair</div>
+          <div class="bc-todo-badge">to-do</div>
+        </div>
+        <input type="checkbox" class="bc-check" onclick="event.stopPropagation()" onchange="toggleBlock(305)">
+      </div>
+      
+    </div><div class="bc amber" style="top:280px;height:40px" onclick="openBlockEdit(307)">
+      <div class="bc-top">
+        <div style="flex:1;min-width:0">
+          <div class="bc-time-lbl">11:30 AM – 12:00 PM</div>
+          <div class="bc-label ">Blung cleaning habits</div>
+          <div class="bc-todo-badge">short item</div>
+        </div>
+        <input type="checkbox" class="bc-check" onclick="event.stopPropagation()" onchange="toggleBlock(307)">
+      </div>
+      
+    </div><div class="bc amber" style="top:1040px;height:40px" onclick="openBlockEdit(309)">
+      <div class="bc-top">
+        <div style="flex:1;min-width:0">
+          <div class="bc-time-lbl">9:00 PM – 9:30 PM</div>
+          <div class="bc-label ">LinkedIn – announce a project</div>
+          <div class="bc-todo-badge">short item</div>
+        </div>
+        <input type="checkbox" class="bc-check" onclick="event.stopPropagation()" onchange="toggleBlock(309)">
+      </div>
+      
+    </div><div class="bc amber" style="top:240px;height:40px" onclick="openBlockEdit(310)">
+      <div class="bc-top">
+        <div style="flex:1;min-width:0">
+          <div class="bc-time-lbl">11:00 AM – 11:30 AM</div>
+          <div class="bc-label ">YC journal</div>
+          <div class="bc-todo-badge">short item</div>
+        </div>
+        <input type="checkbox" class="bc-check" onclick="event.stopPropagation()" onchange="toggleBlock(310)">
+      </div>
+      
+    </div><div class="now-line" style="top:897.3333333333334px"><span class="now-label-el">now</span></div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: todos + short items -->
+    <div class="col col-right">
+      <div class="slabel">To-do today</div>
+      <div class="drag-hint"><i class="ti ti-drag-drop"></i> Drag any item onto the calendar to schedule it</div>
+      <div class="todo-section" id="todo-list">
+    <div class="todo-row cat-none  linked" data-id="1" draggable="true" ondragstart="listDragStart(event,&#39;todo&#39;,1)" ondragover="listDragOver(event,&#39;todo&#39;)" ondragleave="listDragLeave(event)" ondrop="listDrop(event,&#39;todo&#39;,1)" ondragend="listDragEnd(event)">
+      <input type="checkbox" class="todo-cb" onchange="toggleTodo(1)" onclick="event.stopPropagation()">
+      <span class="todo-txt">Oil hair</span>
+      <i class="ti ti-calendar-check" style="font-size:11px;flex-shrink:0;opacity:.7" title="On calendar"></i>
+      <span class="todo-del" onclick="delTodo(1)" draggable="false"><i class="ti ti-x" style="font-size:11px"></i></span>
+    </div>
+    <div class="todo-row cat-none  " data-id="2" draggable="true" ondragstart="listDragStart(event,&#39;todo&#39;,2)" ondragover="listDragOver(event,&#39;todo&#39;)" ondragleave="listDragLeave(event)" ondrop="listDrop(event,&#39;todo&#39;,2)" ondragend="listDragEnd(event)">
+      <input type="checkbox" class="todo-cb" onchange="toggleTodo(2)" onclick="event.stopPropagation()">
+      <span class="todo-txt">Whatsapp messages</span>
+      
+      <span class="todo-del" onclick="delTodo(2)" draggable="false"><i class="ti ti-x" style="font-size:11px"></i></span>
+    </div>
+    <div class="todo-row cat-none  linked" data-id="3" draggable="true" ondragstart="listDragStart(event,&#39;todo&#39;,3)" ondragover="listDragOver(event,&#39;todo&#39;)" ondragleave="listDragLeave(event)" ondrop="listDrop(event,&#39;todo&#39;,3)" ondragend="listDragEnd(event)">
+      <input type="checkbox" class="todo-cb" onchange="toggleTodo(3)" onclick="event.stopPropagation()">
+      <span class="todo-txt">Read remaining Moneymaker docs</span>
+      <i class="ti ti-calendar-check" style="font-size:11px;flex-shrink:0;opacity:.7" title="On calendar"></i>
+      <span class="todo-del" onclick="delTodo(3)" draggable="false"><i class="ti ti-x" style="font-size:11px"></i></span>
+    </div>
+    <div class="todo-row cat-none done-item linked" data-id="4" draggable="true" ondragstart="listDragStart(event,&#39;todo&#39;,4)" ondragover="listDragOver(event,&#39;todo&#39;)" ondragleave="listDragLeave(event)" ondrop="listDrop(event,&#39;todo&#39;,4)" ondragend="listDragEnd(event)">
+      <input type="checkbox" class="todo-cb" checked="" onchange="toggleTodo(4)" onclick="event.stopPropagation()">
+      <span class="todo-txt">Create specific Moneymaker tags/lines</span>
+      <i class="ti ti-calendar-check" style="font-size:11px;flex-shrink:0;opacity:.7" title="On calendar"></i>
+      <span class="todo-del" onclick="delTodo(4)" draggable="false"><i class="ti ti-x" style="font-size:11px"></i></span>
+    </div>
+    <div class="todo-row cat-none done-item linked" data-id="301" draggable="true" ondragstart="listDragStart(event,&#39;todo&#39;,301)" ondragover="listDragOver(event,&#39;todo&#39;)" ondragleave="listDragLeave(event)" ondrop="listDrop(event,&#39;todo&#39;,301)" ondragend="listDragEnd(event)">
+      <input type="checkbox" class="todo-cb" checked="" onchange="toggleTodo(301)" onclick="event.stopPropagation()">
+      <span class="todo-txt">test</span>
+      <i class="ti ti-calendar-check" style="font-size:11px;flex-shrink:0;opacity:.7" title="On calendar"></i>
+      <span class="todo-del" onclick="delTodo(301)" draggable="false"><i class="ti ti-x" style="font-size:11px"></i></span>
+    </div></div>
+      <div class="add-todo-row">
+        <input class="add-todo-inp" id="todo-inp" placeholder="Add a task…" onkeydown="if(event.key===&#39;Enter&#39;)addTodo()">
+        <button class="icon-btn" onclick="addTodo()"><i class="ti ti-plus"></i></button>
+      </div>
+      <div class="div"></div>
+      <div class="slabel">Short list <span style="font-size:10px;font-weight:400;color:var(--ink3);text-transform:none;letter-spacing:0">— drag or tap +</span></div>
+      <div id="sug-list">
+    <div class="sug-row cat-none " data-id="1" draggable="true" ondragstart="listDragStart(event,&#39;short&#39;,1)" ondragover="listDragOver(event,&#39;short&#39;)" ondragleave="listDragLeave(event)" ondrop="listDrop(event,&#39;short&#39;,1)" ondragend="listDragEnd(event)">
+      <span class="sug-txt">YC journal</span>
+      <span class="sug-est">30 min</span>
+      <i class="ti ti-calendar-check" style="font-size:11px;opacity:.7" title="Scheduled"></i>
+      <button class="sug-add" onclick="pullShort(1)" title="Add to to-do list" draggable="false"><i class="ti ti-plus"></i></button>
+    </div>
+    <div class="sug-row cat-none " data-id="2" draggable="true" ondragstart="listDragStart(event,&#39;short&#39;,2)" ondragover="listDragOver(event,&#39;short&#39;)" ondragleave="listDragLeave(event)" ondrop="listDrop(event,&#39;short&#39;,2)" ondragend="listDragEnd(event)">
+      <span class="sug-txt">Blung cleaning habits</span>
+      <span class="sug-est">20 min</span>
+      <i class="ti ti-calendar-check" style="font-size:11px;opacity:.7" title="Scheduled"></i>
+      <button class="sug-add" onclick="pullShort(2)" title="Add to to-do list" draggable="false"><i class="ti ti-plus"></i></button>
+    </div>
+    <div class="sug-row cat-none " data-id="3" draggable="true" ondragstart="listDragStart(event,&#39;short&#39;,3)" ondragover="listDragOver(event,&#39;short&#39;)" ondragleave="listDragLeave(event)" ondrop="listDrop(event,&#39;short&#39;,3)" ondragend="listDragEnd(event)">
+      <span class="sug-txt">Cream darkness research</span>
+      <span class="sug-est">15 min</span>
+      
+      <button class="sug-add" onclick="pullShort(3)" title="Add to to-do list" draggable="false"><i class="ti ti-plus"></i></button>
+    </div>
+    <div class="sug-row cat-none " data-id="4" draggable="true" ondragstart="listDragStart(event,&#39;short&#39;,4)" ondragover="listDragOver(event,&#39;short&#39;)" ondragleave="listDragLeave(event)" ondrop="listDrop(event,&#39;short&#39;,4)" ondragend="listDragEnd(event)">
+      <span class="sug-txt">LinkedIn – announce a project</span>
+      <span class="sug-est">30 min</span>
+      <i class="ti ti-calendar-check" style="font-size:11px;opacity:.7" title="Scheduled"></i>
+      <button class="sug-add" onclick="pullShort(4)" title="Add to to-do list" draggable="false"><i class="ti ti-plus"></i></button>
+    </div>
+    <div class="sug-row cat-none " data-id="5" draggable="true" ondragstart="listDragStart(event,&#39;short&#39;,5)" ondragover="listDragOver(event,&#39;short&#39;)" ondragleave="listDragLeave(event)" ondrop="listDrop(event,&#39;short&#39;,5)" ondragend="listDragEnd(event)">
+      <span class="sug-txt">Finish resume</span>
+      <span class="sug-est">1 hr</span>
+      
+      <button class="sug-add" onclick="pullShort(5)" title="Add to to-do list" draggable="false"><i class="ti ti-plus"></i></button>
+    </div>
+    <div class="sug-row cat-none " data-id="6" draggable="true" ondragstart="listDragStart(event,&#39;short&#39;,6)" ondragover="listDragOver(event,&#39;short&#39;)" ondragleave="listDragLeave(event)" ondrop="listDrop(event,&#39;short&#39;,6)" ondragend="listDragEnd(event)">
+      <span class="sug-txt">Bigger Moneymaker Bingo page</span>
+      <span class="sug-est">45 min</span>
+      
+      <button class="sug-add" onclick="pullShort(6)" title="Add to to-do list" draggable="false"><i class="ti ti-plus"></i></button>
+    </div>
+    <div class="sug-row cat-none " data-id="7" draggable="true" ondragstart="listDragStart(event,&#39;short&#39;,7)" ondragover="listDragOver(event,&#39;short&#39;)" ondragleave="listDragLeave(event)" ondrop="listDrop(event,&#39;short&#39;,7)" ondragend="listDragEnd(event)">
+      <span class="sug-txt">Update Moneymaker Rishikesh costs</span>
+      <span class="sug-est">20 min</span>
+      
+      <button class="sug-add" onclick="pullShort(7)" title="Add to to-do list" draggable="false"><i class="ti ti-plus"></i></button>
+    </div>
+    <div class="sug-row cat-none " data-id="8" draggable="true" ondragstart="listDragStart(event,&#39;short&#39;,8)" ondragover="listDragOver(event,&#39;short&#39;)" ondragleave="listDragLeave(event)" ondrop="listDrop(event,&#39;short&#39;,8)" ondragend="listDragEnd(event)">
+      <span class="sug-txt">Sudoku app</span>
+      <span class="sug-est">2 hrs</span>
+      
+      <button class="sug-add" onclick="pullShort(8)" title="Add to to-do list" draggable="false"><i class="ti ti-plus"></i></button>
+    </div></div>
+    </div>
+  </div>
+
+  <!-- PLAN PAGE -->
+  <div class="plan-page" id="plan-body">
+    <h2 style="font-family:var(--display);font-size:20px;font-weight:700;margin-bottom:6px">Plan &amp; Settings</h2>
+    <p style="font-size:12px;color:var(--ink2);margin-bottom:20px">Manage your habits checklist and scheduling rules. Changes here will be used by the AI scheduler.</p>
+    <div class="plan-grid">
+      <!-- Checklist editor -->
+      <div class="plan-card">
+        <h3>Day checklist items</h3>
+        <div class="plan-sub">These appear in the left sidebar every day.</div>
+        <div id="plan-chips-list"></div>
+        <div class="add-row">
+          <input class="ghost-inp" id="plan-chip-inp" placeholder="New habit…" onkeydown="if(event.key===&#39;Enter&#39;)addChip()">
+          <button class="icon-btn" onclick="addChip()"><i class="ti ti-plus"></i></button>
+        </div>
+      </div>
+      <!-- Rules editor -->
+      <div class="plan-card">
+        <h3>Scheduling rules</h3>
+        <div class="plan-sub">The AI uses these when building your schedule.</div>
+        <div id="plan-rules-list"></div>
+        <button class="btn" style="margin-top:8px;width:100%;justify-content:center;" onclick="openAddRule()"><i class="ti ti-plus"></i> Add rule</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PLACEHOLDER PAGES -->
+  <div class="ph-page" id="ph-habits"><i class="ti ti-repeat"></i><h2>Habits</h2><p>Two-week rolling habit tracker — Phase 2.</p><span class="ph-tag"><i class="ti ti-clock" style="font-size:11px"></i> Phase 2</span></div>
+  <div class="ph-page" id="ph-calendar"><i class="ti ti-calendar"></i><h2>Calendar</h2><p>Monthly overview — Phase 2.</p><span class="ph-tag"><i class="ti ti-clock" style="font-size:11px"></i> Phase 2</span></div>
+  <div class="ph-page" id="ph-short"><i class="ti ti-bolt"></i><h2>Short items</h2><p>Improvement stash — Phase 2.</p><span class="ph-tag"><i class="ti ti-clock" style="font-size:11px"></i> Phase 2</span></div>
+  <div class="ph-page" id="ph-long"><i class="ti ti-rocket"></i><h2>Long projects</h2><p>Multi-session projects — Phase 2.</p><span class="ph-tag"><i class="ti ti-clock" style="font-size:11px"></i> Phase 2</span></div>
+</div>
+        </div><!-- .page -->
+      </div><!-- .page-area -->
+    </div><!-- .book-body -->
+  </div><!-- .book -->
+</div><!-- .app -->
+
+<div class="overlay" id="overlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modal-box"></div>
+</div>
+
+<script>
+const SLOT_H = 40;
+const START_MIN = 480;   // 8:00 AM
+const END_MIN   = 1530;  // 1:30 AM next day
+const TOTAL_SLOTS = (END_MIN - START_MIN) / 30;
+
+const DEFAULTS = {
+  checklist:[
+    {id:1,label:'Fitness',done:false},{id:2,label:'Moneymaker',done:false},
+    {id:3,label:'Vitamin AM',done:false},{id:4,label:'Vitiligo cream AM',done:false},
+    {id:5,label:'Sunscreen AM',done:false},{id:6,label:'Job hunt',done:false},
+    {id:7,label:'Vitamin PM',done:false},{id:8,label:'Vitiligo cream PM',done:false},
+    {id:9,label:'Sunscreen PM',done:false},{id:10,label:'Mobility',done:false},
+    {id:11,label:'Clean down',done:false},
+  ],
+  rules:[
+    {id:1,emoji:'🏋️',text:'Gym finishes by 1 pm on workout days (Mon, Tue, Thu, Fri)',type:'gym'},
+    {id:2,emoji:'🧘',text:'Mobility workout: 11:30 pm – 12:00 am every night',type:'health'},
+    {id:3,emoji:'💊',text:'Medicine + physio always at 11:00 pm',type:'health'},
+    {id:4,emoji:'🌙',text:'Skin care + clean down at 11:30 pm',type:'health'},
+    {id:5,emoji:'😴',text:'In bed by 12:00 am',type:'health'},
+    {id:6,emoji:'🧠',text:'No focus work blocks longer than 90 min without a break',type:'work'},
+    {id:7,emoji:'🍽️',text:'Lunch 1:00–2:00 pm on gym days',type:'sky'},
+  ],
+  todos:[
+    {id:1,text:'Oil hair',done:false,blockId:null,type:'health'},
+    {id:2,text:'Whatsapp messages',done:false,blockId:null,type:null},
+    {id:3,text:'Read remaining Moneymaker docs',done:false,blockId:null,type:'work'},
+    {id:4,text:'Create specific Moneymaker tags/lines',done:false,blockId:null,type:'work'},
+  ],
+  blocks:[
+    {id:1, label:'Wake up + morning routine', type:'sky',    startMin:480,  endMin:510,  checked:false, todoId:null, shortId:null},
+    {id:2, label:'Gym',                        type:'gym',   startMin:540,  endMin:660,  checked:false, todoId:null, shortId:null},
+    {id:3, label:'Lunch',                      type:'sky',   startMin:780,  endMin:840,  checked:false, todoId:null, shortId:null},
+    {id:4, label:'Moneymaker',                 type:'work',  startMin:840,  endMin:930,  checked:false, todoId:null, shortId:null},
+    {id:5, label:'Job hunt',                   type:'work',  startMin:960,  endMin:1020, checked:false, todoId:null, shortId:null},
+    {id:6, label:'Buffer / free',              type:'open',  startMin:1020, endMin:1080, checked:false, todoId:null, shortId:null},
+    {id:7, label:'Medicine + physio',          type:'health',startMin:1380, endMin:1410, checked:false, todoId:null, shortId:null},
+    {id:8, label:'Mobility',                   type:'health',startMin:1410, endMin:1440, checked:false, todoId:null, shortId:null},
+    {id:9, label:'Skin care + clean down',     type:'health',startMin:1440, endMin:1470, checked:false, todoId:null, shortId:null},
+    {id:10,label:'Go to bed',                  type:'sky',   startMin:1470, endMin:1500, checked:false, todoId:null, shortId:null},
+  ],
+  shortItems:[
+    {id:1,text:'YC journal',est:'30 min',done:false,blockId:null,type:'work'},
+    {id:2,text:'Blung cleaning habits',est:'20 min',done:false,blockId:null,type:'health'},
+    {id:3,text:'Cream darkness research',est:'15 min',done:false,blockId:null,type:'health'},
+    {id:4,text:'LinkedIn – announce a project',est:'30 min',done:false,blockId:null,type:'work'},
+    {id:5,text:'Finish resume',est:'1 hr',done:false,blockId:null,type:'work'},
+    {id:6,text:'Bigger Moneymaker Bingo page',est:'45 min',done:false,blockId:null,type:'work'},
+    {id:7,text:'Update Moneymaker Rishikesh costs',est:'20 min',done:false,blockId:null,type:'work'},
+    {id:8,text:'Sudoku app',est:'2 hrs',done:false,blockId:null,type:'amber'},
+  ],
+  notes:'',stale:false,nextId:300,
+};
+
+// ── MULTI-DAY STORAGE (myday_v4) ─────────────────────────────────────────────
+const SK='myday_v4', SK_OLD='myday_v3';
+const pad2=n=>(n<10?'0':'')+n;
+function dateKey(d){return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate());}
+function keyToDate(k){const p=k.split('-').map(Number);return new Date(p[0],p[1]-1,p[2]);}
+function todayKey(){return dateKey(new Date());}
+function isGymKey(k){return [1,2,4,5].includes(keyToDate(k).getDay());}
+
+function blankCfg(){
+  return {
+    checklistTemplate:DEFAULTS.checklist.map(c=>({id:c.id,label:c.label})),
+    rules:JSON.parse(JSON.stringify(DEFAULTS.rules)),
+    shortItems:DEFAULTS.shortItems.map(s=>({id:s.id,text:s.text,est:s.est,type:s.type})),
+    longProjects:[],
+    nextId:DEFAULTS.nextId,
+  };
+}
+function templateBlocks(k){
+  const t=[{label:'Wake up + morning routine',type:'sky',startMin:480,endMin:510}];
+  if(isGymKey(k)){
+    t.push({label:'Gym',type:'gym',startMin:540,endMin:660});
+    t.push({label:'Lunch',type:'sky',startMin:780,endMin:840});
+  }
+  t.push({label:'Medicine + physio',type:'health',startMin:1380,endMin:1410});
+  t.push({label:'Mobility',type:'health',startMin:1410,endMin:1440});
+  t.push({label:'Skin care + clean down',type:'health',startMin:1440,endMin:1470});
+  t.push({label:'Go to bed',type:'sky',startMin:1470,endMin:1500});
+  return t.map(x=>({id:++DB.cfg.nextId,label:x.label,type:x.type,startMin:x.startMin,endMin:x.endMin,checked:false,todoId:null,shortId:null}));
+}
+function freshDay(k){
+  return {
+    checklist:DB.cfg.checklistTemplate.map(c=>({id:c.id,label:c.label,done:false})),
+    todos:[],
+    blocks:templateBlocks(k),
+    shortItems:DB.cfg.shortItems.map(s=>({id:s.id,text:s.text,est:s.est,type:s.type,done:false,blockId:null})),
+    notes:'',stale:false,
+  };
+}
+function getDay(k){if(!DB.days[k])DB.days[k]=freshDay(k);return DB.days[k];}
+
+function migrate(old){
+  const cfg=blankCfg();
+  if(Array.isArray(old.checklist))cfg.checklistTemplate=old.checklist.map(c=>({id:c.id,label:c.label}));
+  if(Array.isArray(old.rules))cfg.rules=old.rules;
+  if(Array.isArray(old.shortItems))cfg.shortItems=old.shortItems.map(s=>({id:s.id,text:s.text,est:s.est,type:s.type===undefined?null:s.type}));
+  cfg.nextId=old.nextId||300;
+  const day={
+    checklist:Array.isArray(old.checklist)?old.checklist.map(c=>({id:c.id,label:c.label,done:!!c.done})):[],
+    todos:Array.isArray(old.todos)?old.todos.map(t=>({id:t.id,text:t.text,done:!!t.done,blockId:t.blockId==null?null:t.blockId,type:t.type==null?null:t.type})):[],
+    blocks:Array.isArray(old.blocks)?old.blocks.map(b=>({id:b.id,label:b.label,type:b.type,startMin:b.startMin,endMin:b.endMin,checked:!!b.checked,todoId:b.todoId==null?null:b.todoId,shortId:b.shortId==null?null:b.shortId})):[],
+    shortItems:Array.isArray(old.shortItems)?old.shortItems.map(s=>({id:s.id,text:s.text,est:s.est,type:s.type==null?null:s.type,done:!!s.done,blockId:s.blockId==null?null:s.blockId})):[],
+    notes:old.notes||'',stale:!!old.stale,
+  };
+  return {cfg,days:{[todayKey()]:day}};
+}
+
+function load(){
+  try{
+    const r=localStorage.getItem(SK);
+    if(r){const d=JSON.parse(r);if(d&&d.cfg&&d.days)return d;}
+    const o=localStorage.getItem(SK_OLD);
+    if(o){const old=JSON.parse(o);if(old)return migrate(old);}
+  }catch(e){console.warn('load failed',e);}
+  return {cfg:blankCfg(),days:{}};
+}
+let DB=load();
+Object.keys(DB.days).forEach(k=>{if(!DB.days[k])delete DB.days[k];});
+
+// ── REMOTE SYNC (Google Apps Script web app) ─────────────────────────────────
+// The /exec URL is pasted ONCE via the dot / "Connect Sheet" button in the top
+// bar and remembered by the browser — you never edit this file. Syncing is
+// automatic: your edits batch up and push ~1.5s after you stop changing things;
+// the Sheet is pulled when the page loads. (Optional baked fallback, usually blank.)
+const SHEETS_URL_BAKED='';
+const URL_KEY='palplan_sheets_url';
+const PUSH_DEBOUNCE=1500;            // ms — coalesces a burst of edits into one save
+let SHEETS_URL='';
+let _pushTimer=null,_pushPending=false;
+
+function loadSheetUrl(){
+  try{SHEETS_URL=localStorage.getItem(URL_KEY)||SHEETS_URL_BAKED||'';}
+  catch(e){SHEETS_URL=SHEETS_URL_BAKED||'';}
+}
+function setSheetUrl(u){
+  SHEETS_URL=(u||'').trim();
+  try{localStorage.setItem(URL_KEY,SHEETS_URL);}catch(e){}
+  refreshSyncUI();
+  if(SHEETS_URL)syncFromSheet();     // pull straight after connecting
+}
+
+// localStorage is the instant cache; the Sheet syncs automatically in the background.
+function save(){
+  try{localStorage.setItem(SK,JSON.stringify(DB));}catch(e){console.warn('save failed',e);}
+  if(SHEETS_URL){_pushPending=true;clearTimeout(_pushTimer);_pushTimer=setTimeout(pushToSheet,PUSH_DEBOUNCE);}
+}
+async function pushToSheet(){
+  if(!SHEETS_URL||!_pushPending)return;
+  setSyncDot('saving');
+  try{
+    // text/plain avoids a CORS preflight that Apps Script doesn't answer well
+    await fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(DB)});
+    _pushPending=false;setSyncDot('ok');
+  }catch(e){console.warn('push failed',e);setSyncDot('offline');}  // stays pending; retries on next save
+}
+async function syncFromSheet(){
+  if(!SHEETS_URL){setSyncDot('local');return;}
+  setSyncDot('saving');
+  try{
+    const r=await fetch(SHEETS_URL,{method:'GET'});
+    const data=await r.json();
+    if(data&&data.cfg&&data.days){
+      DB=data;
+      Object.keys(DB.days).forEach(k=>{if(!DB.days[k])delete DB.days[k];});
+      try{localStorage.setItem(SK,JSON.stringify(DB));}catch(e){}
+      S=makeState();renderAll();scrollToNow();
+    }
+    setSyncDot('ok');
+  }catch(e){console.warn('sync failed',e);setSyncDot('offline');}
+}
+// best-effort flush if the tab closes mid-debounce, so a pending edit still lands
+window.addEventListener('pagehide',()=>{
+  if(SHEETS_URL&&_pushPending){
+    try{fetch(SHEETS_URL,{method:'POST',keepalive:true,headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(DB)});}catch(e){}
+  }
+});
+
+// ── sync UI ──────────────────────────────────────────────────────────────────
+function refreshSyncUI(){
+  const cbtn=document.getElementById('connect-btn');
+  if(cbtn)cbtn.style.display=SHEETS_URL?'none':'inline-flex';
+  setSyncDot(SHEETS_URL?'ok':'local');
+}
+function setSyncDot(state){
+  const el=document.getElementById('sync-dot');if(!el)return;
+  const map={local:['#b0a090','Not connected — click to add your Sheet URL'],
+             saving:['#c48a30','Syncing…'],
+             ok:['#4a9e6a','Synced with your Sheet'],
+             offline:['#c1714a','Offline — saved on this device, will retry']};
+  const v=map[state]||map.local;el.style.color=v[0];el.title=v[1];
+}
+function openConnect(){
+  showModal(`<h3>Connect your Google Sheet</h3>
+    <label class="mlabel">Apps Script web app URL (ends in /exec)</label>
+    <input class="mfield" id="connect-url" type="text" placeholder="https://script.google.com/macros/s/…/exec" value="${esc(SHEETS_URL)}">
+    <div style="font-size:11px;color:var(--ink2);margin:-2px 0 10px;line-height:1.5">Stored in this browser only. You won't need to edit the file again — it's remembered across reloads and future updates.</div>
+    <div class="mfooter">
+      <button class="btn" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveConnect()">Save</button>
+    </div>`);
+  setTimeout(()=>{const i=document.getElementById('connect-url');if(i)i.focus();},50);
+}
+function saveConnect(){setSheetUrl(document.getElementById('connect-url').value);closeModal();}
+
+let curKey=todayKey();
+function uid(){return ++DB.cfg.nextId;}
+
+// Live view of the active day + global config, exposed as `S` so the rest of the
+// app keeps using S.todos / S.blocks / S.rules etc. unchanged.
+function makeState(){
+  const day=getDay(curKey);
+  return {
+    get checklist(){return day.checklist;},   set checklist(v){day.checklist=v;},
+    get todos(){return day.todos;},           set todos(v){day.todos=v;},
+    get blocks(){return day.blocks;},         set blocks(v){day.blocks=v;},
+    get shortItems(){return day.shortItems;}, set shortItems(v){day.shortItems=v;},
+    get notes(){return day.notes;},           set notes(v){day.notes=v;},
+    get stale(){return day.stale;},           set stale(v){day.stale=v;},
+    get rules(){return DB.cfg.rules;},        set rules(v){DB.cfg.rules=v;},
+    get nextId(){return DB.cfg.nextId;},      set nextId(v){DB.cfg.nextId=v;},
+  };
+}
+let S=makeState();
+
+const NOW=new Date();
+const DAYS_FULL=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const DAYS_SHORT=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+function curDateObj(){return keyToDate(curKey);}
+function isViewingToday(){return curKey===todayKey();}
+function isGymDay(){return isGymKey(curKey);}
+
+function minToStr(m){
+  const raw=m%1440;
+  const h=Math.floor(raw/60),mn=raw%60;
+  const ampm=h<12?'AM':'PM';
+  const h12=h%12===0?12:h%12;
+  return h12+':'+(mn<10?'0':'')+mn+' '+ampm;
+}
+function minToY(m){return ((m-START_MIN)/30)*SLOT_H}
+function durStr(mins){const h=Math.floor(mins/60),m=mins%60;return h>0?(h+'h'+(m>0?' '+m+'m':'')):(m+'m')}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+
+// ── VIEW SWITCHING ──────────────────────────────────────────────────────────
+let curView='daily';
+function setView(v,silent){
+  curView=v;
+  document.querySelectorAll('.npill').forEach(e=>e.classList.toggle('active',e.dataset.view===v));
+  document.getElementById('daily-body').style.display=v==='daily'?'grid':'none';
+  document.getElementById('plan-body').classList.toggle('active',v==='plan');
+  ['habits','calendar','short','long'].forEach(p=>{
+    const el=document.getElementById('ph-'+p);if(el)el.classList.toggle('active',v===p);
+  });
+  renderTabs();renderSubtabs();
+  if(v==='plan'){renderPlanPage();}
+}
+function renderTabs(){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.view===curView));
+}
+
+// ── HEADER ──────────────────────────────────────────────────────────────────
+function renderHeader(){
+  const d=curDateObj();
+  const full=DAYS_FULL[d.getDay()]+', '+d.getDate()+' '+MONTHS[d.getMonth()]+' '+d.getFullYear();
+  const tb=document.getElementById('tb-date');if(tb)tb.textContent=full;
+  const bd=document.getElementById('book-date');if(bd)bd.textContent=full;
+  document.getElementById('c-title').textContent=DAYS_SHORT[d.getDay()]+' '+d.getDate()+' '+MONTHS[d.getMonth()];
+  document.getElementById('c-sub').textContent=isGymDay()?'Gym day · finish gym by 1 pm':'Rest day · wind down by midnight';
+  const tbtn=document.getElementById('today-btn');if(tbtn)tbtn.style.display=isViewingToday()?'none':'inline-flex';
+}
+
+// ── CHECKLIST ───────────────────────────────────────────────────────────────
+function renderChecklist(){
+  const w=document.getElementById('checklist-wrap');
+  w.innerHTML=S.checklist.map(c=>`
+    <div class="check-row ${c.done?'done':''}"
+         data-id="${c.id}" draggable="true"
+         ondragstart="listDragStart(event,'checklist',${c.id})"
+         ondragover="listDragOver(event,'checklist')"
+         ondragleave="listDragLeave(event)"
+         ondrop="listDrop(event,'checklist',${c.id})"
+         ondragend="listDragEnd(event)"
+         onclick="toggleChip(${c.id})">
+      <div class="custom-cb">
+        <svg viewBox="0 0 10 8"><polyline points="1,4 4,7 9,1"/></svg>
+      </div>
+      <span class="check-label">${esc(c.label)}</span>
+    </div>`).join('');
+  const done=S.checklist.filter(x=>x.done).length,tot=S.checklist.length;
+  document.getElementById('prog-bar').style.width=(tot?Math.round(done/tot*100):0)+'%';
+  document.getElementById('prog-lbl').textContent=done+' of '+tot+' done';
+}
+function toggleChip(id){const c=S.checklist.find(x=>x.id===id);if(c){c.done=!c.done;save();renderChecklist();}}
+function addChip(){
+  const inp=document.getElementById('plan-chip-inp');if(!inp)return;
+  const v=inp.value.trim();if(!v)return;
+  const id=uid();
+  DB.cfg.checklistTemplate.push({id,label:v});
+  S.checklist.push({id,label:v,done:false});
+  inp.value='';save();renderChecklist();renderPlanPage();
+}
+function delChip(id){
+  DB.cfg.checklistTemplate=DB.cfg.checklistTemplate.filter(x=>x.id!==id);
+  S.checklist=S.checklist.filter(x=>x.id!==id);save();renderChecklist();renderPlanPage();
+}
+
+// ── RULES ───────────────────────────────────────────────────────────────────
+const RULE_COLORS={gym:'var(--gym-bg)',work:'var(--work-bg)',health:'var(--health-bg)',sky:'var(--sky-bg)',amber:'var(--amber-bg)'};
+function renderPlanPage(){
+  // chips list
+  const cl=document.getElementById('plan-chips-list');
+  if(cl)cl.innerHTML=S.checklist.map(c=>`
+    <div class="plan-chip-row">
+      <span class="plan-chip-label">${esc(c.label)}</span>
+      <span class="plan-chip-del" onclick="delChip(${c.id})"><i class="ti ti-x" style="font-size:11px"></i></span>
+    </div>`).join('');
+  // rules list
+  const rl=document.getElementById('plan-rules-list');
+  if(rl){if(!S.rules.length){rl.innerHTML='<div style="font-size:11px;color:var(--ink3);padding:4px 0">No rules yet.</div>';return;}
+  rl.innerHTML=S.rules.map(r=>`
+    <div class="rule-item">
+      <div class="rule-icon" style="background:${RULE_COLORS[r.type]||'var(--parch2)'}"><span>${r.emoji||'📌'}</span></div>
+      <span class="rule-text">${esc(r.text)}</span>
+      <span class="rule-del" onclick="delRule(${r.id})"><i class="ti ti-x" style="font-size:11px"></i></span>
+    </div>`).join('');}
+}
+function delRule(id){S.rules=S.rules.filter(x=>x.id!==id);markStale();save();renderPlanPage();}
+function openAddRule(){
+  showModal(`<h3>Add a rule</h3>
+    <label class="mlabel">Emoji</label>
+    <input class="mfield" id="r-emoji" type="text" placeholder="🧘" style="width:70px">
+    <label class="mlabel" style="margin-top:4px">Rule description</label>
+    <input class="mfield" id="r-text" type="text" placeholder="e.g. Mobility always 11:30 pm">
+    <label class="mlabel" style="margin-top:4px">Category</label>
+    <select class="mfield" id="r-type">
+      <option value="health">Health / body</option>
+      <option value="gym">Gym / fitness</option>
+      <option value="work">Work / focus</option>
+      <option value="sky">Daily routine</option>
+      <option value="amber">Other</option>
+    </select>
+    <div class="mfooter">
+      <button class="btn" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveRule()">Add rule</button>
+    </div>`);
+  setTimeout(()=>document.getElementById('r-text').focus(),50);
+}
+function saveRule(){
+  const text=document.getElementById('r-text').value.trim();if(!text)return;
+  S.rules.push({id:uid(),emoji:document.getElementById('r-emoji').value.trim()||'📌',text,type:document.getElementById('r-type').value});
+  markStale();save();renderPlanPage();closeModal();
+}
+
+// ── STALE ───────────────────────────────────────────────────────────────────
+function markStale(){S.stale=true;save();document.getElementById('stale-banner').classList.add('show')}
+function restoreStale(){if(S.stale)document.getElementById('stale-banner').classList.add('show')}
+
+// ── AI SCHEDULER ────────────────────────────────────────────────────────────
+async function runAISchedule(){
+  const btn=document.getElementById('reschedule-btn');
+  btn.classList.add('loading');btn.innerHTML='<i class="ti ti-loader ti-spin"></i> Thinking…';
+  const rulesText=S.rules.map(r=>r.emoji+' '+r.text).join('\n');
+  const incompleteTodos=S.todos.filter(t=>!t.done).map(t=>t.text);
+  const incompleteShort=S.shortItems.filter(s=>!s.done).map(s=>s.text+' (est '+s.est+')');
+  const everydayBlocks=S.blocks.filter(b=>b.todoId===null&&b.shortId===null);
+  const dayType=isGymDay()?'Gym day':'Rest day';
+  const nowMin=NOW.getHours()*60+NOW.getMinutes();
+  const prompt=`You are scheduling a personal day planner for someone with ADHD. Today is ${DAYS_FULL[NOW.getDay()]}, ${dayType}.
+Current time: ${minToStr(nowMin)}.
+
+Fixed/everyday blocks already in the schedule (do NOT move or duplicate these, just return them as-is):
+${everydayBlocks.map(b=>`- ${b.label}: ${minToStr(b.startMin)}–${minToStr(b.endMin)} [type:${b.type}]`).join('\n')}
+
+Scheduling rules to follow strictly:
+${rulesText}
+
+To-do items to slot in (each needs a block, choose a sensible duration):
+${incompleteTodos.length?incompleteTodos.join('\n'):'(none)'}
+
+Short improvement items to slot in if there is space:
+${incompleteShort.length?incompleteShort.join('\n'):'(none)'}
+
+ADHD principles: max 90-min focus blocks, 10-15 min buffer between transitions, don't over-pack, keep it realistic, morning for creative/focus work.
+
+Return ONLY a JSON array of block objects, no markdown, no explanation. Each object:
+{"label":"...","type":"gym|work|health|sky|amber|open","startMin":NNN,"endMin":NNN,"todoText":"..." or null,"shortText":"..." or null}
+startMin/endMin are minutes since midnight. Post-midnight = values > 1440 (e.g. 12:30 AM = 1470).
+Include all existing everyday blocks AND any newly scheduled to-do/short blocks.`;
+  try{
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
+    const data=await resp.json();
+    const text=data.content.filter(c=>c.type==='text').map(c=>c.text).join('');
+    const clean=text.replace(/```json|```/g,'').trim();
+    const newBlocks=JSON.parse(clean);
+    // Preserve checked states from existing blocks by label match
+    const checkedMap={};S.blocks.forEach(b=>{if(b.checked)checkedMap[b.label]=true;});
+    // Rebuild blocks, linking back todoId/shortId
+    S.blocks=newBlocks.map(b=>{
+      const id=uid();
+      let todoId=null,shortId=null;
+      if(b.todoText){const t=S.todos.find(x=>x.text===b.todoText||b.todoText.includes(x.text));if(t){todoId=t.id;t.blockId=id;}}
+      if(b.shortText){const s=S.shortItems.find(x=>x.text===b.shortText||b.shortText.includes(x.text));if(s){shortId=s.id;s.blockId=id;}}
+      return {id,label:b.label,type:b.type,startMin:b.startMin,endMin:b.endMin,checked:!!checkedMap[b.label],todoId,shortId};
+    });
+    S.stale=false;save();renderCalGrid();renderTodos();renderSuggestions();
+    document.getElementById('stale-banner').classList.remove('show');
+  }catch(err){
+    console.error(err);
+    alert('Scheduling failed — check console. Your existing schedule is unchanged.');
+  }
+  btn.classList.remove('loading');btn.innerHTML='<i class="ti ti-refresh"></i> Re-schedule';
+}
+
+// ── CALENDAR RENDER ─────────────────────────────────────────────────────────
+function renderCalGrid(){
+  const gutter=document.getElementById('time-gutter');
+  const main=document.getElementById('cal-main');
+  const totalH=TOTAL_SLOTS*SLOT_H;
+  let gutterHTML='';
+  for(let i=0;i<=TOTAL_SLOTS;i++){
+    const m=START_MIN+i*30;
+    const isHour=m%60===0;
+    gutterHTML+=`<div class="gutter-slot" style="height:${SLOT_H}px">${isHour?`<span class="gutter-label">${minToStr(m)}</span>`:''}</div>`;
+  }
+  gutter.innerHTML=gutterHTML;gutter.style.height=totalH+'px';
+
+  let mainHTML=`<div style="position:relative;height:${totalH}px" id="cal-inner">`;
+  for(let i=0;i<=TOTAL_SLOTS;i++){
+    const m=START_MIN+i*30,isHour=m%60===0,y=i*SLOT_H;
+    mainHTML+=`<div class="cal-line ${isHour?'hour':''}" style="top:${y}px"></div>`;
+  }
+  const coveredMins=new Set();
+  S.blocks.forEach(b=>{for(let m=b.startMin;m<b.endMin;m+=30)coveredMins.add(m);});
+  for(let i=0;i<TOTAL_SLOTS;i++){
+    const m=START_MIN+i*30;
+    if(!coveredMins.has(m)){
+      const y=i*SLOT_H;
+      mainHTML+=`<div class="cal-empty" data-slot="${m}" style="top:${y}px;height:${SLOT_H}px" onclick="openNewBlock(${m})"></div>`;
+    }
+  }
+  S.blocks.forEach(b=>{
+    const top=minToY(b.startMin);
+    const dur=b.endMin-b.startMin;
+    const height=Math.max((dur/30)*SLOT_H,24);
+    const timeLabel=minToStr(b.startMin)+' – '+minToStr(b.endMin);
+    const showDur=dur>=60,showTime=height>=28;
+    const isTodo=b.todoId!==null;
+    const isShort=b.shortId!==null;
+    const badge=isTodo?'<div class="bc-todo-badge">to-do</div>':isShort?'<div class="bc-todo-badge">short item</div>':'';
+    mainHTML+=`<div class="bc ${b.type}" style="top:${top}px;height:${height}px" onclick="openBlockEdit(${b.id})">
+      <div class="bc-top">
+        <div style="flex:1;min-width:0">
+          ${showTime?`<div class="bc-time-lbl">${timeLabel}</div>`:''}
+          <div class="bc-label ${b.checked?'chk':''}">${esc(b.label)}</div>
+          ${badge}
+        </div>
+        <input type="checkbox" class="bc-check" ${b.checked?'checked':''} onclick="event.stopPropagation()" onchange="toggleBlock(${b.id})">
+      </div>
+      ${showDur?`<div class="bc-dur">${durStr(dur)}</div>`:''}
+    </div>`;
+  });
+
+  // now line (only on the real today)
+  if(isViewingToday()){
+    const nowMin=NOW.getHours()*60+NOW.getMinutes();
+    let nowAdj=nowMin;if(nowMin<START_MIN%1440)nowAdj+=1440;
+    if(nowAdj>=START_MIN&&nowAdj<=END_MIN){
+      const nowY=minToY(nowAdj);
+      mainHTML+=`<div class="now-line" style="top:${nowY}px"><span class="now-label-el">now</span></div>`;
+    }
+  }
+  mainHTML+='</div>';
+  main.innerHTML=mainHTML;
+  setupCalDropZones();
+}
+
+function toggleBlock(id){
+  const b=S.blocks.find(x=>x.id===id);if(!b)return;
+  b.checked=!b.checked;
+  // sync linked todo/short
+  if(b.todoId){const t=S.todos.find(x=>x.id===b.todoId);if(t){t.done=b.checked;}}
+  if(b.shortId){const s=S.shortItems.find(x=>x.id===b.shortId);if(s){s.done=b.checked;}}
+  save();renderCalGrid();renderTodos();renderSuggestions();
+}
+
+// ── DRAG SYSTEM ─────────────────────────────────────────────────────────────
+// Handles both intra-list reordering and calendar drops
+let dragSource=null;
+let _listDragId=null;
+let _listDragList=null;
+
+function listDragStart(e,list,id){
+  _listDragId=id;_listDragList=list;
+  dragSource={type:list==='todo'?'todo':'short',id};
+  e.currentTarget.classList.add('dragging');
+  e.dataTransfer.effectAllowed='move';
+}
+function listDragOver(e,list){
+  if(_listDragList!==list)return;
+  e.preventDefault();
+  e.currentTarget.classList.add('reorder-over');
+}
+function listDragLeave(e){e.currentTarget.classList.remove('reorder-over');}
+function listDrop(e,list,targetId){
+  e.preventDefault();e.stopPropagation();
+  e.currentTarget.classList.remove('reorder-over');
+  if(_listDragList!==list||_listDragId===targetId)return;
+  const arr=list==='checklist'?S.checklist:list==='todo'?S.todos:S.shortItems;
+  const fromIdx=arr.findIndex(x=>x.id===_listDragId);
+  const toIdx=arr.findIndex(x=>x.id===targetId);
+  if(fromIdx<0||toIdx<0)return;
+  const [item]=arr.splice(fromIdx,1);arr.splice(toIdx,0,item);
+  save();
+  if(list==='checklist')renderChecklist();
+  else if(list==='todo')renderTodos();
+  else renderSuggestions();
+}
+function listDragEnd(e){
+  e.currentTarget.classList.remove('dragging','reorder-over');
+  document.querySelectorAll('.reorder-over').forEach(el=>el.classList.remove('reorder-over'));
+}
+
+function setupCalDropZones(){
+  document.querySelectorAll('.cal-empty').forEach(el=>{
+    el.addEventListener('dragover',e=>{e.preventDefault();el.classList.add('drag-over');});
+    el.addEventListener('dragleave',()=>el.classList.remove('drag-over'));
+    el.addEventListener('drop',e=>{
+      e.preventDefault();el.classList.remove('drag-over');
+      const slotMin=parseInt(el.dataset.slot);
+      if(!dragSource)return;
+      dropOnSlot(dragSource,slotMin);
+    });
+  });
+}
+
+function dropOnSlot(src,startMin){
+  let label='',type='work',durMins=30,todoId=null,shortId=null;
+  if(src.type==='todo'){
+    const t=S.todos.find(x=>x.id===src.id);if(!t)return;
+    label=t.text;todoId=t.id;
+    type=t.type||'work';
+    if(t.blockId){S.blocks=S.blocks.filter(b=>b.id!==t.blockId);}
+  } else {
+    const s=S.shortItems.find(x=>x.id===src.id);if(!s)return;
+    label=s.text;shortId=s.id;
+    type=s.type||'amber';
+    const em=s.est.match(/(\d+)\s*(min|hr)/i);
+    if(em){durMins=em[2].toLowerCase()==='hr'?parseInt(em[1])*60:parseInt(em[1]);}
+    durMins=Math.ceil(durMins/30)*30;
+    if(s.blockId){S.blocks=S.blocks.filter(b=>b.id!==s.blockId);}
+  }
+  const endMin=startMin+durMins;
+  const newId=uid();
+  S.blocks.push({id:newId,label,type,startMin,endMin,checked:false,todoId,shortId});
+  if(src.type==='todo'){const t=S.todos.find(x=>x.id===src.id);if(t)t.blockId=newId;}
+  else{const s=S.shortItems.find(x=>x.id===src.id);if(s)s.blockId=newId;}
+  markStale();save();renderCalGrid();renderTodos();renderSuggestions();
+  dragSource=null;
+}
+
+// ── BLOCK MODAL ─────────────────────────────────────────────────────────────
+function slotOptions(selectedMin){
+  let opts='';
+  for(let m=START_MIN;m<=END_MIN;m+=30){
+    opts+=`<option value="${m}" ${m===selectedMin?'selected':''}>${minToStr(m)}</option>`;
+  }
+  return opts;
+}
+let editingBlock=null;
+function openBlockEdit(id){
+  editingBlock=id;
+  const b=S.blocks.find(x=>x.id===id);
+  const isLinked=b.todoId!==null||b.shortId!==null;
+  showModal(`<h3>Edit block</h3>
+    <label class="mlabel">Label</label>
+    <input class="mfield" id="b-label" type="text" value="${esc(b.label)}">
+    <label class="mlabel">From</label>
+    <select class="mfield" id="b-start">${slotOptions(b.startMin)}</select>
+    <label class="mlabel">To</label>
+    <select class="mfield" id="b-end">${slotOptions(b.endMin)}</select>
+    <label class="mlabel">Type</label>
+    <select class="mfield" id="b-type">${['gym','work','health','sky','amber','open'].map(t=>`<option value="${t}"${t===b.type?' selected':''}>${t}</option>`).join('')}</select>
+    ${isLinked?'<div style="font-size:11px;color:var(--work-fg);background:var(--work-bg);padding:6px 10px;border-radius:var(--r-md);margin-bottom:9px"><i class="ti ti-link" style="font-size:11px"></i> Linked to your '+(b.todoId?'to-do':'short item')+' list — completing either will sync.</div>':''}
+    <div class="mfooter">
+      <button class="btn" style="color:var(--gym-acc);border-color:var(--gym-acc)" onclick="deleteBlock(${id})"><i class="ti ti-trash"></i></button>
+      <button class="btn" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveBlock()">Save</button>
+    </div>`);
+  setTimeout(()=>document.getElementById('b-label').focus(),50);
+}
+function openNewBlock(startMin){
+  editingBlock=null;
+  showModal(`<h3>Add block</h3>
+    <label class="mlabel">Label</label>
+    <input class="mfield" id="b-label" type="text" placeholder="What's happening?">
+    <label class="mlabel">From</label>
+    <select class="mfield" id="b-start">${slotOptions(startMin)}</select>
+    <label class="mlabel">To</label>
+    <select class="mfield" id="b-end">${slotOptions(startMin+30)}</select>
+    <label class="mlabel">Type</label>
+    <select class="mfield" id="b-type">${['gym','work','health','sky','amber','open'].map(t=>`<option value="${t}">${t}</option>`).join('')}</select>
+    <div class="mfooter">
+      <button class="btn" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveBlock()">Add</button>
+    </div>`);
+  setTimeout(()=>document.getElementById('b-label').focus(),50);
+}
+function saveBlock(){
+  const label=document.getElementById('b-label').value.trim();
+  const startMin=parseInt(document.getElementById('b-start').value);
+  const endMin=parseInt(document.getElementById('b-end').value);
+  const type=document.getElementById('b-type').value;
+  if(!label||endMin<=startMin)return;
+  if(editingBlock){
+    const b=S.blocks.find(x=>x.id===editingBlock);
+    Object.assign(b,{label,startMin,endMin,type});
+  }else{
+    S.blocks.push({id:uid(),label,startMin,endMin,type,checked:false,todoId:null,shortId:null});
+  }
+  markStale();save();renderCalGrid();closeModal();
+}
+function deleteBlock(id){
+  const b=S.blocks.find(x=>x.id===id);
+  // unlink
+  if(b&&b.todoId){const t=S.todos.find(x=>x.id===b.todoId);if(t)t.blockId=null;}
+  if(b&&b.shortId){const s=S.shortItems.find(x=>x.id===b.shortId);if(s)s.blockId=null;}
+  S.blocks=S.blocks.filter(x=>x.id!==id);
+  markStale();save();renderCalGrid();renderTodos();renderSuggestions();closeModal();
+}
+
+// ── CATEGORY HELPERS ────────────────────────────────────────────────────────
+const CAT_LABELS={gym:'Gym / fitness',work:'Work / focus',health:'Health',sky:'Daily routine',amber:'Other',none:'No category'};
+function catClass(type){return 'cat-'+(type||'none');}
+function catSelectHTML(selected='none'){
+  return Object.entries(CAT_LABELS).map(([v,l])=>`<option value="${v}"${v===selected?' selected':''}>${l}</option>`).join('');
+}
+
+// ── TODOS ───────────────────────────────────────────────────────────────────
+function renderTodos(){
+  const el=document.getElementById('todo-list');
+  if(!S.todos.length){el.innerHTML='<div style="font-size:12px;color:var(--ink3);padding:4px 0">No tasks yet.</div>';return;}
+  el.innerHTML=S.todos.map(t=>`
+    <div class="todo-row ${catClass(t.type)} ${t.done?'done-item':''} ${t.blockId?'linked':''}"
+         data-id="${t.id}" draggable="true"
+         ondragstart="listDragStart(event,'todo',${t.id})"
+         ondragover="listDragOver(event,'todo')"
+         ondragleave="listDragLeave(event)"
+         ondrop="listDrop(event,'todo',${t.id})"
+         ondragend="listDragEnd(event)">
+      <input type="checkbox" class="todo-cb" ${t.done?'checked':''} onchange="toggleTodo(${t.id})" onclick="event.stopPropagation()">
+      <span class="todo-txt">${esc(t.text)}</span>
+      ${t.blockId?'<i class="ti ti-calendar-check" style="font-size:11px;flex-shrink:0;opacity:.7" title="On calendar"></i>':''}
+      <span class="todo-del" onclick="delTodo(${t.id})" draggable="false"><i class="ti ti-x" style="font-size:11px"></i></span>
+    </div>`).join('');
+}
+function toggleTodo(id){
+  const t=S.todos.find(x=>x.id===id);if(!t)return;
+  t.done=!t.done;
+  if(t.blockId){const b=S.blocks.find(x=>x.id===t.blockId);if(b)b.checked=t.done;}
+  markStale();save();renderTodos();renderCalGrid();
+}
+function delTodo(id){
+  const t=S.todos.find(x=>x.id===id);
+  if(t&&t.blockId){S.blocks=S.blocks.filter(b=>b.id!==t.blockId);}
+  S.todos=S.todos.filter(x=>x.id!==id);markStale();save();renderTodos();renderCalGrid();
+}
+function addTodo(){
+  const inp=document.getElementById('todo-inp'),v=inp.value.trim();if(!v)return;
+  inp.value='';
+  // ask category via modal
+  showModal(`<h3>Add to-do</h3>
+    <div style="font-size:12px;font-weight:600;color:var(--ink);margin-bottom:8px">${esc(v)}</div>
+    <label class="mlabel">Category</label>
+    <select class="mfield" id="new-todo-cat">${catSelectHTML()}</select>
+    <div class="mfooter">
+      <button class="btn" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmAddTodo('${esc(v).replace(/'/g,"\\'")}')">Add</button>
+    </div>`);
+}
+function confirmAddTodo(text){
+  const type=document.getElementById('new-todo-cat').value;
+  S.todos.push({id:uid(),text,done:false,blockId:null,type:type==='none'?null:type});
+  markStale();save();renderTodos();closeModal();
+}
+
+// ── SHORT ITEMS ─────────────────────────────────────────────────────────────
+function renderSuggestions(){
+  const el=document.getElementById('sug-list');
+  const items=(S.shortItems||[]).slice(0,8);
+  if(!items.length){el.innerHTML='<div style="font-size:11px;color:var(--ink3)">No short items.</div>';return;}
+  el.innerHTML=items.map(s=>`
+    <div class="sug-row ${catClass(s.type)} ${s.done?'done-item':''}"
+         data-id="${s.id}" draggable="true"
+         ondragstart="listDragStart(event,'short',${s.id})"
+         ondragover="listDragOver(event,'short')"
+         ondragleave="listDragLeave(event)"
+         ondrop="listDrop(event,'short',${s.id})"
+         ondragend="listDragEnd(event)">
+      <span class="sug-txt">${esc(s.text)}</span>
+      <span class="sug-est">${s.est}</span>
+      ${s.blockId?'<i class="ti ti-calendar-check" style="font-size:11px;opacity:.7" title="Scheduled"></i>':''}
+      <button class="sug-add" onclick="pullShort(${s.id})" title="Add to to-do list" draggable="false"><i class="ti ti-plus"></i></button>
+    </div>`).join('');
+}
+function pullShort(id){
+  const s=(S.shortItems||[]).find(x=>x.id===id);if(!s)return;
+  S.todos.push({id:uid(),text:s.text,done:false,blockId:null,type:s.type||null});
+  markStale();save();renderTodos();
+}
+
+// ── NOTES ───────────────────────────────────────────────────────────────────
+let _notesDirty=false;
+function notesDirty(){
+  _notesDirty=true;
+  document.getElementById('notes-ta').classList.add('dirty');
+  document.getElementById('notes-save-btn').classList.add('dirty');
+  document.getElementById('notes-hint').style.opacity='0';
+}
+function saveNotes(){
+  S.notes=document.getElementById('notes-ta').value;save();
+  _notesDirty=false;
+  document.getElementById('notes-ta').classList.remove('dirty');
+  document.getElementById('notes-save-btn').classList.remove('dirty');
+  const hint=document.getElementById('notes-hint');
+  hint.style.opacity='1';
+  setTimeout(()=>hint.style.opacity='0',2000);
+}
+function loadNotes(){const el=document.getElementById('notes-ta');if(el)el.value=S.notes||'';}
+
+// ── RESET DAY ───────────────────────────────────────────────────────────────
+function clearDay(){
+  if(!confirm('Reset all checkboxes and done states for today?'))return;
+  S.checklist.forEach(c=>c.done=false);
+  S.todos.forEach(t=>t.done=false);
+  S.blocks.forEach(b=>b.checked=false);
+  S.shortItems.forEach(s=>s.done=false);
+  S.notes='';S.stale=false;
+  save();renderAll();
+}
+
+// ── MODAL ───────────────────────────────────────────────────────────────────
+function showModal(html){document.getElementById('modal-box').innerHTML=html;document.getElementById('overlay').classList.add('open');}
+function closeModal(){document.getElementById('overlay').classList.remove('open');editingBlock=null;}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+
+function scrollToNow(){
+  const nl=document.querySelector('.now-line');
+  if(nl){const scroll=nl.closest('.time-scroll');if(scroll)scroll.scrollTop=nl.offsetTop-200;}
+}
+
+// ── PAGE FLIP + NAVIGATION ───────────────────────────────────────────────────
+let _flipping=false;
+function reduceMotion(){return window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;}
+function flipTo(commit){
+  const leaf=document.getElementById('flip-leaf');
+  if(_flipping||!leaf||reduceMotion()){commit();return;}
+  _flipping=true;
+  leaf.classList.remove('go');
+  leaf.style.display='flex';
+  void leaf.offsetWidth;                 // paint the leaf covering the page first
+  requestAnimationFrame(()=>{commit();leaf.classList.add('go');}); // swap underneath, then turn
+  const done=()=>{leaf.classList.remove('go');leaf.style.display='none';_flipping=false;leaf.removeEventListener('animationend',done);};
+  leaf.addEventListener('animationend',done);
+  setTimeout(()=>{if(_flipping)done();},950); // safety net — content is already correct
+}
+function goDay(delta){
+  const d=curDateObj();d.setDate(d.getDate()+delta);
+  const k=dateKey(d);
+  flipTo(()=>{curKey=k;S=makeState();setView('daily',true);renderAll();scrollToNow();});
+}
+function goToday(){
+  const k=todayKey();
+  if(k===curKey&&curView==='daily')return;
+  flipTo(()=>{curKey=k;S=makeState();setView('daily',true);renderAll();scrollToNow();});
+}
+function goView(v){
+  if(v===curView)return;
+  flipTo(()=>{setView(v,true);});
+}
+
+// ── DATE JUMPS (months + decades) ────────────────────────────────────────────
+function lastDayOfMonth(y,m){return new Date(y,m+1,0).getDate();}   // m: 0-based
+function decadeOf(day){return day<=10?0:day<=20?1:2;}
+function decadeStart(i){return [1,11,21][i];}
+function goMonth(delta){
+  const d=curDateObj();const day=d.getDate();
+  const nd=new Date(d.getFullYear(),d.getMonth()+delta,1);
+  nd.setDate(Math.min(day,lastDayOfMonth(nd.getFullYear(),nd.getMonth())));
+  const k=dateKey(nd);
+  flipTo(()=>{curKey=k;S=makeState();setView('daily',true);renderAll();scrollToNow();});
+}
+function goDecade(i){
+  const d=curDateObj();
+  const day=Math.min(decadeStart(i),lastDayOfMonth(d.getFullYear(),d.getMonth()));
+  const k=dateKey(new Date(d.getFullYear(),d.getMonth(),day));
+  if(k===curKey)return;
+  flipTo(()=>{curKey=k;S=makeState();setView('daily',true);renderAll();scrollToNow();});
+}
+function renderSubtabs(){
+  const bar=document.getElementById('subtabbar');if(!bar)return;
+  const show=(curView==='daily');
+  bar.classList.toggle('hide',!show);
+  if(!show)return;
+  const d=curDateObj(),y=d.getFullYear(),m=d.getMonth(),day=d.getDate();
+  document.getElementById('month-label').textContent=MONTHS[m]+' '+y;
+  const ranges=[[1,10],[11,20],[21,lastDayOfMonth(y,m)]];
+  const cur=decadeOf(day);
+  document.getElementById('decade-tabs').innerHTML=ranges.map((r,i)=>
+    `<button class="dtab ${i===cur?'active':''}" onclick="goDecade(${i})">${r[0]}–${r[1]}</button>`).join('');
+}
+
+// ── COVER (open / close the book) ────────────────────────────────────────────
+let _bookOpen=false;
+function applyBookState(){
+  const c=document.getElementById('cover');if(!c)return;
+  if(_bookOpen){c.style.display='none';c.classList.remove('open');}
+  else{c.style.display='flex';c.classList.remove('open');}
+}
+function openBook(){
+  if(_bookOpen)return;_bookOpen=true;
+  try{localStorage.setItem('planner_open','1');}catch(e){}
+  const c=document.getElementById('cover');if(!c)return;
+  if(reduceMotion()){c.style.display='none';return;}
+  c.classList.add('open');
+  const end=()=>{c.style.display='none';c.removeEventListener('transitionend',end);};
+  c.addEventListener('transitionend',end);
+  setTimeout(()=>{if(_bookOpen)c.style.display='none';},1000);
+}
+function closeBook(){
+  if(!_bookOpen)return;_bookOpen=false;
+  try{localStorage.setItem('planner_open','0');}catch(e){}
+  const c=document.getElementById('cover');if(!c)return;
+  c.style.display='flex';
+  if(reduceMotion()){c.classList.remove('open');return;}
+  c.classList.add('open');void c.offsetWidth;          // show swung-open, then swing shut
+  requestAnimationFrame(()=>c.classList.remove('open'));
+}
+
+function renderAll(){
+  renderHeader();renderChecklist();renderCalGrid();renderTodos();renderSuggestions();loadNotes();restoreStale();renderTabs();renderSubtabs();
+}
+try{_bookOpen=localStorage.getItem('planner_open')==='1';}catch(e){_bookOpen=false;}
+loadSheetUrl();
+applyBookState();
+renderAll();
+setTimeout(scrollToNow,300);
+refreshSyncUI();
+syncFromSheet();   // pull the Sheet in the background, then re-render
+</script>
+
+
+</body></html>
