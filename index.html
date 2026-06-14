@@ -2,12 +2,12 @@
 <!-- saved from url=(0046)file:///Users/pallavi/Downloads/planner_9.html -->
 <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>My Planner</title>
-<link rel="preconnect" href="https://fonts.googleapis.com/">
-<link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
-<link href="./planner_files/css2" rel="stylesheet">
-<link rel="stylesheet" href="./planner_files/tabler-icons.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Nunito:wght@400;600;700;800&family=Nunito+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.31.0/dist/tabler-icons.min.css">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;overflow:hidden}
@@ -26,9 +26,10 @@ html,body{height:100%;overflow:hidden}
   --slot-h:40px;
   --sans:'Nunito Sans',system-ui,sans-serif;
   --display:'Nunito',system-ui,sans-serif;
+  --serif:'Cormorant Garamond',Georgia,serif;
 }
-body{font-family:var(--sans);background:var(--parch);color:var(--ink);font-size:13px;line-height:1.5;-webkit-font-smoothing:antialiased}
-.shell{display:grid;grid-template-rows:52px 1fr;height:100vh}
+body{font-family:var(--sans);background:var(--parch);color:var(--ink);font-size:13px;line-height:1.5;-webkit-font-smoothing:antialiased;touch-action:manipulation}
+.shell{display:grid;grid-template-rows:52px 1fr;height:100dvh}
 
 /* ── TOP BAR ── */
 .topbar{display:flex;align-items:center;padding:0 20px;gap:12px;border-bottom:1px solid var(--rule);background:var(--parch);z-index:20}
@@ -241,7 +242,7 @@ body{font-family:var(--sans);background:var(--parch);color:var(--ink);font-size:
   --ribbon:#c1714a;--bind-w:20px;
 }
 html,body{background:var(--desk2)}
-.app{position:fixed;inset:0;overflow:hidden;perspective:2800px;
+.app{position:fixed;inset:0;overflow:hidden;perspective:2800px;overscroll-behavior:none;
   background:radial-gradient(130% 100% at 50% 30%,var(--desk1),var(--desk2) 82%)}
 .topbar{display:none!important}      /* old in-page bar moved to the top tabs */
 .nav-pills{display:none!important}
@@ -300,20 +301,31 @@ html,body{background:var(--desk2)}
   background:linear-gradient(90deg,#a3552f,var(--ribbon) 45%,#d68a63);box-shadow:0 1px 4px rgba(0,0,0,.3);
   clip-path:polygon(0 0,100% 0,100% calc(100% - 11px),50% 100%,0 calc(100% - 11px))}
 .page-area{position:relative;flex:1;min-width:0;overflow:hidden;background:var(--parch);perspective:2400px}
-.spine-shadow{position:absolute;top:0;bottom:0;left:0;width:30px;z-index:16;pointer-events:none;
-  background:linear-gradient(90deg,rgba(45,37,32,.16),rgba(45,37,32,0))}
+.spine-shadow{position:absolute;top:0;bottom:0;left:0;width:44px;z-index:16;pointer-events:none;
+  background:linear-gradient(90deg,rgba(0,0,0,.22) 0%,rgba(0,0,0,.07) 50%,rgba(0,0,0,0) 100%)}
 .page{position:absolute;inset:0;overflow:hidden;z-index:1;
-  background:repeating-linear-gradient(0deg,rgba(45,37,32,.02) 0 1px,transparent 1px 30px),var(--parch)}
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E"),
+    repeating-linear-gradient(0deg,rgba(160,175,210,.14) 0 1px,transparent 1px 28px),
+    var(--parch)}
 .page .shell{height:100%;grid-template-rows:1fr}
 
 /* ── turning leaf ── */
 .flip-leaf{position:absolute;inset:0;z-index:30;display:none;align-items:center;justify-content:center;
   transform-origin:left center;backface-visibility:hidden;box-shadow:0 0 0 1px rgba(45,37,32,.05);
-  background:linear-gradient(105deg,rgba(0,0,0,.1),rgba(0,0,0,0) 40%),
-    repeating-linear-gradient(0deg,rgba(45,37,32,.025) 0 1px,transparent 1px 30px),var(--parch)}
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E"),
+    linear-gradient(105deg,rgba(0,0,0,.08),rgba(0,0,0,0) 40%),
+    repeating-linear-gradient(0deg,rgba(160,175,210,.14) 0 1px,transparent 1px 28px),
+    var(--parch)}
 .flip-leaf .leaf-mark{width:54px;height:54px;border-radius:15px;opacity:.18;
   background:linear-gradient(135deg,#c1714a,#9a5890 60%,#4a8aaa)}
-.flip-leaf.go{animation:pageTurn .54s cubic-bezier(.5,.05,.35,1) forwards}
+.flip-leaf.go{animation:pageTurn .54s cubic-bezier(.645,.045,.355,1) forwards}
+.flip-leaf::after{content:'';position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(to right,rgba(0,0,0,.28) 0%,rgba(0,0,0,.08) 30%,transparent 65%);
+  opacity:0}
+.flip-leaf.go::after{animation:flipShadow .54s cubic-bezier(.645,.045,.355,1) forwards}
+@keyframes flipShadow{0%{opacity:0}35%{opacity:1}100%{opacity:0}}
 @keyframes pageTurn{
   0%{transform:rotateY(0);box-shadow:6px 0 22px rgba(0,0,0,0)}
   35%{box-shadow:34px 14px 44px rgba(0,0,0,.32)}
@@ -323,30 +335,46 @@ html,body{background:var(--desk2)}
 /* ── CLOSED COVER ── */
 .cover{position:absolute;inset:0;z-index:60;cursor:pointer;transform-origin:left center;backface-visibility:hidden;
   display:flex;align-items:center;justify-content:center;transition:transform .82s cubic-bezier(.6,.02,.3,1);
-  background:radial-gradient(140% 120% at 30% 25%,#9a4a24 0%,#6e3015 46%,#4e2110 100%);
-  box-shadow:inset 0 0 160px rgba(0,0,0,.5)}
+  background-color:#1c2140;
+  background-image:repeating-linear-gradient(90deg,transparent 0,transparent 38px,rgba(243,235,218,.9) 38px,rgba(243,235,218,.9) 49px);
+  box-shadow:inset 0 0 120px rgba(0,0,0,.32)}
 .cover.open{transform:rotateY(-164deg)}
 .cover::before{content:'';position:absolute;left:0;top:0;bottom:0;width:24px;
-  background:linear-gradient(90deg,#3c1b09,#7a3414 70%,#5d2810);box-shadow:inset -7px 0 10px -6px rgba(0,0,0,.6)}
+  background:linear-gradient(90deg,#0d1020,#1c2a55 70%,#1c2140);box-shadow:inset -5px 0 8px -4px rgba(0,0,0,.7)}
 .cover::after{content:'';position:absolute;right:-1px;top:10px;bottom:10px;width:14px;
   background:repeating-linear-gradient(0deg,#efe9df 0 1px,#ded3c2 1px 2.6px);box-shadow:2px 0 7px rgba(0,0,0,.3)}
 .cover-ribbon{position:absolute;top:0;left:46px;width:13px;height:calc(100% + 26px);
   background:linear-gradient(90deg,#a3552f,var(--ribbon) 45%,#d68a63);
   clip-path:polygon(0 0,100% 0,100% calc(100% - 12px),50% 100%,0 calc(100% - 12px))}
-.cover-inner{text-align:center;color:#f0d8c4;position:relative;z-index:2;padding:40px 56px;
-  border:1px solid rgba(240,216,196,.22);border-radius:8px;box-shadow:inset 0 0 0 4px rgba(240,216,196,.06)}
-.cover-mark{width:62px;height:62px;border-radius:17px;margin:0 auto 20px;display:flex;align-items:center;justify-content:center;
-  background:linear-gradient(135deg,#e09a73,#c98aa8 60%,#7cb0c8);box-shadow:0 4px 14px rgba(0,0,0,.35)}
-.cover-mark svg{width:30px;height:30px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.cover-title{font-family:var(--display);font-size:54px;font-weight:800;letter-spacing:-1px;line-height:1;color:#f3ddc9;
-  text-shadow:0 2px 0 rgba(0,0,0,.35),0 -1px 0 rgba(255,255,255,.12)}
-.cover-rule{width:64px;height:2px;margin:16px auto 14px;background:rgba(240,216,196,.4);border-radius:2px}
-.cover-sub{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(240,216,196,.7)}
+.cover-badge{position:relative;z-index:2;background:#f5ece0;
+  border:1.5px solid rgba(190,145,65,.5);
+  border-radius:46% 46% 6px 6px / 52px 52px 6px 6px;
+  padding:36px 44px 28px;text-align:center;min-width:200px;
+  box-shadow:0 4px 28px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.45)}
+.cover-badge-arc{font-size:7.5px;letter-spacing:2.8px;text-transform:uppercase;
+  color:rgba(100,75,30,.65);font-family:var(--sans);margin-bottom:10px}
+.cover-badge-dot{color:rgba(180,130,60,.7);font-size:18px;line-height:1;margin-bottom:10px}
+.cover-badge-name{font-family:var(--serif);font-size:38px;font-weight:600;
+  color:#8a3f1e;letter-spacing:1px;line-height:1;margin-bottom:14px}
+.cover-badge-month{font-size:9px;letter-spacing:2.5px;text-transform:uppercase;
+  color:rgba(100,75,30,.55);font-family:var(--sans)}
+.cover-badge-tap{font-size:8px;letter-spacing:1.5px;text-transform:uppercase;
+  color:rgba(100,75,30,.35);font-family:var(--sans);margin-top:10px}
 
 @media (prefers-reduced-motion:reduce){.flip-leaf.go{animation-duration:.001s}.cover{transition-duration:.001s}.tab{transition:none}}
 @media (max-width:720px){
   .tabs{gap:2px}.tab{padding:8px 10px;font-size:11px}.tab i{display:none}
-  .brand-text,.book-date{display:none}.subtabbar{gap:8px;flex-wrap:wrap}.cover-title{font-size:40px}
+  .brand-text,.book-date{display:none}.subtabbar{gap:8px;flex-wrap:wrap}.cover-badge-name{font-size:30px}
+}
+@media (hover:none){
+  .tab:hover{background:#cbb7a0;color:#5a4a3a}
+  .check-row:hover{border-color:var(--rule)}
+  .btn:hover{background:var(--parch2)}
+  .todo-row:hover{box-shadow:none}
+  .sug-row:hover{background:inherit}
+  .bc:hover{opacity:1;box-shadow:none}
+  .cal-empty:hover{background:none}
+  .cal-empty:hover::after{display:none}
 }
 </style>
 </head>
@@ -354,15 +382,14 @@ html,body{background:var(--desk2)}
 <div class="app" id="app">
 
   <!-- CLOSED COVER -->
-  <div class="cover" id="cover" onclick="openBook()" role="button" aria-label="Open planner" style="display: none;">
+  <div class="cover" id="cover" onclick="openBook()" role="button" aria-label="Open planner" style="display:none">
     <div class="cover-ribbon"></div>
-    <div class="cover-inner">
-      <div class="cover-mark">
-        <svg viewBox="0 0 16 16"><path d="M3 8h10M8 3v10"></path><circle cx="8" cy="8" r="2.5"></circle></svg>
-      </div>
-      <div class="cover-title">planner</div>
-      <div class="cover-rule"></div>
-      <div class="cover-sub">tap to open</div>
+    <div class="cover-badge">
+      <div class="cover-badge-arc">Notes &amp; Thoughts</div>
+      <div class="cover-badge-dot">·</div>
+      <div class="cover-badge-name">palplan</div>
+      <div class="cover-badge-month" id="cover-month">JUNE 2026</div>
+      <div class="cover-badge-tap">tap to open</div>
     </div>
   </div>
 
@@ -1685,6 +1712,8 @@ try{_bookOpen=localStorage.getItem('planner_open')==='1';}catch(e){_bookOpen=fal
 loadSheetUrl();
 applyBookState();
 renderAll();
+{const el=document.getElementById('cover-month');
+ if(el){const d=new Date();el.textContent=MONTHS[d.getMonth()].toUpperCase()+' '+d.getFullYear();}}
 setTimeout(scrollToNow,300);
 refreshSyncUI();
 syncFromSheet();   // pull the Sheet in the background, then re-render
