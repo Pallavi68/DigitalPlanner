@@ -1,0 +1,169 @@
+:root {
+  /* Palette (see src/lib/tokens.ts) */
+  --navy: #1c2140;
+  --cream: #f3ebda;
+  --paper: #fbf8f1;
+  --paper-edge: #efe8d6;
+  --gold: #b8985a;
+  --terracotta: #c26b4a;
+  --ink: #2c3a58;
+  --ink-soft: #8a94a8;
+  --rule: #c5cfdd;
+  --rule-faint: #e6e2d6;
+  --rule-half: #e6ebf3;
+  --check: #3e7d4e;
+  --cross: #b5493a;
+  --placeholder: #c2b8a3;
+
+  --serif: 'EB Garamond', Georgia, 'Times New Roman', serif;
+  --hand: 'Patrick Hand', 'Comic Sans MS', cursive;
+
+  --spine: linear-gradient(
+    90deg,
+    rgba(28, 33, 64, 0),
+    rgba(28, 33, 64, 0.13) 42%,
+    rgba(28, 33, 64, 0.24) 50%,
+    rgba(28, 33, 64, 0.13) 58%,
+    rgba(28, 33, 64, 0)
+  );
+  --sheet-stack: 0 2px 0 -1px #efe8d6, 0 4px 0 -2px #e5ddc7, 0 6px 0 -3px #d9d0b6,
+    0 8px 14px rgba(28, 33, 64, 0.22);
+  --focus: 0 0 0 2px #fbf8f1, 0 0 0 4px #5a7ab2;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: var(--serif);
+  color: var(--ink);
+  background: #d9d3c6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Accessible focus for keyboard users only. */
+:focus-visible {
+  outline: none;
+  box-shadow: var(--focus);
+  border-radius: 3px;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+a {
+  color: var(--ink);
+}
+a:hover {
+  color: var(--navy);
+}
+
+/* Handwriting inputs on ruled paper. */
+.hand-input {
+  border: none;
+  background: transparent;
+  outline: none;
+  padding: 0;
+  width: 100%;
+  min-width: 0;
+  font-family: var(--hand);
+  color: var(--ink);
+}
+.hand-input::placeholder {
+  color: var(--placeholder);
+  font-style: italic;
+  opacity: 1;
+}
+textarea.hand-input {
+  resize: none;
+  line-height: 1.7;
+}
+
+/* Ink-settle animation for check marks (signature motion). */
+@keyframes ink-settle {
+  0% {
+    transform: scale(0.2) rotate(8deg);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.15) rotate(8deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) rotate(8deg);
+    opacity: 1;
+  }
+}
+.ink-mark {
+  animation: ink-settle 140ms ease-out;
+}
+
+@keyframes toast-in {
+  from {
+    transform: translateY(12px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Page-turn — signature motion for day/page navigation (FR-1). */
+@keyframes page-turn {
+  0% {
+    transform: perspective(1600px) rotateY(-14deg);
+    opacity: 0.35;
+  }
+  100% {
+    transform: perspective(1600px) rotateY(0deg);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* Utility: visually hidden but available to screen readers. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Thin, unobtrusive scrollbars inside paper containers. */
+.paper-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: var(--rule) transparent;
+}
+.paper-scroll::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.paper-scroll::-webkit-scrollbar-thumb {
+  background: var(--rule);
+  border-radius: 4px;
+}
