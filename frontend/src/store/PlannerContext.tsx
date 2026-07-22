@@ -8,10 +8,12 @@ import type {
   RoutineHabit,
   HabitRow,
   Preferences,
+  DailyRoutineInstance,
 } from '../types';
 import { storage } from './storage';
 import { emptyDay, initialState, demoState, uid } from './seed';
 import { todayISO } from '../lib/dates';
+import { materializeRoutine } from './routines';
 
 /* ------------------------------------------------------------------ actions */
 
@@ -25,6 +27,8 @@ type Action =
   | { type: 'DELETE_TODO'; id: string }
   | { type: 'SET_PREFERENCES'; preferences: Preferences }
   | { type: 'SET_ROUTINE'; routineHabits: RoutineHabit[] }
+  | { type: 'SAVE_ROUTINE'; routineHabits: RoutineHabit[]; effectiveDate: ISODate }
+  | { type: 'MATERIALIZE_ROUTINE'; date: ISODate }
   | { type: 'SET_HABIT_ROWS'; habitRows: HabitRow[] };
 
 function ensureDay(state: PlannerState, date: ISODate): DayState {
@@ -68,6 +72,36 @@ function reducer(state: PlannerState, action: Action): PlannerState {
       return touched({ ...state, preferences: action.preferences });
     case 'SET_ROUTINE':
       return touched({ ...state, routineHabits: action.routineHabits });
+    case 'SAVE_ROUTINE': {
+      const days = { ...state.days };
+      Object.keys(days).forEach((date) => {
+        if (date < action.effectiveDate) return;
+        const current = days[date];
+        const priorByRoutine = new Map(current.routineInstances.map((instance) => [instance.sourceRoutineId, instance]));
+        const routineInstances = materializeRoutine(action.routineHabits, date).map((instance) => {
+          const prior = priorByRoutine.get(instance.sourceRoutineId);
+          return { ...instance, done: prior?.done ?? !!current.routineDone[instance.sourceRoutineId] };
+        });
+        const nextById = new Map(routineInstances.map((instance) => [instance.id, instance]));
+        const blocks = current.blocks.flatMap((block) => {
+          if (block.tag !== 'routine' || !block.sourceRefId) return [block];
+          const linked = nextById.get(block.sourceRefId);
+          if (!linked) return [];
+          return [{ ...block, label: linked.label, completed: linked.done }];
+        });
+        days[date] = { ...current, routineInstances, blocks };
+      });
+      return touched({ ...state, routineHabits: action.routineHabits, days });
+    }
+    case 'MATERIALIZE_ROUTINE': {
+      const current = ensureDay(state, action.date);
+      if (current.routineInstances.length) return state;
+      const instances = materializeRoutine(state.routineHabits, action.date).map((instance) => ({
+        ...instance,
+        done: !!current.routineDone[instance.sourceRoutineId],
+      }));
+      return touched({ ...state, days: { ...state.days, [action.date]: { ...current, routineInstances: instances } } });
+    }
     case 'SET_HABIT_ROWS':
       return touched({ ...state, habitRows: action.habitRows });
     default:
@@ -77,12 +111,13 @@ function reducer(state: PlannerState, action: Action): PlannerState {
 
 /* ------------------------------------------------------------------ context */
 
-export type SyncStatus = 'loading' | 'synced' | 'saving' | 'offline';
+export type SyncStatus = 'loading' | 'synced' | 'saving' | 'offline' | 'failed';
 
 interface PlannerContextValue {
   state: PlannerState;
   status: SyncStatus;
   online: boolean;
+  retrySave: () => void;
   getDay: (date: ISODate) => DayState;
   patchDay: (date: ISODate, patch: (day: DayState) => DayState) => void;
   setGridMark: (key: string, mark: CellMark) => void;
@@ -95,6 +130,9 @@ interface PlannerContextValue {
   completeSetup: (p: { routineHabits: RoutineHabit[]; habitRows: HabitRow[]; preferences: Preferences }) => void;
   setPreferences: (p: Preferences) => void;
   setRoutine: (r: RoutineHabit[]) => void;
+  saveRoutine: (r: RoutineHabit[], effectiveDate: ISODate) => void;
+  materializeRoutine: (date: ISODate) => void;
+  toggleRoutine: (date: ISODate, instance: DailyRoutineInstance) => void;
   setHabitRows: (r: HabitRow[]) => void;
   loadDemo: () => void;
   resetAll: () => void;
@@ -106,6 +144,7 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(reducer, undefined as unknown as PlannerState, initialState);
   const [status, setStatus] = useState<SyncStatus>('loading');
   const [online, setOnline] = useState<boolean>(navigator.onLine);
+  const [saveAttempt, setSaveAttempt] = useState(0);
   const hydrated = useRef(false);
   const saveTimer = useRef<number | undefined>(undefined);
 
@@ -146,10 +185,12 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
     setStatus(online ? 'saving' : 'offline');
     window.clearTimeout(saveTimer.current);
     saveTimer.current = window.setTimeout(() => {
-      storage.save(state).then(() => setStatus(online ? 'synced' : 'offline'));
+      storage.save(state)
+        .then(() => setStatus(online ? 'synced' : 'offline'))
+        .catch(() => setStatus('failed'));
     }, 350);
     return () => window.clearTimeout(saveTimer.current);
-  }, [state, online]);
+  }, [state, online, saveAttempt]);
 
   const value = useMemo<PlannerContextValue>(() => {
     const getDay = (date: ISODate) => state.days[date] ?? emptyDay();
@@ -200,6 +241,7 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
       state,
       status,
       online,
+      retrySave: () => setSaveAttempt((attempt) => attempt + 1),
       getDay,
       patchDay,
       setGridMark: (key, mark) => dispatch({ type: 'SET_GRID_MARK', key, mark }),
@@ -210,6 +252,18 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
       completeSetup: (p) => dispatch({ type: 'COMPLETE_SETUP', ...p }),
       setPreferences: (preferences) => dispatch({ type: 'SET_PREFERENCES', preferences }),
       setRoutine: (routineHabits) => dispatch({ type: 'SET_ROUTINE', routineHabits }),
+      saveRoutine: (routineHabits, effectiveDate) => dispatch({ type: 'SAVE_ROUTINE', routineHabits, effectiveDate }),
+      materializeRoutine: (date) => dispatch({ type: 'MATERIALIZE_ROUTINE', date }),
+      toggleRoutine: (date, instance) => dispatch({
+        type: 'PATCH_DAY',
+        date,
+        patch: (day) => ({
+          ...day,
+          routineDone: { ...day.routineDone, [instance.sourceRoutineId]: !instance.done },
+          routineInstances: day.routineInstances.map((item) => item.id === instance.id ? { ...item, done: !item.done } : item),
+          blocks: day.blocks.map((block) => block.sourceRefId === instance.id ? { ...block, completed: !instance.done } : block),
+        }),
+      }),
       setHabitRows: (habitRows) => dispatch({ type: 'SET_HABIT_ROWS', habitRows }),
       loadDemo: () => dispatch({ type: 'RESET', state: demoState() }),
       resetAll: () => dispatch({ type: 'RESET', state: initialState() }),

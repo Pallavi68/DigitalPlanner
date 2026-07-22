@@ -5,10 +5,12 @@ import { usePlanner } from '../store/PlannerContext';
  * future storage-adapter concern and must not be implied by this milestone.
  */
 export function SyncIndicator() {
-  const { status, online } = usePlanner();
+  const { status, online, retrySave } = usePlanner();
 
   const label =
-    !online || status === 'offline'
+    status === 'failed'
+      ? 'Local save failed'
+      : !online || status === 'offline'
       ? 'Saved locally — offline'
       : status === 'saving'
       ? 'Saving locally…'
@@ -16,7 +18,7 @@ export function SyncIndicator() {
       ? 'Opening…'
       : 'Saved locally';
 
-  const dot = !online || status === 'offline' ? 'var(--terracotta)' : status === 'synced' ? 'var(--check)' : 'var(--gold)';
+  const dot = status === 'failed' || !online || status === 'offline' ? 'var(--terracotta)' : status === 'synced' ? 'var(--check)' : 'var(--gold)';
 
   return (
     <span
@@ -43,6 +45,7 @@ export function SyncIndicator() {
         }}
       />
       {label}
+      {status === 'failed' && <button type="button" onClick={retrySave} style={{ border: 0, background: 'transparent', color: 'var(--cream)', textDecoration: 'underline', cursor: 'pointer', font: 'inherit', letterSpacing: 'inherit', padding: 4 }}>Retry</button>}
     </span>
   );
 }

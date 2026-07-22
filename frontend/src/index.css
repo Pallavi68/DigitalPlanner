@@ -167,3 +167,36 @@ textarea.hand-input {
   background: var(--rule);
   border-radius: 4px;
 }
+
+.routine-heading { display: flex; justify-content: space-between; align-items: flex-start; }
+.paper-link { border: 0; border-bottom: 1px solid var(--rule); background: transparent; color: var(--ink-soft); font: italic 14px var(--hand); padding: 2px 4px; }
+.routine-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 0 24px; }
+.routine-period { font: 500 10px var(--serif); letter-spacing: 2px; color: var(--ink-soft); margin-bottom: 6px; }
+.routine-row { display: flex; align-items: center; gap: 8px; min-height: 32px; border-bottom: 1px solid var(--rule-half); position: relative; }
+.routine-label { font: 17px var(--hand); color: var(--ink); flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.routine-drag { width: 30px; min-height: 30px; border: 0; background: transparent; color: var(--ink-soft); touch-action: none; cursor: grab; }
+.routine-schedule-menu summary { list-style: none; width: 30px; min-height: 30px; display: grid; place-items: center; color: var(--ink-soft); cursor: pointer; }
+.routine-schedule-menu summary::-webkit-details-marker { display: none; }
+.routine-schedule-popover { position: absolute; right: 0; top: 30px; z-index: 5; padding: 8px; background: var(--paper); border: 1px solid var(--gold); box-shadow: 0 5px 14px rgba(28,33,64,.18); display: flex; gap: 6px; align-items: end; }
+.routine-schedule-popover label { font: 11px var(--serif); display: grid; gap: 3px; }
+.routine-empty { width: 100%; min-height: 64px; border: 0; border-bottom: 1px solid var(--rule); background: transparent; text-align: left; font: italic 16px var(--hand); color: var(--placeholder); }
+.setup-note { margin: 0 0 16px; font: italic 15px var(--hand); color: var(--ink-soft); }
+.setup-editor { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(180px, .8fr); gap: 22px; }
+.setup-row { display: grid; grid-template-columns: 20px minmax(100px, 1fr) 64px 72px 32px 32px 32px; align-items: center; gap: 5px; min-height: 40px; border-bottom: 1px solid var(--rule); }
+.setup-row select, .setup-row button, .setup-actions button, .routine-schedule-popover select, .routine-schedule-popover button { border: 1px solid var(--rule); background: rgba(255,255,255,.35); color: var(--ink); border-radius: 3px; min-height: 30px; }
+.setup-row button:disabled { opacity: .3; cursor: default; }
+.setup-handle { color: var(--ink-soft); }
+.add-routine { margin-top: 12px; }
+.setup-preview { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; border-left: 1px solid var(--gold); padding-left: 18px; }
+.setup-preview strong { display: block; font: 600 10px var(--serif); letter-spacing: 2px; margin-bottom: 8px; }
+.setup-preview span { display: block; min-height: 27px; border-bottom: 1px solid var(--rule-half); font: 15px var(--hand); overflow-wrap: anywhere; }
+.setup-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; }
+.setup-actions button { padding: 6px 12px; }
+.setup-actions .setup-save { border-color: var(--gold); color: var(--navy); }
+.setup-error { color: var(--cross); margin: 10px 0 0; }
+@media (max-width: 700px) {
+  .setup-editor { grid-template-columns: 1fr; }
+  .setup-row { grid-template-columns: 18px minmax(90px,1fr) 58px 66px 30px 30px 30px; gap: 2px; }
+  .setup-preview { border-left: 0; border-top: 1px solid var(--gold); padding: 14px 0 0; }
+  .routine-columns { gap: 0 10px; }
+}

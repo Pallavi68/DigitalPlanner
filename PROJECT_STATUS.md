@@ -1,10 +1,10 @@
 # Project Status
 
-Last updated: 2026-07-21
+Last updated: 2026-07-22
 
 ## Current objective
 
-Review the runnable Daily Page foundation before implementing the remaining v1 pages and flows.
+Dogfood the new persistent Successful Day checklist setup and routine time-blocking flow.
 
 ## Current working state
 
@@ -22,6 +22,13 @@ The maintained app is locally runnable and currently provides:
 * evening wind-down controls
 * local persistence through the existing `localStorage` adapter
 * explicit local-save status wording that does not imply cloud sync
+* paper-consistent Successful Day Setup opened beside the daily checklist
+* add, edit, archive, drag/button reorder, AM/PM/automatic preference, and 30-minute-to-8-hour routine durations
+* deterministic automatic AM/PM balancing with a live two-column preview
+* date-effective routine revisions and per-day checklist snapshots that preserve past pages while reconciling today/future pages
+* routine drag handles plus a keyboard/button Time Alignment placement flow
+* duration-sized, daily-instance-linked routine blocks with duplicate-placement confirmation
+* safe migration of legacy v1 local state into the v2 routine/snapshot model
 
 ## Completed in the runnable-foundation milestone
 
@@ -33,6 +40,18 @@ The maintained app is locally runnable and currently provides:
 * Removed links to unavailable future pages from the maintained navigation.
 * Recorded the five approved durable product decisions in `decision-list.md`.
 * Fixed three exported TypeScript errors: two unused imports and the demo-block tag inference.
+
+## Completed in the daily-checklist milestone
+
+* Extended the existing local-first storage model with routine revision history and date-scoped routine instances.
+* Added the Successful Day Setup editor and responsive paper styling.
+* Added daily completion persistence against snapshot instances.
+* Added pointer and non-drag scheduling paths using each routine's default duration.
+* Preserved the storage-adapter seam for a future cloud implementation.
+* Added a real drag threshold and full calendar-boundary drop detection so clicks and left-page releases cannot create blocks.
+* Made 30-minute schedule blocks usable for moving, completion, and deletion, with linked completion synchronized both ways.
+* Reconciled edited or archived routines with today/future linked blocks while preserving past dates.
+* Added an explicit failed local-save state and retry action.
 
 ## How to run
 
@@ -73,6 +92,14 @@ Verified on 2026-07-21:
 
 No lint or automated-test configuration is present yet, so those checks could not be run.
 
+Verified on 2026-07-22:
+
+* `npm run typecheck` — passed.
+* `npm run build` — passed with Vite 5.4.21; 54 modules transformed.
+* Development server started successfully at `http://127.0.0.1:5173/`.
+* A follow-up headless-browser DOM check did not complete cleanly because the local Chrome process/profile stalled; interactive setup, drag/drop, and narrow-screen behavior still need manual browser QA.
+* Follow-up QA review passed the reported checklist flicker, drag threshold/bounds, quick-add duration, 30-minute block controls, linked completion, D12 reconciliation, save retry, XSS, repo-safety, and code-hygiene checks by static inspection.
+
 ## Remaining work
 
 The following intentionally remain unavailable pending review and later milestones:
@@ -83,16 +110,16 @@ The following intentionally remain unavailable pending review and later mileston
 * first-run setup
 * Settings, including the approved globally configurable Time Alignment window
 * complete previous/next-day navigation and date selection
-* routine/chore drag sources and manual fixed-commitment UI
-* approved linked-item deletion/reassignment reconciliation
+* chore drag sources and manual fixed-commitment UI
 * cloud sync, authentication, and cross-device persistence
-* storage migrations and validation
+* automated migration/validation tests
 * linting and automated tests
 * deployment configuration
 
 ## Known limitations
 
 * State is stored only in the current browser's `localStorage`; cross-device synchronization does not work yet.
+* The focused feature PRD's Supabase persistence, anonymous device identity, RLS, network retry/error states, and cloud import flow are deferred under locked decision D9 because no provider/configuration has been approved. Current save feedback accurately reports local state only.
 * The Time Alignment window is still fixed at its approved default of 8:00 AM–2:00 AM until Settings is implemented.
 * The initial state contains recurring configuration but no setup UI; unavailable pages are not linked.
 * Google Fonts require a network connection; fallback fonts are used if they cannot load.

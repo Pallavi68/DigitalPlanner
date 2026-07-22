@@ -11,6 +11,7 @@ interface Props {
   day: DayState;
   onChange: (blocks: TimeBlock[]) => void;
   onDeleteBlock: (block: TimeBlock) => void;
+  onToggleBlock: (block: TimeBlock) => void;
 }
 
 type Interaction =
@@ -18,12 +19,12 @@ type Interaction =
   | { kind: 'resize'; id: string; edge: 'top' | 'bottom'; startY: number; origStart: number; origEnd: number };
 
 /** Zone 3 — full-day 30-min Time Alignment grid with drag-drop / move / resize (FR-4, FR-5, FR-15). */
-export function TimeAlignment({ date, day, onChange, onDeleteBlock }: Props) {
+export function TimeAlignment({ date, day, onChange, onDeleteBlock, onToggleBlock }: Props) {
   const gridRef = useRef<HTMLDivElement>(null);
   const { registerGrid } = useDrag();
   const vp = useViewport();
   const phone = vp === 'phone';
-  const slotH = phone ? 26 : 19;
+  const slotH = phone ? 32 : 30;
   const [interaction, setInteraction] = useState<Interaction | null>(null);
   const blocksRef = useRef(day.blocks);
   useLayoutEffect(() => {
@@ -40,14 +41,18 @@ export function TimeAlignment({ date, day, onChange, onDeleteBlock }: Props) {
 
   // Register as the global drop target for items dragged from the To Dos / pool.
   useEffect(() => {
-    return registerGrid((payload: DragPayload, _x, clientY) => {
+    return registerGrid((payload: DragPayload, clientX, clientY) => {
       const el = gridRef.current;
       if (!el) return false;
       const rect = el.getBoundingClientRect();
-      if (clientY < rect.top || clientY > rect.bottom) return false;
+      if (clientX < rect.left || clientX > rect.right || clientY < rect.top || clientY > rect.bottom) return false;
+      if (payload.tag === 'routine' && payload.sourceRefId && blocksRef.current.some((block) => block.sourceRefId === payload.sourceRefId)) {
+        if (!window.confirm(`“${payload.label}” is already on this day. Add it again?`)) return true;
+      }
       const start = slotFromClientY(clientY);
       const span = payload.slots ?? 2;
       const endSlot = Math.min(SLOT_COUNT, start + span);
+      if (endSlot - start < span) window.alert('The block was shortened to fit at the end of the day.');
       const block: TimeBlock = {
         id: uid('blk'),
         date,
@@ -56,6 +61,7 @@ export function TimeAlignment({ date, day, onChange, onDeleteBlock }: Props) {
         label: payload.label,
         tag: payload.tag,
         sourceRefId: payload.sourceRefId,
+        completed: payload.completed,
       };
       onChange([...blocksRef.current, block]);
       return true;
@@ -143,7 +149,7 @@ export function TimeAlignment({ date, day, onChange, onDeleteBlock }: Props) {
                 border: b.fixed ? `1.5px solid ${src.edge}` : undefined,
                 borderLeft: `3px solid ${src.edge}`,
                 borderRadius: 3,
-                padding: '2px 8px',
+                padding: '4px 54px 3px 8px',
                 boxSizing: 'border-box',
                 overflow: 'hidden',
                 cursor: b.fixed ? 'default' : 'grab',
@@ -155,16 +161,24 @@ export function TimeAlignment({ date, day, onChange, onDeleteBlock }: Props) {
                 setInteraction({ kind: 'move', id: b.id, startY: e.clientY, origStart: b.startSlot, origEnd: b.endSlot });
               }}
             >
-              <div style={{ display: 'flex', justifyContent: 'space-between', gap: 6, alignItems: 'flex-start' }}>
-                <span style={{ font: `${phone ? 15 : 15}px var(--hand)`, color: b.fixed ? 'var(--navy)' : 'var(--ink)', lineHeight: 1.15 }}>{b.label}</span>
-                <span style={{ display: 'flex', gap: 4, flex: 'none' }}>
+              <div>
+                <span style={{ font: `${phone ? 15 : 15}px var(--hand)`, color: b.fixed ? 'var(--navy)' : 'var(--ink)', lineHeight: 1.15, textDecoration: b.completed ? 'line-through' : undefined, opacity: b.completed ? .65 : 1 }}>{b.label}</span>
+                <span style={{ position: 'absolute', right: 2, top: 0, display: 'flex', gap: 1, zIndex: 3 }}>
                   {b.fixed && <span style={{ font: "600 8px var(--serif)", letterSpacing: '1.5px', color: '#8a7648' }}>◆</span>}
+                  <button
+                    type="button"
+                    aria-label={`Mark ${b.label} ${b.completed ? 'not done' : 'done'}`}
+                    aria-pressed={!!b.completed}
+                    onPointerDown={(e) => e.stopPropagation()}
+                    onClick={(e) => { e.stopPropagation(); onToggleBlock(b); }}
+                    style={{ width: 24, height: 24, border: 'none', background: 'rgba(255,255,255,.8)', color: 'var(--ink)', font: '14px var(--serif)', lineHeight: 1, padding: 0, cursor: 'pointer', borderRadius: 3 }}
+                  >{b.completed ? '✓' : '○'}</button>
                   <button
                     type="button"
                     aria-label={`Remove ${b.label} from schedule`}
                     onPointerDown={(e) => e.stopPropagation()}
-                    onClick={() => onDeleteBlock(b)}
-                    style={{ border: 'none', background: 'transparent', color: 'var(--ink-soft)', font: '12px var(--serif)', lineHeight: 1, padding: 2, cursor: 'pointer' }}
+                    onClick={(e) => { e.stopPropagation(); onDeleteBlock(b); }}
+                    style={{ width: 24, height: 24, border: 'none', background: 'rgba(255,255,255,.8)', color: 'var(--ink-soft)', font: '14px var(--serif)', lineHeight: 1, padding: 0, cursor: 'pointer', borderRadius: 3 }}
                   >
                     ✕
                   </button>
@@ -203,7 +217,7 @@ function Handle({ position, onDown }: { position: 'top' | 'bottom'; onDown: (e: 
         left: 0,
         right: 0,
         [position]: 0,
-        height: 10,
+        height: 4,
         cursor: 'ns-resize',
         touchAction: 'none',
       }}

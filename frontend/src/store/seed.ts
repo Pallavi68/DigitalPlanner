@@ -6,7 +6,7 @@ export function uid(prefix = 'id'): string {
 }
 
 /** Default recurring routine ("Successful Day") — pre-seeded at setup. */
-export const DEFAULT_ROUTINE: Omit<RoutineHabit, 'id' | 'since'>[] = [
+export const DEFAULT_ROUTINE: Pick<RoutineHabit, 'label' | 'period'>[] = [
   { label: 'Wake by 8', period: 'AM' },
   { label: 'Vitamins', period: 'AM' },
   { label: 'Skincare', period: 'AM' },
@@ -35,6 +35,7 @@ export const DEFAULT_WINDDOWN_ITEMS = ['Tidy desk', 'Set out clothes', 'Plan tom
 export function emptyDay(): DayState {
   return {
     routineDone: {},
+    routineInstances: [],
     todos: Array.from({ length: 15 }, () => ({ text: '', done: false })),
     blocks: [],
     windDown: {
@@ -49,9 +50,16 @@ export function emptyDay(): DayState {
 export function initialState(): PlannerState {
   const since = todayISO();
   return {
-    version: 1,
+    version: 2,
     setupComplete: false,
-    routineHabits: DEFAULT_ROUTINE.map((h) => ({ ...h, id: uid('rh'), since })),
+    routineHabits: DEFAULT_ROUTINE.map((h, sortOrder) => ({
+      ...h,
+      id: uid('rh'),
+      since,
+      durationMinutes: 30,
+      sortOrder,
+      revisions: [{ effectiveFrom: since, label: h.label, period: h.period, durationMinutes: 30, sortOrder, archived: false }],
+    })),
     habitRows: DEFAULT_HABIT_ROWS.map((r) => ({ ...r, id: uid('hr'), since })),
     todos: [],
     days: {},

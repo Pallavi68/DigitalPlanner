@@ -8,6 +8,7 @@ export interface DragPayload {
   sourceRefId?: string;
   /** Preferred duration in 30-min slots when dropped. */
   slots?: number;
+  completed?: boolean;
 }
 
 type GridDropHandler = (payload: DragPayload, clientX: number, clientY: number) => boolean;
@@ -42,21 +43,33 @@ export function DragProvider({ children }: { children: ReactNode }) {
   const startDrag = useCallback((payload: DragPayload, e: React.PointerEvent) => {
     e.preventDefault();
     payloadRef.current = payload;
-    setGhost({ x: e.clientX, y: e.clientY, label: payload.label, tag: payload.tag });
+    const origin = { x: e.clientX, y: e.clientY };
+    let activated = false;
 
     const move = (ev: PointerEvent) => {
-      setGhost((g) => (g ? { ...g, x: ev.clientX, y: ev.clientY } : g));
+      if (!activated && Math.hypot(ev.clientX - origin.x, ev.clientY - origin.y) < 6) return;
+      activated = true;
+      setGhost({ x: ev.clientX, y: ev.clientY, label: payload.label, tag: payload.tag });
     };
     const up = (ev: PointerEvent) => {
       window.removeEventListener('pointermove', move);
       window.removeEventListener('pointerup', up);
+      window.removeEventListener('pointercancel', cancel);
       const p = payloadRef.current;
-      if (p && gridHandler.current) gridHandler.current(p, ev.clientX, ev.clientY);
+      if (activated && p && gridHandler.current) gridHandler.current(p, ev.clientX, ev.clientY);
+      payloadRef.current = null;
+      setGhost(null);
+    };
+    const cancel = () => {
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+      window.removeEventListener('pointercancel', cancel);
       payloadRef.current = null;
       setGhost(null);
     };
     window.addEventListener('pointermove', move, { passive: false });
     window.addEventListener('pointerup', up);
+    window.addEventListener('pointercancel', cancel);
   }, []);
 
   return (

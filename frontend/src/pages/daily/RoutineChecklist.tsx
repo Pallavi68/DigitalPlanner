@@ -1,41 +1,62 @@
-import type { DayState, ISODate, RoutineHabit } from '../../types';
+import type { DailyRoutineInstance, DayState, ISODate } from '../../types';
 import { InkBubble } from '../../components/InkBubble';
 import { SectionLabel } from '../../components/ui';
+import { useDrag } from '../../lib/DragContext';
 
 interface Props {
   date: ISODate;
   day: DayState;
-  habits: RoutineHabit[];
-  onToggle: (habitId: string) => void;
+  items: DailyRoutineInstance[];
+  onToggle: (item: DailyRoutineInstance) => void;
+  onOpenSetup: () => void;
+  onSchedule: (item: DailyRoutineInstance) => void;
 }
 
-/** Zone 1 — "Successful Day" recurring AM/PM routine checklist (FR-2). */
-export function RoutineChecklist({ day, habits, onToggle }: Props) {
-  const am = habits.filter((h) => h.period === 'AM' && !h.archived);
-  const pm = habits.filter((h) => h.period === 'PM' && !h.archived);
-
-  const Col = ({ title, items }: { title: string; items: RoutineHabit[] }) => (
-    <div>
-      <div style={{ font: "500 10px var(--serif)", letterSpacing: '2px', color: 'var(--ink-soft)', marginBottom: 6 }}>{title}</div>
-      {items.map((h) => (
-        <label
-          key={h.id}
-          style={{ display: 'flex', alignItems: 'center', gap: 10, height: 30, borderBottom: '1px solid #dde4ee', cursor: 'pointer' }}
-        >
-          <InkBubble done={!!day.routineDone[h.id]} onToggle={() => onToggle(h.id)} label={`${h.label} (${h.period})`} />
-          <span style={{ font: "17px var(--hand)", color: 'var(--ink)' }}>{h.label}</span>
-        </label>
-      ))}
-    </div>
-  );
+export function RoutineChecklist({ items, onToggle, onOpenSetup, onSchedule }: Props) {
+  const { startDrag } = useDrag();
+  const am = items.filter((item) => item.period === 'AM');
+  const pm = items.filter((item) => item.period === 'PM');
 
   return (
     <div style={{ marginBottom: 22 }}>
-      <SectionLabel>Successful Day</SectionLabel>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 24px' }}>
-        <Col title="AM" items={am} />
-        <Col title="PM" items={pm} />
+      <div className="routine-heading">
+        <SectionLabel>Successful Day</SectionLabel>
+        <button type="button" className="paper-link" onClick={onOpenSetup}>edit setup</button>
       </div>
+      {items.length ? (
+        <div className="routine-columns">
+          <RoutineColumn title="AM" values={am} onToggle={onToggle} onSchedule={onSchedule} startDrag={startDrag} />
+          <RoutineColumn title="PM" values={pm} onToggle={onToggle} onSchedule={onSchedule} startDrag={startDrag} />
+        </div>
+      ) : (
+        <button type="button" className="routine-empty" onClick={onOpenSetup}>add the first line to your successful day…</button>
+      )}
     </div>
   );
+}
+
+interface RoutineColumnProps {
+  title: string;
+  values: DailyRoutineInstance[];
+  onToggle: (item: DailyRoutineInstance) => void;
+  onSchedule: (item: DailyRoutineInstance) => void;
+  startDrag: ReturnType<typeof useDrag>['startDrag'];
+}
+
+function RoutineColumn({ title, values, onToggle, onSchedule, startDrag }: RoutineColumnProps) {
+  return <div>
+    <div className="routine-period">{title}</div>
+    {values.map((item) => <div className="routine-row" key={item.id}>
+      <InkBubble done={item.done} onToggle={() => onToggle(item)} label={`${item.label} (${item.period})`} />
+      <span className="routine-label">{item.label}</span>
+      <button
+        type="button"
+        className="routine-drag"
+        aria-label={`Drag ${item.label} onto Time Alignment`}
+        title={`Drag to schedule (${item.durationMinutes} minutes)`}
+        onPointerDown={(event) => startDrag({ label: item.label, tag: 'routine', sourceRefId: item.id, slots: item.durationMinutes / 30, completed: item.done }, event)}
+      >⠿</button>
+      <button type="button" className="routine-quick-add" aria-label={`Add ${item.label} to Time Alignment`} title={`Add using its ${item.durationMinutes}-minute setup duration`} onClick={() => onSchedule(item)}>＋</button>
+    </div>)}
+  </div>;
 }

@@ -50,7 +50,7 @@ export function Modal({ open, onClose, title, children }: ModalProps) {
         aria-modal="true"
         aria-label={title}
         style={{
-          width: 'min(440px, 100%)',
+          width: 'min(760px, 100%)',
           maxHeight: '86vh',
           overflow: 'auto',
           background: 'var(--paper)',

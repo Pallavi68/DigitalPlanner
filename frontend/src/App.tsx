@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Navigate, Route, Routes, useParams } from 'react-router-dom';
 import { BookShell } from './components/BookShell';
 import { Spread } from './components/Spread';
@@ -9,6 +10,10 @@ import { WindDown } from './pages/daily/WindDown';
 import { usePlanner } from './store/PlannerContext';
 import { dayOfMonth, fromISO, monthName, ordinal, todayISO, weekdayLong } from './lib/dates';
 import type { ISODate, TimeBlock } from './types';
+import { RoutineSetup } from './pages/daily/RoutineSetup';
+import { materializeRoutine as buildRoutineSnapshot } from './store/routines';
+import { uid } from './store/seed';
+import { SLOT_COUNT } from './lib/dates';
 
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -20,7 +25,12 @@ function isValidISODate(value: string | undefined): value is ISODate {
 
 function DailyPage() {
   const { date: routeDate } = useParams();
-  const { state, getDay, patchDay } = usePlanner();
+  const { state, getDay, patchDay, materializeRoutine, toggleRoutine, saveRoutine } = usePlanner();
+  const [setupOpen, setSetupOpen] = useState(false);
+
+  useEffect(() => {
+    if (isValidISODate(routeDate)) materializeRoutine(routeDate);
+  }, [routeDate, materializeRoutine]);
 
   if (!isValidISODate(routeDate)) {
     return <Navigate to={`/day/${todayISO()}`} replace />;
@@ -28,8 +38,18 @@ function DailyPage() {
 
   const date = routeDate;
   const day = getDay(date);
-  const habits = state.routineHabits.filter((habit) => !habit.archived && habit.since <= date);
+  const routineItems = day.routineInstances.length ? day.routineInstances : buildRoutineSnapshot(state.routineHabits, date);
   const updateBlocks = (blocks: TimeBlock[]) => patchDay(date, (current) => ({ ...current, blocks }));
+  const scheduleRoutine = (item: typeof routineItems[number]) => {
+    const duplicates = day.blocks.some((block) => block.sourceRefId === item.id);
+    if (duplicates && !window.confirm(`“${item.label}” is already on this day. Add it again?`)) return;
+    const span = item.durationMinutes / 30;
+    const startSlot = Array.from({ length: Math.max(1, SLOT_COUNT - span + 1) }, (_, slot) => slot)
+      .find((slot) => !day.blocks.some((block) => slot < block.endSlot && slot + span > block.startSlot)) ?? 0;
+    const endSlot = Math.min(SLOT_COUNT, startSlot + span);
+    if (endSlot - startSlot < item.durationMinutes / 30) window.alert('The block was shortened to fit at the end of the day.');
+    updateBlocks([...day.blocks, { id: uid('blk'), date, startSlot, endSlot, label: item.label, tag: 'routine', sourceRefId: item.id, completed: item.done }]);
+  };
 
   return (
     <Spread
@@ -41,13 +61,17 @@ function DailyPage() {
           <RoutineChecklist
             date={date}
             day={day}
-            habits={habits}
-            onToggle={(habitId) =>
-              patchDay(date, (current) => ({
-                ...current,
-                routineDone: { ...current.routineDone, [habitId]: !current.routineDone[habitId] },
-              }))
-            }
+            items={routineItems}
+            onToggle={(item) => toggleRoutine(date, item)}
+            onOpenSetup={() => setSetupOpen(true)}
+            onSchedule={scheduleRoutine}
+          />
+          <RoutineSetup
+            open={setupOpen}
+            onClose={() => setSetupOpen(false)}
+            date={todayISO()}
+            habits={state.routineHabits}
+            onSave={(habits) => saveRoutine(habits, todayISO())}
           />
           <ToDos
             date={date}
@@ -74,6 +98,11 @@ function DailyPage() {
             day={day}
             onChange={updateBlocks}
             onDeleteBlock={(block) => updateBlocks(day.blocks.filter((candidate) => candidate.id !== block.id))}
+            onToggleBlock={(block) => {
+              const linked = routineItems.find((item) => item.id === block.sourceRefId);
+              if (linked) toggleRoutine(date, linked);
+              else updateBlocks(day.blocks.map((candidate) => candidate.id === block.id ? { ...candidate, completed: !candidate.completed } : candidate));
+            }}
           />
           <WindDown
             date={date}

@@ -11,15 +11,39 @@ export type Weekday = 0 | 1 | 2 | 3 | 4 | 5 | 6; // 0 = Monday ... 6 = Sunday
 
 /** Where a schedulable item originated. Drives future color-coding (FR seam). */
 export type SourceTag = 'goodDay' | 'todo' | 'routine' | 'chore' | 'fixed' | 'manual';
+export type RoutinePeriod = 'AM' | 'PM' | 'auto';
+
+export interface RoutineRevision {
+  effectiveFrom: ISODate;
+  label: string;
+  period: RoutinePeriod;
+  durationMinutes: number;
+  sortOrder: number;
+  archived: boolean;
+}
 
 /** A recurring "Successful Day" routine habit (AM/PM bubble checklist). */
 export interface RoutineHabit {
   id: string;
   label: string;
-  period: 'AM' | 'PM';
+  period: RoutinePeriod;
+  durationMinutes: number;
+  sortOrder: number;
   /** Date the habit started applying (recurring changes are forward-only). */
   since: ISODate;
   archived?: boolean;
+  /** Date-effective history. The latest revision on/before a date wins. */
+  revisions: RoutineRevision[];
+}
+
+export interface DailyRoutineInstance {
+  id: string;
+  sourceRoutineId: string;
+  label: string;
+  period: 'AM' | 'PM';
+  durationMinutes: number;
+  sortOrder: number;
+  done: boolean;
 }
 
 /** A recurring or day-specific habit/chore row in the Two-Week grid. */
@@ -71,6 +95,8 @@ export interface TimeBlock {
   fixed?: boolean;
   /** Link back to the source item so deletes reconcile (FR / open question). */
   sourceRefId?: string;
+  /** Completion mirrors a linked Successful Day item when one exists. */
+  completed?: boolean;
 }
 
 export interface WindDown {
@@ -100,6 +126,8 @@ export interface Preferences {
 /** Per-day, mutable state the owner fills in. */
 export interface DayState {
   routineDone: Record<string, boolean>; // habitId -> done
+  /** Immutable for past dates; regenerated for today/future after setup edits. */
+  routineInstances: DailyRoutineInstance[];
   todos: DailyTodoLine[]; // exactly 15 lines
   blocks: TimeBlock[];
   windDown: WindDown;
