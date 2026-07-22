@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,500;0,600;0,700;1,500&amp;family=Patrick+Hand&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#efece5;font-family:system-ui,sans-serif}
+a{color:#2c3a58}a:hover{color:#1c2140}
+input::placeholder{color:#c2b8a3;font-style:italic;opacity:1}
+.dv-turn{padding:40px 44px 32px;border-bottom:1px solid rgba(0,0,0,.08);scroll-margin-top:16px}
+.dv-thd{display:flex;align-items:baseline;gap:10px;margin:0 0 20px}
+.dv-tid{font:600 10px ui-monospace,Menlo,monospace;padding:3px 7px;background:#1a1a1a;color:#fff;border-radius:4px;text-decoration:none}
+.dv-tname{font:600 13px/1.2 system-ui,sans-serif;color:#1a1a1a}
+.dv-opts{display:flex;flex-wrap:wrap;gap:36px;align-items:flex-start}
+.dv-opt{flex:none;display:flex;flex-direction:column;gap:9px;scroll-margin-top:16px}
+.dv-oid{font:600 10.5px ui-monospace,Menlo,monospace;padding:3px 7px;background:rgba(0,0,0,.08);color:#1a1a1a;border-radius:5px;text-decoration:none}
+.dv-olabel{display:flex;align-items:baseline;gap:8px;font:400 11px/1.3 system-ui,sans-serif;color:rgba(0,0,0,.55)}
+.dv-opt:target .dv-oid{background:#2a78d6;color:#fff}
+.dv-next{margin:22px 0 0;font:12px/1.5 system-ui,sans-serif;color:rgba(0,0,0,.5)}
+</style>
+</helmet>
+
+<section class="dv-turn" id="t2">
+  <div class="dv-thd"><a class="dv-tid" href="#t2">2</a><span class="dv-tname">Revisions on <a class="dv-oid" href="#1b">1b</a> + habit grid + the living book (page-flip)</span></div>
+  <div class="dv-opts">
+
+    <!-- ============ 2a COVER 2026 ============ -->
+    <div class="dv-opt" id="2a" data-screen-label="2a Cover 2026">
+      <div class="dv-olabel"><a class="dv-oid" href="#2a">2a</a>Cover — regular numerals</div>
+      <div style="position:relative;width:560px;height:800px;border-radius:6px 14px 14px 6px;background:repeating-linear-gradient(90deg,#1c2140 0px,#1c2140 38px,#f3ebda 38px,#f3ebda 49px);box-shadow:0 18px 40px rgba(28,33,64,.28),0 3px 8px rgba(28,33,64,.2);display:flex;align-items:center;justify-content:center">
+        <div style="position:absolute;inset:0;border-radius:6px 14px 14px 6px;background:linear-gradient(90deg,rgba(0,0,0,.22) 0,rgba(0,0,0,0) 22px,rgba(255,255,255,.06) 40px,rgba(0,0,0,0) 70px);pointer-events:none"></div>
+        <div style="position:absolute;left:26px;top:-6px;width:26px;height:120px;background:linear-gradient(180deg,#b25f40,#c26b4a);clip-path:polygon(0 0,100% 0,100% 100%,50% 88%,0 100%);box-shadow:2px 3px 6px rgba(28,33,64,.35)"></div>
+        <div style="width:280px;background:#f6efdf;border:1.5px solid #b8985a;border-radius:140px 140px 10px 10px;padding:46px 26px 34px;text-align:center;box-shadow:0 6px 18px rgba(28,33,64,.35)">
+          <div style="font:600 11px 'EB Garamond',serif;letter-spacing:4px;color:#8a7648">NOTES &amp; THOUGHTS</div>
+          <div style="width:5px;height:5px;border-radius:50%;background:#b8985a;margin:20px auto"></div>
+          <div style="font:600 64px/1 'EB Garamond',serif;color:#1c2140;font-style:italic">July</div>
+          <div style="width:34px;height:1px;background:#b8985a;margin:22px auto"></div>
+          <div style="font:500 13px 'EB Garamond',serif;letter-spacing:6px;color:#1c2140">2026</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ 2b REVISED SPREAD ============ -->
+    <div class="dv-opt" id="2b" data-screen-label="2b Spread revised">
+      <div class="dv-olabel"><a class="dv-oid" href="#2b">2b</a><a class="dv-oid" href="#1b">1b</a> revised — bubble to-dos (no numbers, no strikethrough); full-page Time Alignment, no wind-down</div>
+      <div style="position:relative;padding:13px 15px 17px;border-radius:8px;background:repeating-linear-gradient(90deg,#1c2140 0px,#1c2140 38px,#f3ebda 38px,#f3ebda 49px);box-shadow:0 16px 38px rgba(28,33,64,.26)">
+        <div style="position:absolute;left:150px;bottom:-24px;width:22px;height:58px;background:linear-gradient(180deg,#b25f40,#c26b4a);clip-path:polygon(0 0,100% 0,100% 100%,50% 86%,0 100%);box-shadow:2px 3px 6px rgba(28,33,64,.3)"></div>
+        <div style="position:relative;display:flex;box-shadow:0 2px 0 -1px #efe8d6,0 4px 0 -2px #e5ddc7,0 6px 0 -3px #d9d0b6,0 8px 14px rgba(28,33,64,.22)">
+
+          <!-- LEFT PAGE -->
+          <div style="width:540px;background:#fbf8f1;padding:30px 34px 26px 30px;background-image:linear-gradient(90deg,rgba(28,33,64,0) 82%,rgba(28,33,64,.07))">
+            <div style="display:flex;align-items:baseline;gap:12px;border-bottom:1px solid #b8985a;padding-bottom:10px;margin-bottom:18px">
+              <span style="font:500 11px 'EB Garamond',serif;letter-spacing:3px;color:#8a94a8">MONDAY</span>
+              <span style="font:600 26px 'EB Garamond',serif;color:#1c2140">July 6</span>
+            </div>
+            <div style="font:600 12px 'EB Garamond',serif;letter-spacing:2.5px;color:#1c2140;margin-bottom:2px">SUCCESSFUL DAY</div>
+            <div style="width:28px;height:2px;background:#b8985a;margin-bottom:12px"></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 24px;margin-bottom:20px">
+              <div>
+                <div style="font:500 10px 'EB Garamond',serif;letter-spacing:2px;color:#8a94a8;margin-bottom:6px">AM</div>
+                <sc-for list="{{ habitsAM }}" as="h" hint-placeholder-count="5">
+                  <div style="display:flex;align-items:center;gap:10px;height:28px;border-bottom:1px solid #dde4ee">
+                    <span style="width:15px;height:15px;flex:none;border:1.5px solid #2c3a58;border-radius:47% 53% 50% 50%;display:flex;align-items:center;justify-content:center">
+                      <sc-if value="{{ h.done }}" hint-placeholder-val="{{ false }}"><span style="width:9px;height:9px;background:#2c3a58;border-radius:55% 45% 50% 52%;transform:rotate(12deg)"></span></sc-if>
+                    </span>
+                    <span style="font:17px 'Patrick Hand',cursive;color:#2c3a58">{{ h.label }}</span>
+                  </div>
+                </sc-for>
+              </div>
+              <div>
+                <div style="font:500 10px 'EB Garamond',serif;letter-spacing:2px;color:#8a94a8;margin-bottom:6px">PM</div>
+                <sc-for list="{{ habitsPM }}" as="h" hint-placeholder-count="4">
+                  <div style="display:flex;align-items:center;gap:10px;height:28px;border-bottom:1px solid #dde4ee">
+                    <span style="width:15px;height:15px;flex:none;border:1.5px solid #2c3a58;border-radius:52% 48% 50% 50%;display:flex;align-items:center;justify-content:center">
+                      <sc-if value="{{ h.done }}" hint-placeholder-val="{{ false }}"><span style="width:9px;height:9px;background:#2c3a58;border-radius:45% 55% 52% 48%;transform:rotate(-8deg)"></span></sc-if>
+                    </span>
+                    <span style="font:17px 'Patrick Hand',cursive;color:#2c3a58">{{ h.label }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+            <div style="font:600 12px 'EB Garamond',serif;letter-spacing:2.5px;color:#1c2140;margin-bottom:2px">TO DOS</div>
+            <div style="width:28px;height:2px;background:#b8985a;margin-bottom:8px"></div>
+            <sc-for list="{{ todos2 }}" as="t" hint-placeholder-count="15">
+              <div style="display:flex;align-items:center;gap:12px;height:27px;border-bottom:1px solid #c5cfdd">
+                <span onClick="{{ t.onToggle }}" style="width:15px;height:15px;flex:none;border:1.5px solid #2c3a58;border-radius:50% 48% 52% 50%;display:flex;align-items:center;justify-content:center;cursor:pointer">
+                  <sc-if value="{{ t.done }}" hint-placeholder-val="{{ false }}"><span style="width:9px;height:9px;background:#2c3a58;border-radius:55% 45% 50% 52%;transform:rotate(10deg)"></span></sc-if>
+                </span>
+                <input value="{{ t.text }}" onInput="{{ t.onInput }}" placeholder="tap a line to write…" style="flex:1;min-width:0;border:none;background:transparent;outline:none;padding:0;font:17px 'Patrick Hand',cursive;color:#2c3a58" />
+              </div>
+            </sc-for>
+          </div>
+
+          <!-- SPINE -->
+          <div style="position:absolute;left:50%;top:0;bottom:0;width:64px;transform:translateX(-50%);background:linear-gradient(90deg,rgba(28,33,64,0),rgba(28,33,64,.13) 42%,rgba(28,33,64,.24) 50%,rgba(28,33,64,.13) 58%,rgba(28,33,64,0));pointer-events:none;z-index:2"></div>
+
+          <!-- RIGHT PAGE: FULL TIME ALIGNMENT -->
+          <div style="width:540px;background:#fbf8f1;padding:30px 30px 26px 34px;background-image:linear-gradient(90deg,rgba(28,33,64,.07),rgba(28,33,64,0) 18%)">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid #b8985a;padding-bottom:10px;margin-bottom:14px">
+              <span style="font:600 12px 'EB Garamond',serif;letter-spacing:2.5px;color:#1c2140">TIME ALIGNMENT</span>
+              <span style="font:500 10px 'EB Garamond',serif;letter-spacing:2px;color:#8a94a8">8AM — 2AM</span>
+            </div>
+            <div style="position:relative">
+              <sc-for list="{{ slots }}" as="s" hint-placeholder-count="12">
+                <div style="height:19px;border-top:1px solid {{ s.rule }};position:relative">
+                  <span style="position:absolute;left:0;top:-6px;font:500 9px 'EB Garamond',serif;letter-spacing:.5px;color:#8a94a8;width:40px">{{ s.t }}</span>
+                </div>
+              </sc-for>
+              <div style="position:absolute;left:54px;right:6px;top:0;height:36px;background:rgba(233,196,90,.30);border-left:3px solid #c9a23c;border-radius:3px;transform:rotate(-.2deg);padding:3px 9px;font:16px 'Patrick Hand',cursive;color:#2c3a58">Morning routine</div>
+              <div style="position:absolute;left:54px;right:6px;top:57px;height:74px;background:rgba(120,150,200,.22);border-left:3px solid #5a7ab2;border-radius:3px;transform:rotate(.15deg);padding:4px 9px;font:16px 'Patrick Hand',cursive;color:#2c3a58">Moneymaker — client site</div>
+              <div style="position:absolute;left:54px;right:6px;top:152px;height:17px;background:rgba(140,180,120,.25);border-left:3px solid #6f9a5c;border-radius:3px;padding:0 9px;font:14px/17px 'Patrick Hand',cursive;color:#2c3a58">Walk</div>
+              <div style="position:absolute;left:54px;right:6px;top:190px;height:55px;background:rgba(140,180,120,.25);border-left:3px solid #6f9a5c;border-radius:3px;transform:rotate(-.15deg);padding:4px 9px;font:16px 'Patrick Hand',cursive;color:#2c3a58">Gym + shower</div>
+              <div style="position:absolute;left:54px;right:6px;top:304px;height:36px;background:rgba(194,109,79,.18);border-left:3px solid #c26b4a;border-radius:3px;padding:3px 9px;font:16px 'Patrick Hand',cursive;color:#2c3a58">Email landlord + bank call</div>
+              <div style="position:absolute;left:54px;right:6px;top:456px;height:36px;background:rgba(233,196,90,.30);border-left:3px solid #c9a23c;border-radius:3px;transform:rotate(.2deg);padding:3px 9px;font:16px 'Patrick Hand',cursive;color:#2c3a58">Dinner</div>
+              <div style="position:absolute;left:54px;right:6px;top:551px;height:36px;background:rgba(120,150,200,.16);border-left:3px solid #8a94a8;border-radius:3px;padding:3px 9px;font:16px 'Patrick Hand',cursive;color:#2c3a58">Wind-down</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ 2c HABIT PLANNER (day-columns) ============ -->
+    <div class="dv-opt" id="2c" data-screen-label="2c Two-week habit planner">
+      <div class="dv-olabel"><a class="dv-oid" href="#2c">2c</a>Two-Week Habit Planner — day-columns with each ROW a fixed activity type (Workout, Moneymaker, Chores…) aligned across the week. Tap a task line → red ✓.</div>
+      <div style="position:relative;padding:13px 15px 17px;border-radius:8px;background:repeating-linear-gradient(90deg,#1c2140 0px,#1c2140 38px,#f3ebda 38px,#f3ebda 49px);box-shadow:0 16px 38px rgba(28,33,64,.26)">
+        <div style="position:absolute;left:150px;bottom:-24px;width:22px;height:58px;background:linear-gradient(180deg,#b25f40,#c26b4a);clip-path:polygon(0 0,100% 0,100% 100%,50% 86%,0 100%);box-shadow:2px 3px 6px rgba(28,33,64,.3)"></div>
+        <div style="position:relative;display:flex;box-shadow:0 2px 0 -1px #efe8d6,0 4px 0 -2px #e5ddc7,0 6px 0 -3px #d9d0b6,0 8px 14px rgba(28,33,64,.22)">
+
+          <!-- LEFT PAGE: WEEK ONE -->
+          <div style="width:540px;background:#fbf8f1;padding:28px 24px 30px 28px;background-image:linear-gradient(90deg,rgba(28,33,64,0) 82%,rgba(28,33,64,.07))">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px">
+              <span style="font:600 21px 'EB Garamond',serif;color:#1c2140">Two-Week Habit Planner</span>
+              <span style="font:18px 'Patrick Hand',cursive;color:#2c3a58;transform:rotate(-1.5deg)">13th – 26th July</span>
+            </div>
+            <!-- day header row -->
+            <div style="display:flex">
+              <div style="width:46px;flex:none"></div>
+              <sc-for list="{{ gridWeek1.cols }}" as="col" hint-placeholder-count="7">
+                <div style="flex:1;min-width:0;background:{{ col.color }};padding:4px 3px;display:flex;align-items:baseline;gap:3px;justify-content:center;white-space:nowrap;border-right:1px solid #fbf8f1">
+                  <span style="font:600 9px 'EB Garamond',serif;letter-spacing:.5px;color:#fff">{{ col.dayLabel }}</span>
+                  <span style="font:600 13px 'EB Garamond',serif;color:#fff">{{ col.date }}</span>
+                  <span style="font:500 7px 'EB Garamond',serif;color:#fff;position:relative;top:-3px">{{ col.suffix }}</span>
+                </div>
+              </sc-for>
+            </div>
+            <!-- activity rows -->
+            <sc-for list="{{ gridWeek1.rows }}" as="r" hint-placeholder-count="9">
+              <div style="display:flex;align-items:stretch">
+                <div style="width:46px;flex:none;display:flex;align-items:center;height:31px;font:600 7px 'EB Garamond',serif;letter-spacing:.5px;text-transform:uppercase;color:#a9a291;border-bottom:1px solid #e6e2d6;overflow:hidden">{{ r.label }}</div>
+                <sc-for list="{{ r.cells }}" as="c" hint-placeholder-count="7">
+                  <div onClick="{{ c.onTap }}" style="flex:1;min-width:0;height:31px;border-bottom:1px solid #e6e2d6;border-right:1px solid {{ c.colorLt }};display:flex;align-items:center;gap:3px;padding:0 4px;cursor:{{ c.cursor }}">
+                    <span style="font:14px 'Patrick Hand',cursive;color:#2c3a58;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1">{{ c.text }}</span>
+                    <span style="font:15px 'Patrick Hand',cursive;color:#c0392b;flex:none">{{ c.chk }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-for>
+            <div style="margin-top:14px;font:italic 13px 'Patrick Hand',cursive;color:#b3b9c4">tap a task line to tick it off — each row is one activity type, aligned across the week</div>
+          </div>
+
+          <!-- SPINE -->
+          <div style="position:absolute;left:50%;top:0;bottom:0;width:64px;transform:translateX(-50%);background:linear-gradient(90deg,rgba(28,33,64,0),rgba(28,33,64,.13) 42%,rgba(28,33,64,.24) 50%,rgba(28,33,64,.13) 58%,rgba(28,33,64,0));pointer-events:none;z-index:2"></div>
+
+          <!-- RIGHT PAGE: WEEK TWO -->
+          <div style="width:540px;background:#fbf8f1;padding:28px 28px 30px 24px;background-image:linear-gradient(90deg,rgba(28,33,64,.07),rgba(28,33,64,0) 18%)">
+            <div style="display:flex;justify-content:flex-end;align-items:baseline;margin-bottom:14px;height:27px">
+              <span style="font:500 11px 'EB Garamond',serif;letter-spacing:2px;color:#8a94a8">WEEK TWO · JULY 20 – 26</span>
+            </div>
+            <div style="display:flex">
+              <sc-for list="{{ gridWeek2.cols }}" as="col" hint-placeholder-count="7">
+                <div style="flex:1;min-width:0;background:{{ col.color }};padding:4px 3px;display:flex;align-items:baseline;gap:3px;justify-content:center;white-space:nowrap;border-right:1px solid #fbf8f1">
+                  <span style="font:600 13px 'EB Garamond',serif;color:#fff">{{ col.date }}</span>
+                  <span style="font:500 7px 'EB Garamond',serif;color:#fff;position:relative;top:-3px">{{ col.suffix }}</span>
+                </div>
+              </sc-for>
+            </div>
+            <sc-for list="{{ gridWeek2.rows }}" as="r" hint-placeholder-count="9">
+              <div style="display:flex;align-items:stretch">
+                <sc-for list="{{ r.cells }}" as="c" hint-placeholder-count="7">
+                  <div onClick="{{ c.onTap }}" style="flex:1;min-width:0;height:31px;border-bottom:1px solid #e6e2d6;border-right:1px solid {{ c.colorLt }};display:flex;align-items:center;gap:3px;padding:0 4px;cursor:{{ c.cursor }}">
+                    <span style="font:14px 'Patrick Hand',cursive;color:#2c3a58;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1">{{ c.text }}</span>
+                    <span style="font:15px 'Patrick Hand',cursive;color:#c0392b;flex:none">{{ c.chk }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ 2d LIVING BOOK ============ -->
+    <div class="dv-opt" id="2d" data-screen-label="2d Living book flip demo">
+      <div class="dv-olabel"><a class="dv-oid" href="#2d">2d</a>The living book — click the right edge to flip: cover → daily page → habit grid (simplified pages, full flip physics)</div>
+      <div style="display:flex;flex-direction:column;gap:12px;align-items:center">
+        <div style="position:relative;padding:11px 13px 15px;border-radius:8px;background:repeating-linear-gradient(90deg,#1c2140 0px,#1c2140 28px,#f3ebda 28px,#f3ebda 36px);box-shadow:0 16px 38px rgba(28,33,64,.26)">
+          <div style="position:relative;width:800px;height:560px;perspective:2600px;box-shadow:0 2px 0 -1px #efe8d6,0 4px 0 -2px #e5ddc7,0 6px 0 -3px #d9d0b6,0 8px 14px rgba(28,33,64,.22)">
+
+            <!-- CLOSED COVER (right half) -->
+            <sc-if value="{{ isCover }}" hint-placeholder-val="{{ true }}">
+              <div style="position:absolute;top:0;bottom:0;left:50%;width:50%;background:repeating-linear-gradient(90deg,#1c2140 0px,#1c2140 28px,#f3ebda 28px,#f3ebda 36px);border-radius:0 8px 8px 0;display:flex;align-items:center;justify-content:center;z-index:3">
+                <div style="width:180px;background:#f6efdf;border:1.5px solid #b8985a;border-radius:90px 90px 8px 8px;padding:28px 18px 22px;text-align:center;box-shadow:0 5px 14px rgba(28,33,64,.35)">
+                  <div style="font:600 8px 'EB Garamond',serif;letter-spacing:3px;color:#8a7648">NOTES &amp; THOUGHTS</div>
+                  <div style="width:4px;height:4px;border-radius:50%;background:#b8985a;margin:12px auto"></div>
+                  <div style="font:600 40px/1 'EB Garamond',serif;color:#1c2140;font-style:italic">July</div>
+                  <div style="width:26px;height:1px;background:#b8985a;margin:14px auto"></div>
+                  <div style="font:500 10px 'EB Garamond',serif;letter-spacing:4px;color:#1c2140">2026</div>
+                </div>
+              </div>
+            </sc-if>
+
+            <!-- OPEN PAGES -->
+            <sc-if value="{{ isOpen }}" hint-placeholder-val="{{ false }}">
+              <div style="position:absolute;inset:0;display:flex;z-index:1">
+                <!-- LEFT -->
+                <div style="width:50%;background:#fbf8f1;padding:22px 24px;background-image:linear-gradient(90deg,rgba(28,33,64,0) 80%,rgba(28,33,64,.08))">
+                  <sc-if value="{{ isDaily }}" hint-placeholder-val="{{ true }}">
+                    <div style="display:flex;align-items:baseline;gap:9px;border-bottom:1px solid #b8985a;padding-bottom:7px;margin-bottom:12px">
+                      <span style="font:500 9px 'EB Garamond',serif;letter-spacing:2.5px;color:#8a94a8">MONDAY</span>
+                      <span style="font:600 19px 'EB Garamond',serif;color:#1c2140">July 6</span>
+                    </div>
+                    <div style="font:600 10px 'EB Garamond',serif;letter-spacing:2px;color:#1c2140;margin-bottom:8px">SUCCESSFUL DAY</div>
+                    <div style="display:flex;align-items:center;gap:8px;height:23px;border-bottom:1px solid #dde4ee"><span style="width:12px;height:12px;flex:none;border:1.5px solid #2c3a58;border-radius:47% 53% 50% 50%;background:radial-gradient(circle,#2c3a58 55%,transparent 56%)"></span><span style="font:14px 'Patrick Hand',cursive;color:#2c3a58">Vitamins</span></div>
+                    <div style="display:flex;align-items:center;gap:8px;height:23px;border-bottom:1px solid #dde4ee"><span style="width:12px;height:12px;flex:none;border:1.5px solid #2c3a58;border-radius:52% 48% 50% 50%;background:radial-gradient(circle,#2c3a58 55%,transparent 56%)"></span><span style="font:14px 'Patrick Hand',cursive;color:#2c3a58">Skincare</span></div>
+                    <div style="display:flex;align-items:center;gap:8px;height:23px;border-bottom:1px solid #dde4ee"><span style="width:12px;height:12px;flex:none;border:1.5px solid #2c3a58;border-radius:50% 50% 48% 52%"></span><span style="font:14px 'Patrick Hand',cursive;color:#2c3a58">Fitness</span></div>
+                    <div style="display:flex;align-items:center;gap:8px;height:23px;border-bottom:1px solid #dde4ee;margin-bottom:14px"><span style="width:12px;height:12px;flex:none;border:1.5px solid #2c3a58;border-radius:48% 52% 50% 50%"></span><span style="font:14px 'Patrick Hand',cursive;color:#2c3a58">Moneymaker</span></div>
+                    <div style="font:600 10px 'EB Garamond',serif;letter-spacing:2px;color:#1c2140;margin-bottom:6px">TO DOS</div>
+                    <div style="display:flex;align-items:center;gap:8px;height:23px;border-bottom:1px solid #c5cfdd"><span style="width:12px;height:12px;flex:none;border:1.5px solid #2c3a58;border-radius:50% 48% 52% 50%;background:radial-gradient(circle,#2c3a58 55%,transparent 56%)"></span><span style="font:14px 'Patrick Hand',cursive;color:#2c3a58">Call bank re: card</span></div>
+                    <div style="display:flex;align-items:center;gap:8px;height:23px;border-bottom:1px solid #c5cfdd"><span style="width:12px;height:12px;flex:none;border:1.5px solid #2c3a58;border-radius:52% 48% 50% 50%"></span><span style="font:14px 'Patrick Hand',cursive;color:#2c3a58">Grocery run</span></div>
+                    <div style="display:flex;align-items:center;gap:8px;height:23px;border-bottom:1px solid #c5cfdd"><span style="width:12px;height:12px;flex:none;border:1.5px solid #2c3a58;border-radius:48% 52% 50% 50%"></span><span style="font:14px 'Patrick Hand',cursive;color:#2c3a58">Email landlord</span></div>
+                    <div style="height:150px;background:repeating-linear-gradient(to bottom,transparent 0,transparent 22px,#c5cfdd 22px,#c5cfdd 23px)"></div>
+                  </sc-if>
+                  <sc-if value="{{ isHabits }}" hint-placeholder-val="{{ false }}">
+                    <div style="display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid #b8985a;padding-bottom:7px;margin-bottom:12px">
+                      <span style="font:600 10px 'EB Garamond',serif;letter-spacing:2px;color:#1c2140">TWO-WEEK HABITS</span>
+                      <span style="font:500 9px 'EB Garamond',serif;letter-spacing:2px;color:#8a94a8">WEEK ONE</span>
+                    </div>
+                    <div style="display:flex;gap:6px">
+                      <sc-for list="{{ miniCols }}" as="col" hint-placeholder-count="7">
+                        <div style="flex:1">
+                          <div style="height:4px;border-radius:2px;background:{{ col.spine }};margin-bottom:4px"></div>
+                          <div style="text-align:center;font:500 9px 'EB Garamond',serif;color:#8a94a8;margin-bottom:4px">{{ col.label }}</div>
+                          <sc-for list="{{ col.marks }}" as="m" hint-placeholder-count="5">
+                            <div style="height:26px;border-bottom:1px solid #dde4ee;display:flex;align-items:center;justify-content:center"><span style="font:17px 'Patrick Hand',cursive;color:{{ m.c }}">{{ m.g }}</span></div>
+                          </sc-for>
+                        </div>
+                      </sc-for>
+                    </div>
+                    <div style="height:120px;margin-top:16px;background:repeating-linear-gradient(to bottom,transparent 0,transparent 22px,#dde4ee 22px,#dde4ee 23px)"></div>
+                  </sc-if>
+                </div>
+                <!-- RIGHT -->
+                <div style="width:50%;background:#fbf8f1;padding:22px 24px;background-image:linear-gradient(90deg,rgba(28,33,64,.08),rgba(28,33,64,0) 20%)">
+                  <sc-if value="{{ isDaily }}" hint-placeholder-val="{{ true }}">
+                    <div style="display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid #b8985a;padding-bottom:7px;margin-bottom:12px">
+                      <span style="font:600 10px 'EB Garamond',serif;letter-spacing:2px;color:#1c2140">TIME ALIGNMENT</span>
+                      <span style="font:500 9px 'EB Garamond',serif;letter-spacing:1.5px;color:#8a94a8">8AM — 2AM</span>
+                    </div>
+                    <div style="position:relative;height:440px;background:repeating-linear-gradient(to bottom,transparent 0,transparent 14px,#dde4ee 14px,#dde4ee 15px)">
+                      <div style="position:absolute;left:0;right:0;top:0;height:28px;background:rgba(233,196,90,.30);border-left:3px solid #c9a23c;border-radius:3px;padding:1px 7px;font:13px 'Patrick Hand',cursive;color:#2c3a58">Morning routine</div>
+                      <div style="position:absolute;left:0;right:0;top:45px;height:58px;background:rgba(120,150,200,.22);border-left:3px solid #5a7ab2;border-radius:3px;padding:2px 7px;font:13px 'Patrick Hand',cursive;color:#2c3a58">Moneymaker</div>
+                      <div style="position:absolute;left:0;right:0;top:120px;height:43px;background:rgba(140,180,120,.25);border-left:3px solid #6f9a5c;border-radius:3px;padding:2px 7px;font:13px 'Patrick Hand',cursive;color:#2c3a58">Gym + shower</div>
+                      <div style="position:absolute;left:0;right:0;top:225px;height:28px;background:rgba(194,109,79,.18);border-left:3px solid #c26b4a;border-radius:3px;padding:1px 7px;font:13px 'Patrick Hand',cursive;color:#2c3a58">Errands + calls</div>
+                      <div style="position:absolute;left:0;right:0;top:330px;height:28px;background:rgba(233,196,90,.30);border-left:3px solid #c9a23c;border-radius:3px;padding:1px 7px;font:13px 'Patrick Hand',cursive;color:#2c3a58">Dinner</div>
+                    </div>
+                  </sc-if>
+                  <sc-if value="{{ isHabits }}" hint-placeholder-val="{{ false }}">
+                    <div style="display:flex;justify-content:flex-end;align-items:baseline;border-bottom:1px solid #b8985a;padding-bottom:7px;margin-bottom:12px">
+                      <span style="font:500 9px 'EB Garamond',serif;letter-spacing:2px;color:#8a94a8">WEEK TWO</span>
+                    </div>
+                    <div style="display:flex;gap:6px">
+                      <sc-for list="{{ miniCols }}" as="col" hint-placeholder-count="7">
+                        <div style="flex:1">
+                          <div style="height:4px;border-radius:2px;background:{{ col.spine }};margin-bottom:4px"></div>
+                          <div style="text-align:center;font:500 9px 'EB Garamond',serif;color:#8a94a8;margin-bottom:4px">{{ col.label }}</div>
+                          <sc-for list="{{ col.marks }}" as="m" hint-placeholder-count="5">
+                            <div style="height:26px;border-bottom:1px solid #dde4ee;display:flex;align-items:center;justify-content:center"><span style="font:17px 'Patrick Hand',cursive;color:{{ m.c }}">{{ m.g }}</span></div>
+                          </sc-for>
+                        </div>
+                      </sc-for>
+                    </div>
+                    <div style="height:120px;margin-top:16px;background:repeating-linear-gradient(to bottom,transparent 0,transparent 22px,#dde4ee 22px,#dde4ee 23px)"></div>
+                  </sc-if>
+                </div>
+              </div>
+              <!-- SPINE -->
+              <div style="position:absolute;left:50%;top:0;bottom:0;width:56px;transform:translateX(-50%);background:linear-gradient(90deg,rgba(28,33,64,0),rgba(28,33,64,.13) 42%,rgba(28,33,64,.24) 50%,rgba(28,33,64,.13) 58%,rgba(28,33,64,0));pointer-events:none;z-index:2"></div>
+            </sc-if>
+
+            <!-- TURNING LEAF -->
+            <sc-if value="{{ leafOn }}" hint-placeholder-val="{{ false }}">
+              <div onTransitionEnd="{{ onLeafDone }}" style="position:absolute;top:0;bottom:0;left:50%;width:50%;transform-origin:left center;transform:{{ leafTransform }};transition:transform .95s cubic-bezier(.45,.05,.25,1);transform-style:preserve-3d;z-index:6">
+                <div style="position:absolute;inset:0;backface-visibility:hidden;background:#fbf8f1;box-shadow:-6px 0 22px rgba(28,33,64,.22)">
+                  <sc-if value="{{ leafCover }}" hint-placeholder-val="{{ false }}">
+                    <div style="position:absolute;inset:0;background:repeating-linear-gradient(90deg,#1c2140 0px,#1c2140 28px,#f3ebda 28px,#f3ebda 36px);border-radius:0 8px 8px 0;display:flex;align-items:center;justify-content:center">
+                      <div style="width:180px;background:#f6efdf;border:1.5px solid #b8985a;border-radius:90px 90px 8px 8px;padding:28px 18px 22px;text-align:center">
+                        <div style="font:600 8px 'EB Garamond',serif;letter-spacing:3px;color:#8a7648">NOTES &amp; THOUGHTS</div>
+                        <div style="width:4px;height:4px;border-radius:50%;background:#b8985a;margin:12px auto"></div>
+                        <div style="font:600 40px/1 'EB Garamond',serif;color:#1c2140;font-style:italic">July</div>
+                        <div style="width:26px;height:1px;background:#b8985a;margin:14px auto"></div>
+                        <div style="font:500 10px 'EB Garamond',serif;letter-spacing:4px;color:#1c2140">2026</div>
+                      </div>
+                    </div>
+                  </sc-if>
+                  <sc-if value="{{ leafPlain }}" hint-placeholder-val="{{ false }}">
+                    <div style="padding:22px 24px;height:100%;box-sizing:border-box">
+                      <div style="font:600 10px 'EB Garamond',serif;letter-spacing:2px;color:#1c2140;border-bottom:1px solid #b8985a;padding-bottom:7px;margin-bottom:12px">{{ leafFrontTitle }}</div>
+                      <div style="height:82%;background:repeating-linear-gradient(to bottom,transparent 0,transparent 14px,#dde4ee 14px,#dde4ee 15px)"></div>
+                    </div>
+                  </sc-if>
+                </div>
+                <div style="position:absolute;inset:0;backface-visibility:hidden;transform:rotateY(180deg);background:#fbf8f1;box-shadow:6px 0 22px rgba(28,33,64,.22)">
+                  <div style="padding:22px 24px;height:100%;box-sizing:border-box">
+                    <div style="font:600 10px 'EB Garamond',serif;letter-spacing:2px;color:#1c2140;border-bottom:1px solid #b8985a;padding-bottom:7px;margin-bottom:12px">{{ leafBackTitle }}</div>
+                    <div style="height:82%;background:repeating-linear-gradient(to bottom,transparent 0,transparent 22px,#dde4ee 22px,#dde4ee 23px)"></div>
+                  </div>
+                </div>
+              </div>
+            </sc-if>
+
+            <!-- EDGE CLICK ZONES -->
+            <div onClick="{{ flipFwd }}" style="position:absolute;top:0;bottom:0;right:0;width:64px;z-index:8;cursor:pointer;display:flex;align-items:center;justify-content:flex-end" title="flip forward">
+              <span style="font:600 22px 'EB Garamond',serif;color:rgba(28,33,64,.35);padding-right:8px">›</span>
+            </div>
+            <div onClick="{{ flipBack }}" style="position:absolute;top:0;bottom:0;left:0;width:64px;z-index:8;cursor:pointer;display:flex;align-items:center" title="flip back">
+              <span style="font:600 22px 'EB Garamond',serif;color:rgba(28,33,64,.35);padding-left:8px">‹</span>
+            </div>
+          </div>
+        </div>
+        <div style="font:italic 14px 'Patrick Hand',cursive;color:#8a94a8">click the page edges — cover → daily page → habit grid</div>
+      </div>
+    </div>
+
+  </div>
+  <p class="dv-next">Try next: "make the flip in <a class="dv-oid" href="#2d">2d</a> full-fidelity with the real pages" · "phone version of <a class="dv-oid" href="#2b">2b</a>" · "add a drag-corner flip instead of click"</p>
+</section>
+
+<section class="dv-turn" id="t1">
+  <div class="dv-thd"><a class="dv-tid" href="#t1">1</a><span class="dv-tname">The book — cover + three spread layouts (desktop/tablet, filled state)</span></div>
+  <div style="max-width:860px;margin:0 0 24px;font:13px/1.6 system-ui,sans-serif;color:rgba(0,0,0,.6)">
+    <strong style="color:#1a1a1a">Assumptions:</strong> brand name on the badge = the current month ("July"). Serif = EB Garamond, handwriting = Patrick Hand (casual ballpoint print). Ink is ballpoint blue-black, rules are blue-gray, paper is near-white cream. Time Alignment is fixed 8am–2am; highlighter-tint blocks with a hand-bracket left edge; fixed commitments get a solid outline. All three spreads share identical book chrome (striped cover peeking around the pages, sheet-stack edge, spine crease, terracotta ribbon) — they differ only in zone arrangement.
+    <span style="display:inline-flex;gap:6px;vertical-align:middle;margin-left:10px"><span style="width:16px;height:16px;border-radius:4px;background:#1c2140"></span><span style="width:16px;height:16px;border-radius:4px;background:#f3ebda;border:1px solid rgba(0,0,0,.1)"></span><span style="width:16px;height:16px;border-radius:4px;background:#b8985a"></span><span style="width:16px;height:16px;border-radius:4px;background:#c26b4a"></span><span style="width:16px;height:16px;border-radius:4px;background:#c5cfdd"></span><span style="width:16px;height:16px;border-radius:4px;background:#2c3a58"></span></span>
+  </div>
+
+  <div class="dv-opts">
+
+    <!-- ============ 1a COVER ============ -->
+    <div class="dv-opt" id="1a" data-screen-label="1a Cover">
+      <div class="dv-olabel"><a class="dv-oid" href="#1a">1a</a>Closed cover — navy stripes, arch badge, ribbon</div>
+      <div style="position:relative;width:560px;height:800px;border-radius:6px 14px 14px 6px;background:repeating-linear-gradient(90deg,#1c2140 0px,#1c2140 38px,#f3ebda 38px,#f3ebda 49px);box-shadow:0 18px 40px rgba(28,33,64,.28),0 3px 8px rgba(28,33,64,.2);display:flex;align-items:center;justify-content:center">
+        <div style="position:absolute;inset:0;border-radius:6px 14px 14px 6px;background:linear-gradient(90deg,rgba(0,0,0,.22) 0,rgba(0,0,0,0) 22px,rgba(255,255,255,.06) 40px,rgba(0,0,0,0) 70px);pointer-events:none"></div>
+        <div style="position:absolute;left:26px;top:-6px;width:26px;height:120px;background:linear-gradient(180deg,#b25f40,#c26b4a);clip-path:polygon(0 0,100% 0,100% 100%,50% 88%,0 100%);box-shadow:2px 3px 6px rgba(28,33,64,.35)"></div>
+        <div style="width:280px;background:#f6efdf;border:1.5px solid #b8985a;border-radius:140px 140px 10px 10px;padding:46px 26px 34px;text-align:center;box-shadow:0 6px 18px rgba(28,33,64,.35)">
+          <div style="font:600 11px 'EB Garamond',serif;letter-spacing:4px;color:#8a7648">NOTES &amp; THOUGHTS</div>
+          <div style="width:5px;height:5px;border-radius:50%;background:#b8985a;margin:20px auto"></div>
+          <div style="font:600 64px/1 'EB Garamond',serif;color:#1c2140;font-style:italic">July</div>
+          <div style="width:34px;height:1px;background:#b8985a;margin:22px auto"></div>
+          <div style="font:500 12px 'EB Garamond',serif;letter-spacing:5px;color:#1c2140">MMXXVI</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ 1b CLASSIC SPLIT ============ -->
+    <div class="dv-opt" id="1b" data-screen-label="1b Spread - classic split">
+      <div class="dv-olabel"><a class="dv-oid" href="#1b">1b</a>Spread A — lists on the left page, whole day on the right</div>
+      <div style="position:relative;padding:13px 15px 17px;border-radius:8px;background:repeating-linear-gradient(90deg,#1c2140 0px,#1c2140 38px,#f3ebda 38px,#f3ebda 49px);box-shadow:0 16px 38px rgba(28,33,64,.26)">
+        <div style="position:absolute;left:150px;bottom:-24px;width:22px;height:58px;background:linear-gradient(180deg,#b25f40,#c26b4a);clip-path:polygon(0 0,100% 0,100% 100%,50% 86%,0 100%);box-shadow:2px 3px 6px rgba(28,33,64,.3)"></div>
+        <div style="position:relative;display:flex;box-shadow:0 2px 0 -1px #efe8d6,0 4px 0 -2px #e5ddc7,0 6px 0 -3px #d9d0b6,0 8px 14px rgba(28,33,64,.22)">
+
+          <!-- LEFT PAGE -->
+          <div style="width:540px;background:#fbf8f1;padding:30px 34px 26px 30px;background-image:linear-gradient(90deg,rgba(28,33,64,0) 82%,rgba(28,33,64,.07))">
+            <div style="display:flex;align-items:baseline;gap:12px;border-bottom:1px solid #b8985a;padding-bottom:10px;margin-bottom:18px">
+              <span style="font:500 11px 'EB Garamond',serif;letter-spacing:3px;color:#8a94a8">MONDAY</span>
+              <span style="font:600 26px 'EB Garamond',serif;color:#1c2140">July 6</span>
+            </div>
+            <div style="font:600 12px 'EB Garamond',serif;letter-spacing:2.5px;color:#1c2140;margin-bottom:2px">SUCCESSFUL DAY</div>
+            <div style="width:28px;height:2px;background:#b8985a;margin-bottom:12px"></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 24px;margin-bottom:20px">
+              <div>
+                <div style="font:500 10px 'EB Garamond',serif;letter-spacing:2px;color:#8a94a8;margin-bottom:6px">AM</div>
+                <sc-for list="{{ habitsAM }}" as="h" hint-placeholder-count="5">
+                  <div style="display:flex;align-items:center;gap:10px;height:28px;border-bottom:1px solid #dde4ee">
+                    <span style="width:15px;height:15px;flex:none;border:1.5px solid #2c3a58;border-radius:47% 53% 50% 50%;display:flex;align-items:center;justify-content:center">
+                      <sc-if value="{{ h.done }}" hint-placeholder-val="{{ false }}"><span style="width:9px;height:9px;background:#2c3a58;border-radius:55% 45% 50% 52%;transform:rotate(12deg)"></span></sc-if>
+                    </span>
+                    <span style="font:17px 'Patrick Hand',cursive;color:#2c3a58">{{ h.label }}</span>
+                  </div>
+                </sc-for>
+              </div>
+              <div>
+                <div style="font:500 10px 'EB Garamond',serif;letter-spacing:2px;color:#8a94a8;margin-bottom:6px">PM</div>
+                <sc-for list="{{ habitsPM }}" as="h" hint-placeholder-count="4">
+                  <div style="display:flex;align-items:center;gap:10px;height:28px;border-bottom:1px solid #dde4ee">
+                    <span style="width:15px;height:15px;flex:none;border:1.5px solid #2c3a58;border-radius:52% 48% 50% 50%;display:flex;align-items:center;justify-content:center">
+                      <sc-if value="{{ h.done }}" hint-placeholder-val="{{ false }}"><span style="width:9px;height:9px;background:#2c3a58;border-radius:45% 55% 52% 48%;transform:rotate(-8deg)"></span></sc-if>
+                    </span>
+                    <span style="font:17px 'Patrick Hand',cursive;color:#2c3a58">{{ h.label }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+            <div style="font:600 12px 'EB Garamond',serif;letter-spacing:2.5px;color:#1c2140;margin-bottom:2px">TO DOS</div>
+            <div style="width:28px;height:2px;background:#b8985a;margin-bottom:8px"></div>
+            <sc-for list="{{ todos }}" as="t" hint-placeholder-count="15">
+              <div style="display:flex;align-items:center;gap:12px;height:27px;border-bottom:1px solid #c5cfdd">
+                <span style="font:500 11px 'EB Garamond',serif;color:#8a94a8;width:18px;flex:none">{{ t.n }}</span>
+                <span style="font:17px 'Patrick Hand',cursive;color:#2c3a58;text-decoration:{{ t.deco }}">{{ t.text }}</span>
+                <sc-if value="{{ t.prompt }}" hint-placeholder-val="{{ false }}"><span style="font:italic 14px 'Patrick Hand',cursive;color:#b3b9c4">tap a line to write…</span></sc-if>
+              </div>
+            </sc-for>
+          </div>
+
+          <!-- SPINE -->
+          <div style="position:absolute;left:50%;top:0;bottom:0;width:64px;transform:translateX(-50%);background:linear-gradient(90deg,rgba(28,33,64,0),rgba(28,33,64,.13) 42%,rgba(28,33,64,.24) 50%,rgba(28,33,64,.13) 58%,rgba(28,33,64,0));pointer-events:none;z-index:2"></div>
+
+          <!-- RIGHT PAGE -->
+          <div style="width:540px;background:#fbf8f1;padding:30px 30px 26px 34px;background-image:linear-gradient(90deg,rgba(28,33,64,.07),rgba(28,33,64,0) 18%)">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid #b8985a;padding-bottom:10px;margin-bottom:14px">
+              <span style="font:600 12px 'EB Garamond',serif;letter-spacing:2.5px;color:#1c2140">TIME ALIGNMENT</span>
+              <span style="font:500 10px 'EB Garamond',serif;letter-spacing:2px;color:#8a94a8">8AM — 2AM</span>
+            </div>
+            <div style="position:relative">
+              <sc-for list="{{ slots }}" as="s" hint-placeholder-count="12">
+                <div style="height:17px;border-top:1px solid {{ s.rule }};position:relative">
+                  <span style="position:absolute;left:0;top:-6px;font:500 9px 'EB Garamond',serif;letter-spacing:.5px;color:#8a94a8;width:40px">{{ s.t }}</span>
+                </div>
+              </sc-for>
+              <div style="position:absolute;left:52px;right:6px;top:0;height:32px;background:rgba(233,196,90,.30);border-left:3px solid #c9a23c;border-radius:3px;transform:rotate(-.2deg);padding:2px 8px;font:15px 'Patrick Hand',cursive;color:#2c3a58">Morning routine</div>
+              <div style="position:absolute;left:52px;right:6px;top:51px;height:66px;background:rgba(120,150,200,.22);border-left:3px solid #5a7ab2;border-radius:3px;transform:rotate(.15deg);padding:3px 8px;font:15px 'Patrick Hand',cursive;color:#2c3a58">Moneymaker — client site</div>
+              <div style="position:absolute;left:52px;right:6px;top:136px;height:15px;background:rgba(140,180,120,.25);border-left:3px solid #6f9a5c;border-radius:3px;padding:0 8px;font:13px/15px 'Patrick Hand',cursive;color:#2c3a58">Walk</div>
+              <div style="position:absolute;left:52px;right:6px;top:170px;height:49px;background:rgba(140,180,120,.25);border-left:3px solid #6f9a5c;border-radius:3px;transform:rotate(-.15deg);padding:3px 8px;font:15px 'Patrick Hand',cursive;color:#2c3a58">Gym + shower</div>
+              <div style="position:absolute;left:52px;right:6px;top:272px;height:32px;background:rgba(194,109,79,.18);border-left:3px solid #c26b4a;border-radius:3px;padding:2px 8px;font:15px 'Patrick Hand',cursive;color:#2c3a58">Email landlord + bank call</div>
+              <div style="position:absolute;left:52px;right:6px;top:408px;height:32px;background:rgba(233,196,90,.30);border-left:3px solid #c9a23c;border-radius:3px;transform:rotate(.2deg);padding:2px 8px;font:15px 'Patrick Hand',cursive;color:#2c3a58">Dinner</div>
+              <div style="position:absolute;left:52px;right:6px;top:493px;height:32px;background:rgba(120,150,200,.16);border-left:3px solid #8a94a8;border-radius:3px;padding:2px 8px;font:15px 'Patrick Hand',cursive;color:#2c3a58">Wind-down</div>
+            </div>
+            <div style="margin-top:14px;border-top:1px solid #b8985a;padding-top:10px;display:flex;align-items:center;gap:14px">
+              <span style="font:600 11px 'EB Garamond',serif;letter-spacing:2px;color:#1c2140;flex:none">WIND-DOWN</span>
+              <span style="font:15px 'Patrick Hand',cursive;color:#2c3a58;border-bottom:1px solid #c5cfdd;flex:1">Tomorrow: gym early, finish expenses</span>
+              <span style="font:15px 'Patrick Hand',cursive;color:#2c3a58;flex:none">Lights out: 12:30</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ 1c TIMELINE LEFT ============ -->
+    <div class="dv-opt" id="1c" data-screen-label="1c Spread - timeline left">
+      <div class="dv-olabel"><a class="dv-oid" href="#1c">1c</a>Spread B — the day plan is the left hero; lists on the right (incl. a ◆ fixed block)</div>
+      <div style="position:relative;padding:13px 15px 17px;border-radius:8px;background:repeating-linear-gradient(90deg,#1c2140 0px,#1c2140 38px,#f3ebda 38px,#f3ebda 49px);box-shadow:0 16px 38px rgba(28,33,64,.26)">
+        <div style="position:absolute;left:150px;bottom:-24px;width:22px;height:58px;background:linear-gradient(180deg,#b25f40,#c26b4a);clip-path:polygon(0 0,100% 0,100% 100%,50% 86%,0 100%);box-shadow:2px 3px 6px rgba(28,33,64,.3)"></div>
+        <div style="position:relative;display:flex;box-shadow:0 2px 0 -1px #efe8d6,0 4px 0 -2px #e5ddc7,0 6px 0 -3px #d9d0b6,0 8px 14px rgba(28,33,64,.22)">
+
+          <!-- LEFT PAGE: TIME ALIGNMENT -->
+          <div style="width:540px;background:#fbf8f1;padding:30px 34px 26px 30px;background-image:linear-gradient(90deg,rgba(28,33,64,0) 82%,rgba(28,33,64,.07))">
+            <div style="display:flex;align-items:baseline;justify-content:space-between;border-bottom:1px solid #b8985a;padding-bottom:10px;margin-bottom:14px">
+              <span style="display:flex;align-items:baseline;gap:12px"><span style="font:500 11px 'EB Garamond',serif;letter-spacing:3px;color:#8a94a8">MONDAY</span><span style="font:600 26px 'EB Garamond',serif;color:#1c2140">July 6</span></span>
+              <span style="font:600 12px 'EB Garamond',serif;letter-spacing:2.5px;color:#1c2140">TIME ALIGNMENT</span>
+            </div>
+            <div style="position:relative">
+              <sc-for list="{{ slots }}" as="s" hint-placeholder-count="12">
+                <div style="height:19px;border-top:1px solid {{ s.rule }};position:relative">
+                  <span style="position:absolute;left:0;top:-6px;font:500 9px 'EB Garamond',serif;letter-spacing:.5px;color:#8a94a8;width:40px">{{ s.t }}</span>
+                </div>
+              </sc-for>
+              <div style="position:absolute;left:54px;right:6px;top:0;height:36px;background:rgba(233,196,90,.30);border-left:3px solid #c9a23c;border-radius:3px;transform:rotate(-.2deg);padding:3px 9px;font:16px 'Patrick Hand',cursive;color:#2c3a58">Morning routine</div>
+              <div style="position:absolute;left:54px;right:6px;top:57px;height:74px;background:rgba(120,150,200,.22);border-left:3px solid #5a7ab2;border-radius:3px;transform:rotate(.15deg);padding:4px 9px;font:16px 'Patrick Hand',cursive;color:#2c3a58">Moneymaker — client site</div>
+              <div style="position:absolute;left:54px;right:6px;top:152px;height:17px;background:rgba(140,180,120,.25);border-left:3px solid #6f9a5c;border-radius:3px;padding:0 9px;font:14px/17px 'Patrick Hand',cursive;color:#2c3a58">Walk</div>
+              <div style="position:absolute;left:54px;right:6px;top:190px;height:55px;background:rgba(140,180,120,.25);border-left:3px solid #6f9a5c;border-radius:3px;transform:rotate(-.15deg);padding:4px 9px;font:16px 'Patrick Hand',cursive;color:#2c3a58">Gym + shower</div>
+              <div style="position:absolute;left:54px;right:6px;top:304px;height:36px;background:rgba(194,109,79,.18);border-left:3px solid #c26b4a;border-radius:3px;padding:3px 9px;font:16px 'Patrick Hand',cursive;color:#2c3a58">Email landlord + bank call</div>
+              <div style="position:absolute;left:54px;right:6px;top:380px;height:36px;background:#f6efdf;border:1.5px solid #1c2140;border-left-width:3px;border-radius:3px;padding:2px 9px;font:16px 'Patrick Hand',cursive;color:#1c2140;display:flex;align-items:center;justify-content:space-between"><span>Dentist appointment</span><span style="font:600 9px 'EB Garamond',serif;letter-spacing:2px;color:#8a7648">◆ FIXED</span></div>
+              <div style="position:absolute;left:54px;right:6px;top:456px;height:36px;background:rgba(233,196,90,.30);border-left:3px solid #c9a23c;border-radius:3px;transform:rotate(.2deg);padding:3px 9px;font:16px 'Patrick Hand',cursive;color:#2c3a58">Dinner</div>
+              <div style="position:absolute;left:54px;right:6px;top:551px;height:36px;background:rgba(120,150,200,.16);border-left:3px solid #8a94a8;border-radius:3px;padding:3px 9px;font:16px 'Patrick Hand',cursive;color:#2c3a58">Wind-down</div>
+            </div>
+          </div>
+
+          <!-- SPINE -->
+          <div style="position:absolute;left:50%;top:0;bottom:0;width:64px;transform:translateX(-50%);background:linear-gradient(90deg,rgba(28,33,64,0),rgba(28,33,64,.13) 42%,rgba(28,33,64,.24) 50%,rgba(28,33,64,.13) 58%,rgba(28,33,64,0));pointer-events:none;z-index:2"></div>
+
+          <!-- RIGHT PAGE: LISTS -->
+          <div style="width:540px;background:#fbf8f1;padding:30px 30px 26px 34px;background-image:linear-gradient(90deg,rgba(28,33,64,.07),rgba(28,33,64,0) 18%)">
+            <div style="font:600 12px 'EB Garamond',serif;letter-spacing:2.5px;color:#1c2140;margin-bottom:2px">SUCCESSFUL DAY</div>
+            <div style="width:28px;height:2px;background:#b8985a;margin-bottom:10px"></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 24px;margin-bottom:18px">
+              <div>
+                <sc-for list="{{ habitsAM }}" as="h" hint-placeholder-count="5">
+                  <div style="display:flex;align-items:center;gap:10px;height:27px;border-bottom:1px solid #dde4ee">
+                    <span style="width:15px;height:15px;flex:none;border:1.5px solid #2c3a58;border-radius:47% 53% 50% 50%;display:flex;align-items:center;justify-content:center">
+                      <sc-if value="{{ h.done }}" hint-placeholder-val="{{ false }}"><span style="width:9px;height:9px;background:#2c3a58;border-radius:55% 45% 50% 52%;transform:rotate(12deg)"></span></sc-if>
+                    </span>
+                    <span style="font:16px 'Patrick Hand',cursive;color:#2c3a58">{{ h.label }}</span>
+                  </div>
+                </sc-for>
+              </div>
+              <div>
+                <sc-for list="{{ habitsPM }}" as="h" hint-placeholder-count="4">
+                  <div style="display:flex;align-items:center;gap:10px;height:27px;border-bottom:1px solid #dde4ee">
+                    <span style="width:15px;height:15px;flex:none;border:1.5px solid #2c3a58;border-radius:52% 48% 50% 50%;display:flex;align-items:center;justify-content:center">
+                      <sc-if value="{{ h.done }}" hint-placeholder-val="{{ false }}"><span style="width:9px;height:9px;background:#2c3a58;border-radius:45% 55% 52% 48%;transform:rotate(-8deg)"></span></sc-if>
+                    </span>
+                    <span style="font:16px 'Patrick Hand',cursive;color:#2c3a58">{{ h.label }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+            <div style="font:600 12px 'EB Garamond',serif;letter-spacing:2.5px;color:#1c2140;margin-bottom:2px">TO DOS</div>
+            <div style="width:28px;height:2px;background:#b8985a;margin-bottom:8px"></div>
+            <sc-for list="{{ todos }}" as="t" hint-placeholder-count="15">
+              <div style="display:flex;align-items:center;gap:12px;height:26px;border-bottom:1px solid #c5cfdd">
+                <span style="font:500 11px 'EB Garamond',serif;color:#8a94a8;width:18px;flex:none">{{ t.n }}</span>
+                <span style="font:16px 'Patrick Hand',cursive;color:#2c3a58;text-decoration:{{ t.deco }}">{{ t.text }}</span>
+                <sc-if value="{{ t.prompt }}" hint-placeholder-val="{{ false }}"><span style="font:italic 14px 'Patrick Hand',cursive;color:#b3b9c4">tap a line to write…</span></sc-if>
+              </div>
+            </sc-for>
+            <div style="margin-top:16px;border-top:1px solid #b8985a;padding-top:10px">
+              <div style="font:600 11px 'EB Garamond',serif;letter-spacing:2px;color:#1c2140;margin-bottom:6px">WIND-DOWN</div>
+              <div style="display:flex;gap:18px;margin-bottom:8px">
+                <span style="display:flex;align-items:center;gap:8px"><span style="width:13px;height:13px;border:1.5px solid #2c3a58;border-radius:50% 48% 52% 50%"></span><span style="font:15px 'Patrick Hand',cursive;color:#2c3a58">Tidy desk</span></span>
+                <span style="display:flex;align-items:center;gap:8px"><span style="width:13px;height:13px;border:1.5px solid #2c3a58;border-radius:48% 52% 50% 50%"></span><span style="font:15px 'Patrick Hand',cursive;color:#2c3a58">Set out clothes</span></span>
+                <span style="display:flex;align-items:center;gap:8px"><span style="width:13px;height:13px;border:1.5px solid #2c3a58;border-radius:50% 50% 48% 52%"></span><span style="font:15px 'Patrick Hand',cursive;color:#2c3a58">Plan tomorrow</span></span>
+              </div>
+              <div style="display:flex;align-items:center;gap:14px">
+                <span style="font:15px 'Patrick Hand',cursive;color:#2c3a58;border-bottom:1px solid #c5cfdd;flex:1">Tomorrow: gym early, finish expenses</span>
+                <span style="font:15px 'Patrick Hand',cursive;color:#2c3a58;flex:none">Lights out: 12:30</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ 1d TODOS HERO ============ -->
+    <div class="dv-opt" id="1d" data-screen-label="1d Spread - todos hero">
+      <div class="dv-olabel"><a class="dv-oid" href="#1d">1d</a>Spread C — habits as a compact chip strip; To Dos get the whole left page</div>
+      <div style="position:relative;padding:13px 15px 17px;border-radius:8px;background:repeating-linear-gradient(90deg,#1c2140 0px,#1c2140 38px,#f3ebda 38px,#f3ebda 49px);box-shadow:0 16px 38px rgba(28,33,64,.26)">
+        <div style="position:absolute;left:150px;bottom:-24px;width:22px;height:58px;background:linear-gradient(180deg,#b25f40,#c26b4a);clip-path:polygon(0 0,100% 0,100% 100%,50% 86%,0 100%);box-shadow:2px 3px 6px rgba(28,33,64,.3)"></div>
+        <div style="position:relative;display:flex;box-shadow:0 2px 0 -1px #efe8d6,0 4px 0 -2px #e5ddc7,0 6px 0 -3px #d9d0b6,0 8px 14px rgba(28,33,64,.22)">
+
+          <!-- LEFT PAGE -->
+          <div style="width:540px;background:#fbf8f1;padding:30px 34px 26px 30px;background-image:linear-gradient(90deg,rgba(28,33,64,0) 82%,rgba(28,33,64,.07))">
+            <div style="display:flex;align-items:baseline;gap:12px;border-bottom:1px solid #b8985a;padding-bottom:10px;margin-bottom:14px">
+              <span style="font:500 11px 'EB Garamond',serif;letter-spacing:3px;color:#8a94a8">MONDAY</span>
+              <span style="font:600 26px 'EB Garamond',serif;color:#1c2140">July 6</span>
+            </div>
+            <div style="font:600 12px 'EB Garamond',serif;letter-spacing:2.5px;color:#1c2140;margin-bottom:8px">SUCCESSFUL DAY</div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px 12px;margin-bottom:18px">
+              <sc-for list="{{ habitsAll }}" as="h" hint-placeholder-count="9">
+                <span style="display:flex;align-items:center;gap:7px;padding:3px 10px 3px 6px;border:1px solid #dde4ee;border-radius:14px;background:{{ h.bg }}">
+                  <span style="width:13px;height:13px;flex:none;border:1.5px solid #2c3a58;border-radius:47% 53% 50% 50%;display:flex;align-items:center;justify-content:center">
+                    <sc-if value="{{ h.done }}" hint-placeholder-val="{{ false }}"><span style="width:8px;height:8px;background:#2c3a58;border-radius:55% 45% 50% 52%"></span></sc-if>
+                  </span>
+                  <span style="font:15px 'Patrick Hand',cursive;color:#2c3a58">{{ h.label }}</span>
+                </span>
+              </sc-for>
+            </div>
+            <div style="font:600 12px 'EB Garamond',serif;letter-spacing:2.5px;color:#1c2140;margin-bottom:2px">TO DOS</div>
+            <div style="width:28px;height:2px;background:#b8985a;margin-bottom:8px"></div>
+            <sc-for list="{{ todos }}" as="t" hint-placeholder-count="15">
+              <div style="display:flex;align-items:center;gap:14px;height:33px;border-bottom:1px solid #c5cfdd">
+                <span style="font:500 12px 'EB Garamond',serif;color:#8a94a8;width:20px;flex:none">{{ t.n }}</span>
+                <span style="font:18px 'Patrick Hand',cursive;color:#2c3a58;text-decoration:{{ t.deco }}">{{ t.text }}</span>
+                <sc-if value="{{ t.prompt }}" hint-placeholder-val="{{ false }}"><span style="font:italic 15px 'Patrick Hand',cursive;color:#b3b9c4">tap a line to write…</span></sc-if>
+              </div>
+            </sc-for>
+          </div>
+
+          <!-- SPINE -->
+          <div style="position:absolute;left:50%;top:0;bottom:0;width:64px;transform:translateX(-50%);background:linear-gradient(90deg,rgba(28,33,64,0),rgba(28,33,64,.13) 42%,rgba(28,33,64,.24) 50%,rgba(28,33,64,.13) 58%,rgba(28,33,64,0));pointer-events:none;z-index:2"></div>
+
+          <!-- RIGHT PAGE -->
+          <div style="width:540px;background:#fbf8f1;padding:30px 30px 26px 34px;background-image:linear-gradient(90deg,rgba(28,33,64,.07),rgba(28,33,64,0) 18%)">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid #b8985a;padding-bottom:10px;margin-bottom:14px">
+              <span style="font:600 12px 'EB Garamond',serif;letter-spacing:2.5px;color:#1c2140">TIME ALIGNMENT</span>
+              <span style="font:500 10px 'EB Garamond',serif;letter-spacing:2px;color:#8a94a8">8AM — 2AM</span>
+            </div>
+            <div style="position:relative">
+              <sc-for list="{{ slots }}" as="s" hint-placeholder-count="12">
+                <div style="height:17px;border-top:1px solid {{ s.rule }};position:relative">
+                  <span style="position:absolute;left:0;top:-6px;font:500 9px 'EB Garamond',serif;letter-spacing:.5px;color:#8a94a8;width:40px">{{ s.t }}</span>
+                </div>
+              </sc-for>
+              <div style="position:absolute;left:52px;right:6px;top:0;height:32px;background:rgba(233,196,90,.30);border-left:3px solid #c9a23c;border-radius:3px;transform:rotate(-.2deg);padding:2px 8px;font:15px 'Patrick Hand',cursive;color:#2c3a58">Morning routine</div>
+              <div style="position:absolute;left:52px;right:6px;top:51px;height:66px;background:rgba(120,150,200,.22);border-left:3px solid #5a7ab2;border-radius:3px;transform:rotate(.15deg);padding:3px 8px;font:15px 'Patrick Hand',cursive;color:#2c3a58">Moneymaker — client site</div>
+              <div style="position:absolute;left:52px;right:6px;top:136px;height:15px;background:rgba(140,180,120,.25);border-left:3px solid #6f9a5c;border-radius:3px;padding:0 8px;font:13px/15px 'Patrick Hand',cursive;color:#2c3a58">Walk</div>
+              <div style="position:absolute;left:52px;right:6px;top:170px;height:49px;background:rgba(140,180,120,.25);border-left:3px solid #6f9a5c;border-radius:3px;transform:rotate(-.15deg);padding:3px 8px;font:15px 'Patrick Hand',cursive;color:#2c3a58">Gym + shower</div>
+              <div style="position:absolute;left:52px;right:6px;top:272px;height:32px;background:rgba(194,109,79,.18);border-left:3px solid #c26b4a;border-radius:3px;padding:2px 8px;font:15px 'Patrick Hand',cursive;color:#2c3a58">Email landlord + bank call</div>
+              <div style="position:absolute;left:52px;right:6px;top:408px;height:32px;background:rgba(233,196,90,.30);border-left:3px solid #c9a23c;border-radius:3px;transform:rotate(.2deg);padding:2px 8px;font:15px 'Patrick Hand',cursive;color:#2c3a58">Dinner</div>
+              <div style="position:absolute;left:52px;right:6px;top:493px;height:32px;background:rgba(120,150,200,.16);border-left:3px solid #8a94a8;border-radius:3px;padding:2px 8px;font:15px 'Patrick Hand',cursive;color:#2c3a58">Wind-down</div>
+            </div>
+            <div style="margin-top:14px;border-top:1px solid #b8985a;padding-top:10px;display:flex;align-items:center;gap:14px">
+              <span style="font:600 11px 'EB Garamond',serif;letter-spacing:2px;color:#1c2140;flex:none">WIND-DOWN</span>
+              <span style="font:15px 'Patrick Hand',cursive;color:#2c3a58;border-bottom:1px solid #c5cfdd;flex:1">Tomorrow: gym early, finish expenses</span>
+              <span style="font:15px 'Patrick Hand',cursive;color:#2c3a58;flex:none">Lights out: 12:30</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <p class="dv-next">Try next: "make <a class="dv-oid" href="#1b">1b</a> interactive with a real page flip" · "show the phone version of <a class="dv-oid" href="#1c">1c</a>" · "riff on the cover badge in <a class="dv-oid" href="#1a">1a</a>"</p>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = {
+    spread: 0,
+    leafT: 0,
+    leaf: null,
+    checks: { '0-0-0': true, '0-4-0': true },
+    todoText: ['Call bank re: new card', 'Grocery run — veg + coffee', 'Email landlord about leak', 'Book dentist follow-up', 'Finish expense tracker', '30 min job hunt', '', '', '', '', '', '', '', '', ''],
+    todoDone: [true, false, false, false, false, false, false, false, false, false, false, false, false, false, false]
+  };
+  // ── Seam for v1.5 color-coding ──────────────────────────────────────
+  // Every Time Alignment block carries a `source`; the map below is the
+  // single place a future release decides its swatch. Not applied to the
+  // paint yet (owner asked to defer), but the model exists so tagged
+  // to-dos / checklist items / routine blocks can be colored consistently.
+  static SOURCE_TAGS = {
+    goodDay: { label: 'Successful Day', color: '#c9a23c' },
+    todo:    { label: 'To Dos',          color: '#5a7ab2' },
+    routine: { label: 'Routine',         color: '#6f9a5c' },
+    chore:   { label: 'Chore',           color: '#c26b4a' },
+    fixed:   { label: 'Fixed commitment',color: '#1c2140' },
+    manual:  { label: 'Manual block',    color: '#8a94a8' }
+  };
+  toggleTask(key) {
+    this.setState(st => ({ checks: { ...st.checks, [key]: !st.checks[key] } }));
+  }
+  editTodo(i, val) {
+    this.setState(st => { const a = st.todoText.slice(); a[i] = val; return { todoText: a }; });
+  }
+  toggleTodo(i) {
+    this.setState(st => { const a = st.todoDone.slice(); a[i] = !a[i]; return { todoDone: a }; });
+  }
+  rightTitle(s) { return s === 1 ? 'TIME ALIGNMENT' : s === 2 ? 'WEEK TWO' : ''; }
+  leftTitle(s) { return s === 1 ? 'MONDAY · JULY 6' : s === 2 ? 'WEEK ONE' : ''; }
+  startFlip(back) {
+    if (this.state.leaf) return;
+    const s = this.state.spread;
+    if (back ? s <= 0 : s >= 2) return;
+    const leaf = back
+      ? { cover: s - 1 === 0, frontTitle: this.rightTitle(s - 1), backTitle: this.leftTitle(s), dirBack: true }
+      : { cover: s === 0, frontTitle: this.rightTitle(s), backTitle: this.leftTitle(s + 1), dirBack: false };
+    this.setState({ spread: back ? s - 1 : s + 1, leaf, leafT: 0 });
+    requestAnimationFrame(() => requestAnimationFrame(() => this.setState({ leafT: 1 })));
+  }
+  flipFwd = () => this.startFlip(false);
+  flipBack = () => this.startFlip(true);
+  onLeafDone = () => this.setState({ leaf: null, leafT: 0 });
+  renderVals() {
+    const slots = [];
+    for (let i = 0; i < 36; i++) {
+      const h24 = 8 + Math.floor(i / 2);
+      const half = i % 2 === 1;
+      const hh = ((h24 - 1) % 12) + 1;
+      slots.push({
+        t: half ? '' : hh + (h24 === 12 ? 'pm' : h24 > 12 && h24 < 24 ? 'pm' : 'am'),
+        rule: half ? '#e6ebf3' : '#c5cfdd'
+      });
+    }
+    const todoData = [
+      ['Call bank re: new card', true],
+      ['Grocery run — veg + coffee', false],
+      ['Email landlord about leak', false],
+      ['Book dentist follow-up', false],
+      ['Finish expense tracker', false],
+      ['30 min job hunt', false]
+    ];
+    const todos = [];
+    for (let i = 0; i < 15; i++) {
+      const d = todoData[i];
+      todos.push({
+        n: String(i + 1).padStart(2, '0'),
+        text: d ? d[0] : '',
+        deco: d && d[1] ? 'line-through' : 'none',
+        prompt: i === todoData.length
+      });
+    }
+    const habitsAM = [
+      { label: 'Wake by 8', done: true },
+      { label: 'Vitamins', done: true },
+      { label: 'Skincare', done: true },
+      { label: 'Mobility — 10 min', done: true },
+      { label: 'Fitness', done: false }
+    ];
+    const habitsPM = [
+      { label: 'Moneymaker', done: false },
+      { label: 'Skincare PM', done: false },
+      { label: 'Read 10 pages', done: false },
+      { label: 'In bed by 1', done: false }
+    ];
+    const habitsAll = habitsAM.concat(habitsPM).map(h => ({
+      label: h.label,
+      done: h.done,
+      bg: h.done ? 'rgba(233,196,90,.14)' : 'transparent'
+    }));
+    const tt = this.state.todoText, tdn = this.state.todoDone;
+    const todos2 = [];
+    for (let i = 0; i < 15; i++) {
+      todos2.push({ text: tt[i] || '', done: !!tdn[i], onInput: e => this.editTodo(i, e.target.value), onToggle: () => this.toggleTodo(i) });
+    }
+    const spineColors = ['#c26b4a', '#c9a23c', '#96a84e', '#5f9a63', '#4f958f', '#5a7ab2', '#8a6fae'];
+    const dayShort = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    const dayColors = [
+      { h: '#c76b8a', lt: '#eccfd8' }, { h: '#5a7ab2', lt: '#cdd8ea' }, { h: '#8a6fae', lt: '#dccfea' },
+      { h: '#5f9a63', lt: '#cfe2d0' }, { h: '#c9a23c', lt: '#ecdfb2' }, { h: '#c76b8a', lt: '#eccfd8' }, { h: '#5a7ab2', lt: '#cdd8ea' }
+    ];
+    // Each ROW is one activity TYPE, aligned across all 7 day-columns.
+    const cats = [
+      { label: 'Workout',    wd: ['Gym', 'Gym', '', 'Gym', 'Gym', '', 'Badminton'] },
+      { label: 'Moneymaker', wd: ['$$maker', '$$maker', '$$maker', '$$maker', '$$maker', '$$maker', ''] },
+      { label: 'Walk',       wd: ['', '', 'Biki walk', '', '', 'Biki walk', ''] },
+      { label: 'Chores',     wd: ['Clean house', 'Clean house', 'Clean house', 'Clean house', 'Clean house', 'Clean house', 'Clean house'] },
+      { label: 'Self-care',  wd: ['Oil hair', 'Wash hair', '', '', '', 'Wash hair', ''] },
+      { label: 'Finance',    wd: ['', '', '', '', '', '', 'Splitwise'] },
+      { label: 'Social',     wd: ['Bingo', '', 'Bingo', '', 'Bingo', '', 'Bingo'] },
+      { label: '',           wd: ['', '', '', '', '', '', ''] },
+      { label: '',           wd: ['', '', '', '', '', '', ''] }
+    ];
+    const ck = this.state.checks;
+    const ord = n => { const t = n % 10, h = Math.floor(n % 100 / 10); return h === 1 ? 'th' : t === 1 ? 'st' : t === 2 ? 'nd' : t === 3 ? 'rd' : 'th'; };
+    const buildWeek = (w, startDate, showDay) => {
+      const cols = [];
+      for (let d = 0; d < 7; d++) {
+        const date = startDate + d;
+        cols.push({ dayLabel: showDay ? dayShort[d] : '', date: String(date), suffix: ord(date), color: dayColors[d].h, colorLt: dayColors[d].lt });
+      }
+      const rows = cats.map((cat, ci) => {
+        const cells = [];
+        for (let d = 0; d < 7; d++) {
+          const text = cat.wd[d];
+          const colorLt = dayColors[d].lt;
+          if (text) {
+            const key = w + '-' + ci + '-' + d;
+            cells.push({ text, isTask: true, chk: ck[key] ? '✓' : '', onTap: () => this.toggleTask(key), cursor: 'pointer', colorLt });
+          } else {
+            cells.push({ text: '', isTask: false, chk: '', cursor: 'default', colorLt });
+          }
+        }
+        return { label: cat.label, cells };
+      });
+      return { cols, rows };
+    };
+    const gridWeek1 = buildWeek(0, 13, true);
+    const gridWeek2 = buildWeek(1, 20, false);
+    const miniCols = spineColors.map((sc, i) => ({
+      spine: sc,
+      label: ['M', 'T', 'W', 'T', 'F', 'S', 'S'][i],
+      marks: [0, 1, 2, 3, 4].map(r => {
+        const v = (i + r) % 3 === 0 ? 1 : ((i * 2 + r) % 7 === 3 ? 2 : 0);
+        return { g: v === 1 ? '✓' : v === 2 ? '✗' : '', c: v === 2 ? '#b5493a' : '#3e7d4e' };
+      })
+    }));
+    const leaf = this.state.leaf, lt = this.state.leafT, spread = this.state.spread;
+    const leafTransform = leaf
+      ? (leaf.dirBack ? (lt ? 'rotateY(0deg)' : 'rotateY(-179.8deg)') : (lt ? 'rotateY(-179.8deg)' : 'rotateY(0deg)'))
+      : 'none';
+    return {
+      slots, todos, habitsAM, habitsPM, habitsAll,
+      todos2, gridWeek1, gridWeek2, miniCols,
+      leafOn: !!leaf,
+      leafCover: !!(leaf && leaf.cover),
+      leafPlain: !!(leaf && !leaf.cover),
+      leafFrontTitle: leaf ? leaf.frontTitle : '',
+      leafBackTitle: leaf ? leaf.backTitle : '',
+      leafTransform,
+      isCover: spread === 0,
+      isOpen: spread > 0,
+      isDaily: spread === 1,
+      isHabits: spread === 2,
+      flipFwd: this.flipFwd,
+      flipBack: this.flipBack,
+      onLeafDone: this.onLeafDone
+    };
+  }
+}
+</script>
+</body>
+</html>
