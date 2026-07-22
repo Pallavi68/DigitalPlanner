@@ -1,193 +1,109 @@
 # Project Status
 
-Last updated: 2026-07-14
+Last updated: 2026-07-21
 
 ## Current objective
 
-Convert the approved Claude Design output into a complete, standalone frontend application that can be run locally and developed through Cursor using either Claude Code or OpenAI Codex.
+Review the runnable Daily Page foundation before implementing the remaining v1 pages and flows.
 
 ## Current working state
 
-The project repository currently contains planning and design documentation, including:
+The untouched Claude Design export remains archived under `design-handoff/`. The maintained React 18, TypeScript, and Vite application now lives under `frontend/`.
 
-* `prd.md`
-* `design-brief.md`
-* `decision-list.md`
-* `AGENTS.md`
-* `CLAUDE.md`, if already created
-* other supporting project documents
+The maintained app is locally runnable and currently provides:
 
-The project design has already been created using Claude Design based on `design-brief.md`.
+* root routing to today's Daily Page
+* dated Daily Page routes at `/day/:date`
+* a safe fallback from invalid or unknown routes to today
+* the existing book shell and responsive spread
+* the Successful Day routine checklist
+* numbered Daily To Dos `01–15`
+* the 8:00 AM–2:00 AM Time Alignment grid
+* evening wind-down controls
+* local persistence through the existing `localStorage` adapter
+* explicit local-save status wording that does not imply cloud sync
 
-It has not yet been confirmed whether the Claude Design output is:
+## Completed in the runnable-foundation milestone
 
-* only a visual design
-* an interactive prototype
-* an exported HTML bundle
-* or a complete, maintainable frontend codebase
-
-A locally runnable frontend has not yet been confirmed.
-
-## Completed
-
-* Product requirements have been documented in `prd.md`.
-* Design requirements have been documented in `design-brief.md`.
-* Important existing decisions have been documented in `decision-list.md`.
-* An initial project design has been created in Claude Design.
-* Shared coding-agent instructions have been created in `AGENTS.md`.
-* A shared workflow has been defined for using both Claude Code and OpenAI Codex.
-
-## In progress
-
-* Preparing the Claude Design output for functional frontend implementation.
-* Establishing a reliable handoff from Claude Design to the local project repository.
-* Preparing the repository to be opened and developed through Cursor.
-
-## Next immediate step
-
-Ask Claude Design to review the existing design against:
-
-* `prd.md`
-* `design-brief.md`
-* `decision-list.md`
-
-Then request a functional frontend handoff or the most complete available source-code export.
-
-Do not begin rebuilding the frontend before confirming what code or export Claude Design can provide.
-
-## Planned subsequent steps
-
-1. Obtain the Claude Design handoff or export.
-2. Add the handoff to the repository without overwriting the project documentation.
-3. Inspect the exported files before changing them.
-4. Determine whether the handoff is reusable as a standalone application.
-5. Create or complete the locally runnable frontend.
-6. Install dependencies.
-7. Run the local development server.
-8. Verify the implementation against the PRD and design brief.
-9. Run linting, type checking, tests, and a production build where available.
-10. Review the final changes and make a Git checkpoint.
-
-## Known issues and unknowns
-
-* The frontend framework has not yet been confirmed.
-* The package manager has not yet been confirmed.
-* Local installation commands are not yet known.
-* Local development server commands are not yet known.
-* A successful production build has not yet been confirmed.
-* It is not yet known whether Claude Design generated reusable source code.
-* It is not yet known whether the design relies on Claude-specific runtime functionality.
-* It is not yet known whether all PRD screens and user flows are represented in the current design.
-* Backend requirements, if any, have not yet been assessed for the frontend milestone.
-* The final repository structure for the frontend has not yet been decided.
-
-## Current product and design sources
-
-### Product requirements
-
-`prd.md`
-
-Use this file to determine:
-
-* required features
-* user flows
-* functional behaviour
-* product scope
-* success criteria
-
-### Design requirements
-
-`design-brief.md`
-
-Use this file to determine:
-
-* visual direction
-* layout
-* styling
-* interaction expectations
-* responsive behaviour
-* design principles
-
-### Existing decisions
-
-`decision-list.md`
-
-Check this file before revisiting product, design, architecture, or technical choices that may already have been settled.
-
-### Agent instructions
-
-`AGENTS.md`
-
-This is the shared source of durable working instructions for coding agents.
-
-Claude Code should also load these instructions through `CLAUDE.md`.
+* Copied `design-handoff/planner-app/` to the maintained `frontend/` directory without changing the archive.
+* Installed the npm dependencies and created `frontend/package-lock.json`.
+* Corrected the TypeScript build command/configuration.
+* Added the missing top-level app and minimum Daily Page composition.
+* Composed the Planner, Toast, and Drag providers.
+* Removed links to unavailable future pages from the maintained navigation.
+* Recorded the five approved durable product decisions in `decision-list.md`.
+* Fixed three exported TypeScript errors: two unused imports and the demo-block tag inference.
 
 ## How to run
 
-Local run instructions are not yet available.
-
-Add the exact commands here once a runnable frontend has been created or integrated.
-
-Expected format:
+From the repository root:
 
 ```bash
-cd <frontend-directory>
+cd frontend
 npm install
 npm run dev
 ```
 
-Do not assume these commands are correct until the actual framework and package manager have been inspected.
+The default local URL is:
+
+```text
+http://localhost:5173/
+```
+
+Useful checks:
+
+```bash
+cd frontend
+npm run typecheck
+npm run build
+npm run preview
+```
 
 ## Verification status
 
-### Not yet verified
+Verified on 2026-07-21:
 
-* dependency installation
-* local development server
-* TypeScript or type checking
-* linting
-* automated tests
-* production build
-* responsive behaviour
-* primary user flows
-* accessibility basics
-* persistence behaviour
-* compatibility outside Claude Design
+* `npm install` — passed; 70 packages installed and lockfile created.
+* `npm run typecheck` — passed.
+* `npm run build` — passed with Vite 5.4.21; 51 modules transformed.
+* Development server — passed at `http://127.0.0.1:5173/`.
+* Root and dated-route HTTP checks — passed with HTTP 200 responses.
+* Headless Chrome render — passed; the Daily Page rendered rather than a blank screen, and no application runtime errors were observed.
+* `design-handoff/` integrity — checksum unchanged after implementation.
 
-## Current expected repository structure
+No lint or automated-test configuration is present yet, so those checks could not be run.
 
-```text
-project-root/
-├── AGENTS.md
-├── CLAUDE.md
-├── PROJECT_STATUS.md
-├── decision-list.md
-├── design-brief.md
-├── prd.md
-├── other supporting documents
-└── frontend or design handoff files
-```
+## Remaining work
 
-The exact frontend directory and structure will be updated after the Claude Design handoff has been received and inspected.
+The following intentionally remain unavailable pending review and later milestones:
 
-## Handoff notes
+* Two-Week Habit Planner
+* Running Short To-Do List
+* Running Long To-Do List
+* first-run setup
+* Settings, including the approved globally configurable Time Alignment window
+* complete previous/next-day navigation and date selection
+* routine/chore drag sources and manual fixed-commitment UI
+* approved linked-item deletion/reassignment reconciliation
+* cloud sync, authentication, and cross-device persistence
+* storage migrations and validation
+* linting and automated tests
+* deployment configuration
 
-Claude Code and OpenAI Codex must both read:
+## Known limitations
 
-* `AGENTS.md`
-* `PROJECT_STATUS.md`
-* `decision-list.md`
-* `prd.md`
-* `design-brief.md`
+* State is stored only in the current browser's `localStorage`; cross-device synchronization does not work yet.
+* The Time Alignment window is still fixed at its approved default of 8:00 AM–2:00 AM until Settings is implemented.
+* The initial state contains recurring configuration but no setup UI; unavailable pages are not linked.
+* Google Fonts require a network connection; fallback fonts are used if they cannot load.
+* `npm install` reported two dependency audit findings (one moderate and one high). No forced breaking upgrade was applied during this focused milestone.
+* Responsive layout and detailed drag interactions have not yet received full manual device testing.
 
-They must also inspect:
+## Sources of truth
 
-* the current codebase
-* `git status`
-* recent relevant commits or diffs
-
-Progress should be recorded in this file.
-
-Durable product, design, architecture, and technical decisions should be recorded in `decision-list.md`.
-
-Normal session history should not be copied into either file.
+* Product requirements: `prd.md`
+* Approved visual direction: `design-brief.md`
+* Durable decisions: `decision-list.md`
+* Agent workflow: `AGENTS.md`
+* Archival design handoff: `design-handoff/`
+* Maintained implementation: `frontend/`

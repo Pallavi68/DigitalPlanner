@@ -2,7 +2,7 @@
 
 A running log of locked product/scope decisions. When a decision changes, update it here and note the date. See `PRD.md` for full context.
 
-_Last updated: 2026-07-07_
+_Last updated: 2026-07-21_
 
 ---
 
@@ -18,6 +18,11 @@ _Last updated: 2026-07-07_
 | D6 | **Cross-device sync** | Hard requirement — planner state must sync across laptop/phone/tablet. Current static GitHub Pages hosting can't do this alone; needs a cloud store. | The whole point of going digital is access anywhere without the physical book. |
 | D7 | **Single user** | Personal tool for one person. No accounts, sharing, permissions, or collaboration. | Not a product for others; keeps scope tight. |
 | D8 | **Future capture (architected-for, not built)** | WhatsApp/Telegram inbound capture into the to-do lists, via a single internal "add item" entry point built in v1 (FR-16). | Lets future messaging capture slot in without a rewrite. |
+| D9 | **Current milestone storage** | Cloud sync is deferred for the current frontend milestone. Use the existing `localStorage` adapter and preserve the storage seam for a later Firebase, Supabase, or other cloud adapter. Do not imply cross-device sync currently works. | Establishes a runnable frontend without prematurely selecting or integrating a cloud provider. |
+| D10 | **Daily to-do layout** | Retain the numbered `01–15` daily to-do layout required by the PRD and design brief. | Resolves the conflict with the later unnumbered design exploration in favor of the product requirements. |
+| D11 | **Time Alignment window** | Use one globally configurable window in Settings, defaulting to 8:00 AM–2:00 AM. It is not independently configurable per day in v1. | Keeps daily pages consistent while allowing the owner to adjust the planner-wide schedule range. |
+| D12 | **Linked-item deletion and reassignment** | For today and future dates, automatically update or remove linked daily entries and time blocks. Preserve past entries unless the user explicitly deletes them from that past day. | Keeps active plans consistent without rewriting the historical record. |
+| D13 | **Habit-grid derivation** | Derive rows and applicable dates from recurring configuration. Individual cells store only blank, ✓, or ✗ marks and cannot redefine habit configuration. | Maintains a single source of truth while preserving per-day completion history. |
 
 ## Page types
 
@@ -28,11 +33,9 @@ _Last updated: 2026-07-07_
 
 ## Open questions (not yet decided)
 
-- Where sync/data lives (Firebase vs. Supabase vs. other) — decide at architecture step.
+- Which cloud provider will supply the deferred cross-device sync requirement (Firebase vs. Supabase vs. other).
 - v1.5 scheduler brain: rule-based only vs. hybrid (rules + AI). Leaning rule-based first.
 - Whether to add a real-ink (stylus) layer on tablet eventually.
-- How much of the two-week grid is auto-derived from recurring config vs. hand-edited per cell.
-- Default Time Alignment day window and whether it's per-day adjustable.
 
 ## Process
 
