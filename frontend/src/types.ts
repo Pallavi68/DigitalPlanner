@@ -18,6 +18,8 @@ export interface RoutineRevision {
   label: string;
   period: RoutinePeriod;
   durationMinutes: number;
+  /** Optional preferred quick-add start within the Time Alignment grid. */
+  defaultStartSlot?: number;
   sortOrder: number;
   archived: boolean;
 }
@@ -28,6 +30,7 @@ export interface RoutineHabit {
   label: string;
   period: RoutinePeriod;
   durationMinutes: number;
+  defaultStartSlot?: number;
   sortOrder: number;
   /** Date the habit started applying (recurring changes are forward-only). */
   since: ISODate;
@@ -42,6 +45,7 @@ export interface DailyRoutineInstance {
   label: string;
   period: 'AM' | 'PM';
   durationMinutes: number;
+  defaultStartSlot?: number;
   sortOrder: number;
   done: boolean;
 }
@@ -62,6 +66,8 @@ export type CellMark = 'blank' | 'check' | 'cross';
 
 /** A single line in the day's numbered To Dos (01–15). */
 export interface DailyTodoLine {
+  /** Stable daily identity used by linked Time Alignment blocks. */
+  id: string;
   text: string;
   done: boolean;
   /** Set when this line was surfaced from a running list (FR-10). */
@@ -128,7 +134,7 @@ export interface DayState {
   routineDone: Record<string, boolean>; // habitId -> done
   /** Immutable for past dates; regenerated for today/future after setup edits. */
   routineInstances: DailyRoutineInstance[];
-  todos: DailyTodoLine[]; // exactly 15 lines
+  todos: DailyTodoLine[]; // starts with 15 ruled lines and grows as needed
   blocks: TimeBlock[];
   windDown: WindDown;
 }

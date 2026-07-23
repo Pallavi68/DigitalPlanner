@@ -1,14 +1,17 @@
-import { type ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import { useViewport } from '../hooks/useViewport';
 
 interface SpreadProps {
   left: ReactNode;
   right: ReactNode;
-  /** Changing this key replays the page-turn animation (FR-1). */
-  flipKey?: string;
   ariaLabel?: string;
   /** Max width of the whole book. */
   maxWidth?: number;
+  onPrevious?: () => void;
+  onNext?: () => void;
+  previousLabel?: string;
+  nextLabel?: string;
+  turnLabel?: string;
 }
 
 /**
@@ -16,9 +19,33 @@ interface SpreadProps {
  * a stacked single column on phone. Recreates the book chrome from the
  * approved design (navy stripe frame, sheet-stack shadow, spine crease).
  */
-export function Spread({ left, right, flipKey, ariaLabel, maxWidth = 1120 }: SpreadProps) {
+export function Spread({
+  left,
+  right,
+  ariaLabel,
+  maxWidth = 1120,
+  onPrevious,
+  onNext,
+  previousLabel = 'Previous day',
+  nextLabel = 'Next day',
+  turnLabel = 'Planner page',
+}: SpreadProps) {
   const vp = useViewport();
   const phone = vp === 'phone';
+  const [turn, setTurn] = useState<{ direction: 'forward' | 'backward'; fromLabel: string; active: boolean } | null>(null);
+
+  const beginTurn = (direction: 'forward' | 'backward') => {
+    if (turn) return;
+    const navigate = direction === 'forward' ? onNext : onPrevious;
+    if (!navigate) return;
+    setTurn({ direction, fromLabel: turnLabel, active: false });
+    navigate();
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        setTurn((current) => current ? { ...current, active: true } : current);
+      });
+    });
+  };
 
   const page: React.CSSProperties = {
     background: 'var(--paper)',
@@ -38,6 +65,7 @@ export function Spread({ left, right, flipKey, ariaLabel, maxWidth = 1120 }: Spr
         background: 'repeating-linear-gradient(90deg,#1c2140 0px,#1c2140 38px,#f3ebda 38px,#f3ebda 49px)',
         boxShadow: '0 16px 38px rgba(28,33,64,.26)',
         position: 'relative',
+        alignSelf: 'flex-start',
       }}
     >
       {/* terracotta ribbon */}
@@ -55,14 +83,12 @@ export function Spread({ left, right, flipKey, ariaLabel, maxWidth = 1120 }: Spr
         }}
       />
       <div
-        key={flipKey}
+        className="page-spread"
         style={{
           position: 'relative',
           display: 'flex',
           flexDirection: phone ? 'column' : 'row',
           boxShadow: 'var(--sheet-stack)',
-          transformOrigin: 'left center',
-          animation: flipKey ? 'page-turn 420ms cubic-bezier(.36,.1,.2,1)' : undefined,
         }}
       >
         <div
@@ -100,7 +126,68 @@ export function Spread({ left, right, flipKey, ariaLabel, maxWidth = 1120 }: Spr
         >
           {right}
         </div>
+        {onPrevious && (
+          <>
+            <CornerButton corner="top-left" label={previousLabel} direction="previous" onClick={() => beginTurn('backward')} />
+            <CornerButton corner="bottom-left" label={previousLabel} direction="previous" onClick={() => beginTurn('backward')} />
+          </>
+        )}
+        {onNext && (
+          <>
+            <CornerButton corner="top-right" label={nextLabel} direction="next" onClick={() => beginTurn('forward')} />
+            <CornerButton corner="bottom-right" label={nextLabel} direction="next" onClick={() => beginTurn('forward')} />
+          </>
+        )}
+        {turn && (
+          <div
+            className={`turning-leaf ${turn.direction} ${turn.active ? 'active' : ''}`}
+            onTransitionEnd={(event) => {
+              if (event.target === event.currentTarget) setTurn(null);
+            }}
+            aria-hidden
+          >
+            <div className="leaf-face leaf-front">
+              <LeafPaper label={turn.direction === 'forward' ? turn.fromLabel : turnLabel} />
+            </div>
+            <div className="leaf-face leaf-back">
+              <LeafPaper label={turn.direction === 'forward' ? turnLabel : turn.fromLabel} />
+            </div>
+          </div>
+        )}
       </div>
     </section>
+  );
+}
+
+function CornerButton({
+  corner,
+  label,
+  direction,
+  onClick,
+}: {
+  corner: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
+  label: string;
+  direction: 'previous' | 'next';
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      className={`page-corner ${corner}`}
+      onClick={onClick}
+      aria-label={label}
+      title={label}
+    >
+      <span aria-hidden>{direction === 'previous' ? '‹' : '›'}</span>
+    </button>
+  );
+}
+
+function LeafPaper({ label }: { label: string }) {
+  return (
+    <div className="leaf-paper">
+      <span>{label}</span>
+      <div />
+    </div>
   );
 }

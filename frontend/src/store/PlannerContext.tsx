@@ -11,7 +11,7 @@ import type {
   DailyRoutineInstance,
 } from '../types';
 import { storage } from './storage';
-import { emptyDay, initialState, demoState, uid } from './seed';
+import { blankDailyTodo, emptyDay, initialState, demoState, uid } from './seed';
 import { todayISO } from '../lib/dates';
 import { materializeRoutine } from './routines';
 
@@ -219,9 +219,11 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
         patch: (day) => {
           if (day.todos.some((l) => l.sourceRefId === todo.id)) return day;
           const idx = day.todos.findIndex((l) => l.text.trim() === '');
-          if (idx === -1) return day; // 01–15 full — stays in running list (no layout break)
+          if (idx === -1) {
+            return { ...day, todos: [...day.todos, { ...blankDailyTodo(), text: todo.text, sourceRefId: todo.id }] };
+          }
           const todos = day.todos.slice();
-          todos[idx] = { text: todo.text, done: false, sourceRefId: todo.id };
+          todos[idx] = { ...todos[idx], text: todo.text, done: false, sourceRefId: todo.id };
           return { ...day, todos };
         },
       });
@@ -230,11 +232,9 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
     const assignTodoToDay = (todoId: string, date: ISODate) => {
       const todo = state.todos.find((t) => t.id === todoId);
       if (!todo) return false;
-      const day = getDay(date);
-      const hasSlot = day.todos.some((l) => l.text.trim() === '') || day.todos.some((l) => l.sourceRefId === todoId);
       dispatch({ type: 'UPSERT_TODO', todo: { ...todo, assignedDate: date } });
       surfaceOnDay(todo, date);
-      return hasSlot;
+      return true;
     };
 
     return {

@@ -49,14 +49,18 @@ function RoutineColumn({ title, values, onToggle, onSchedule, startDrag }: Routi
     {values.map((item) => <div className="routine-row" key={item.id}>
       <InkBubble done={item.done} onToggle={() => onToggle(item)} label={`${item.label} (${item.period})`} />
       <span className="routine-label">{item.label}</span>
-      <button
-        type="button"
-        className="routine-drag"
-        aria-label={`Drag ${item.label} onto Time Alignment`}
-        title={`Drag to schedule (${item.durationMinutes} minutes)`}
-        onPointerDown={(event) => startDrag({ label: item.label, tag: 'routine', sourceRefId: item.id, slots: item.durationMinutes / 30, completed: item.done }, event)}
-      >⠿</button>
-      <button type="button" className="routine-quick-add" aria-label={`Add ${item.label} to Time Alignment`} title={`Add using its ${item.durationMinutes}-minute setup duration`} onClick={() => onSchedule(item)}>＋</button>
+      {item.durationMinutes > 0 && (
+        <>
+          <button
+            type="button"
+            className="routine-drag"
+            aria-label={`Drag ${item.label} onto Time Alignment`}
+            title={`Drag to schedule (${item.durationMinutes} minutes)`}
+            onPointerDown={(event) => startDrag({ label: item.label, tag: 'routine', sourceRefId: item.id, slots: item.durationMinutes / 30, completed: item.done }, event)}
+          >⠿</button>
+          <button type="button" className="routine-quick-add" aria-label={`Add ${item.label} to Time Alignment`} title={`Add using its ${item.durationMinutes}-minute setup duration`} onClick={() => onSchedule(item)}>＋</button>
+        </>
+      )}
     </div>)}
   </div>;
 }

@@ -32,6 +32,7 @@ export function materializeRoutine(habits: RoutineHabit[], date: ISODate): Daily
       label: revision.label,
       period,
       durationMinutes: revision.durationMinutes,
+      defaultStartSlot: revision.defaultStartSlot,
       sortOrder: revision.sortOrder,
       done: false,
     };

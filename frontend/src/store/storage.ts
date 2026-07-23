@@ -1,4 +1,4 @@
-import type { DayState, PlannerState, RoutineHabit } from '../types';
+import type { DailyTodoLine, DayState, PlannerState, RoutineHabit } from '../types';
 
 /**
  * Storage adapter — the single seam for cross-device sync (FR-11 / FR-12).
@@ -61,14 +61,27 @@ function migrate(input: PlannerState): PlannerState {
       ...legacy,
       durationMinutes,
       sortOrder,
+      defaultStartSlot: legacy.defaultStartSlot,
       revisions: legacy.revisions?.length
-        ? legacy.revisions
-        : [{ effectiveFrom: legacy.since, label: legacy.label, period, durationMinutes, sortOrder, archived: !!legacy.archived }],
+        ? legacy.revisions.map((revision) => ({ ...revision, defaultStartSlot: revision.defaultStartSlot }))
+        : [{ effectiveFrom: legacy.since, label: legacy.label, period, durationMinutes, defaultStartSlot: legacy.defaultStartSlot, sortOrder, archived: !!legacy.archived }],
     };
   });
   const days = Object.fromEntries(
     Object.entries(state.days ?? {}).map(([date, day]) => {
       const legacyDay = day as DayState;
+      const todos: DailyTodoLine[] = (legacyDay.todos ?? []).map((line, index) => ({
+        ...line,
+        id: line.id ?? `daily_todo_${date}_${index}`,
+      }));
+      while (todos.length < 15) {
+        todos.push({ id: `daily_todo_${date}_${todos.length}`, text: '', done: false });
+      }
+      const dailyTodoIdByLegacyRef = new Map<string, string>();
+      todos.forEach((line, index) => {
+        dailyTodoIdByLegacyRef.set(`daily:${date}:${index}`, line.id);
+        dailyTodoIdByLegacyRef.set(`daily:${index}`, line.id);
+      });
       const routineInstances = legacyDay.routineInstances ?? routineHabits
         .filter((habit) => habit.since <= date && !habit.archived)
         .map((habit) => ({
@@ -77,13 +90,18 @@ function migrate(input: PlannerState): PlannerState {
           label: habit.label,
           period: habit.period === 'PM' ? 'PM' as const : 'AM' as const,
           durationMinutes: habit.durationMinutes,
+          defaultStartSlot: habit.defaultStartSlot,
           sortOrder: habit.sortOrder,
           done: !!legacyDay.routineDone?.[habit.id],
         }));
-      return [date, { ...legacyDay, routineInstances }];
+      const blocks = (legacyDay.blocks ?? []).map((block) => ({
+        ...block,
+        sourceRefId: block.sourceRefId ? dailyTodoIdByLegacyRef.get(block.sourceRefId) ?? block.sourceRefId : undefined,
+      }));
+      return [date, { ...legacyDay, todos, routineInstances, blocks }];
     }),
   );
-  return { ...state, version: 2, routineHabits, days };
+  return { ...state, version: 3, routineHabits, days };
 }
 
 export const storage: StorageAdapter = new LocalStorageAdapter();

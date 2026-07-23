@@ -19,10 +19,12 @@ export function SyncIndicator() {
       : 'Saved locally';
 
   const dot = status === 'failed' || !online || status === 'offline' ? 'var(--terracotta)' : status === 'synced' ? 'var(--check)' : 'var(--gold)';
+  const detail = `${label}. Stored only in this browser; backend sync is not connected.`;
 
   return (
     <span
-      title={label}
+      title={detail}
+      aria-label={detail}
       style={{
         display: 'inline-flex',
         alignItems: 'center',

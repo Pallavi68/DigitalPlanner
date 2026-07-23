@@ -41,9 +41,9 @@ Derived from photos of the actual physical planner. This is not decoration; it's
 Four faithful zones. On desktop this is a spread; on phone it stacks/tabs (see §4).
 
 1. **"Successful Day" routine checklist** — recurring AM/PM habits as **bubble checkboxes**. Tap fills with an ink mark. Pre-seeded from setup (Fitness, Moneymaker, Vitamins, skincare, Mobility…).
-2. **To Dos** — numbered **01–15** ruled list. Tap a line → type → renders in handwriting on that line. Empty lines are just ruled paper with a faint "tap a line to write" affordance. Caps at 15 visible like paper; overflow routes to the running lists (don't break layout).
+2. **To Dos** — numbered ruled list beginning with **01–15**. Tap a line → type → renders in handwriting on that line. Enter advances and adds a new numbered row after the final line. Filled rows have a subtle delete mark; deleting the source row also removes linked schedule blocks, while unscheduling a block leaves the row intact.
 3. **Time Alignment** — full-day schedule in **30-minute blocks** (default ~8am–2am, start/end configurable). The owner **drags** to-dos / chores / checklist items onto slots to create labeled time blocks; **drag block edges to resize** (30-min steps), **drag body to move**. Overlaps render side-by-side or flag a conflict, but manual double-booking is always allowed (you can on paper too).
-4. **Evening wind-down** (P1) — small end-of-day checklist + "tomorrow plan" note line + bedtime line.
+4. **Evening wind-down** (P1) — small end-of-day checklist + "tomorrow plan" note line + bedtime line, positioned on the left page beneath the to-dos. The right page is reserved for Time Alignment.
 
 Design the **drag affordance** so items feel physically picked up and set down — this is the digital-only superpower and it must feel tactile, not like a form widget.
 

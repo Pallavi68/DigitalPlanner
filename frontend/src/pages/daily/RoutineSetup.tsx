@@ -3,6 +3,17 @@ import { Modal } from '../../components/Modal';
 import type { ISODate, RoutineHabit, RoutinePeriod } from '../../types';
 import { uid } from '../../store/seed';
 import { materializeRoutine, revisionForDate } from '../../store/routines';
+import { SLOT_COUNT, slotTime } from '../../lib/dates';
+
+const DURATION_OPTIONS = [0, 5, 10, 15, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300];
+
+function durationLabel(minutes: number): string {
+  if (minutes === 0) return 'None';
+  if (minutes < 60) return `${minutes}m`;
+  const hours = Math.floor(minutes / 60);
+  const remainder = minutes % 60;
+  return remainder ? `${hours}h 30m` : `${hours}h`;
+}
 
 interface Props {
   open: boolean;
@@ -25,12 +36,12 @@ export function RoutineSetup({ open, onClose, date, habits, onSave }: Props) {
     }
   }, [open, habits]);
 
-  const revise = (id: string, patch: Partial<{ label: string; period: RoutinePeriod; durationMinutes: number; archived: boolean }>) => {
+  const revise = (id: string, patch: Partial<{ label: string; period: RoutinePeriod; durationMinutes: number; defaultStartSlot: number; archived: boolean }>) => {
     setDraft((current) => current.map((habit) => {
       if (habit.id !== id) return habit;
       const base = revisionForDate(habit, date)!;
       const revision = { ...base, ...patch, effectiveFrom: date };
-      return { ...habit, label: revision.label, period: revision.period, durationMinutes: revision.durationMinutes, archived: revision.archived, revisions: [...habit.revisions.filter((item) => item.effectiveFrom !== date), revision] };
+      return { ...habit, label: revision.label, period: revision.period, durationMinutes: revision.durationMinutes, defaultStartSlot: revision.defaultStartSlot, archived: revision.archived, revisions: [...habit.revisions.filter((item) => item.effectiveFrom !== date), revision] };
     }));
   };
   const move = (id: string, delta: number) => {
@@ -61,7 +72,7 @@ export function RoutineSetup({ open, onClose, date, habits, onSave }: Props) {
   };
   const add = () => {
     const sortOrder = draft.length;
-    const revision = { effectiveFrom: date, label: 'New routine', period: 'auto' as const, durationMinutes: 30, sortOrder, archived: false };
+    const revision = { effectiveFrom: date, label: 'New routine', period: 'auto' as const, durationMinutes: 30, defaultStartSlot: undefined, sortOrder, archived: false };
     setDraft([...draft, { id: uid('rh'), since: date, label: revision.label, period: revision.period, durationMinutes: 30, sortOrder, revisions: [revision] }]);
   };
   const save = () => {
@@ -77,7 +88,7 @@ export function RoutineSetup({ open, onClose, date, habits, onSave }: Props) {
     <Modal open={open} onClose={onClose} title="Successful Day Setup">
       <p className="setup-note">Changes begin {date}. Earlier pages keep their original checklist and marks.</p>
       <div className="setup-editor">
-        <div>
+        <div className="setup-list paper-scroll">
           {draft
             .filter((habit) => !revisionForDate(habit, date)?.archived)
             .sort((a, b) => (revisionForDate(a, date)?.sortOrder ?? 0) - (revisionForDate(b, date)?.sortOrder ?? 0))
@@ -94,8 +105,24 @@ export function RoutineSetup({ open, onClose, date, habits, onSave }: Props) {
                 <select aria-label={`Period for ${revision.label}`} value={revision.period} onChange={(event) => revise(habit.id, { period: event.target.value as RoutinePeriod })}>
                   <option value="auto">Auto</option><option value="AM">AM</option><option value="PM">PM</option>
                 </select>
-                <select aria-label={`Duration for ${revision.label}`} value={revision.durationMinutes} onChange={(event) => revise(habit.id, { durationMinutes: Number(event.target.value) })}>
-                  {Array.from({ length: 16 }, (_, i) => (i + 1) * 30).map((minutes) => <option key={minutes} value={minutes}>{minutes < 60 ? `${minutes}m` : `${minutes / 60}h`}</option>)}
+                <select
+                  aria-label={`Duration for ${revision.label}`}
+                  value={revision.durationMinutes}
+                  onChange={(event) => {
+                    const durationMinutes = Number(event.target.value);
+                    revise(habit.id, { durationMinutes, ...(durationMinutes === 0 ? { defaultStartSlot: undefined } : {}) });
+                  }}
+                >
+                  {DURATION_OPTIONS.map((minutes) => <option key={minutes} value={minutes}>{durationLabel(minutes)}</option>)}
+                </select>
+                <select
+                  aria-label={`Default time for ${revision.label}`}
+                  value={revision.defaultStartSlot ?? ''}
+                  disabled={revision.durationMinutes === 0}
+                  onChange={(event) => revise(habit.id, { defaultStartSlot: event.target.value === '' ? undefined : Number(event.target.value) })}
+                >
+                  <option value="">No default</option>
+                  {Array.from({ length: SLOT_COUNT }, (_, slot) => <option key={slot} value={slot}>{slotTime(slot)}</option>)}
                 </select>
                 <button type="button" disabled={index === 0} onClick={() => move(habit.id, -1)} aria-label={`Move ${revision.label} earlier`}>↑</button>
                 <button type="button" disabled={index === active.length - 1} onClick={() => move(habit.id, 1)} aria-label={`Move ${revision.label} later`}>↓</button>

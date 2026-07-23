@@ -4,7 +4,7 @@
 > - The primary and only user is the planner owner.
 > - An item with no AM/PM preference is automatically placed in the shorter visible column; ties alternate AM then PM, preserving global order within each column.
 > - “Today forward” uses the device's current date in the owner's local timezone.
-> - Checklist duration is configured in 30-minute increments for this milestone, matching the existing Time Alignment grid.
+> - Checklist duration is optional. Supported defaults are none, 5, 10, 15, or 30 minutes, then 1 hour through 5 hours in 30-minute increments.
 > - Supabase is the recommended backend. The first release uses an invisible anonymous device session: no login UI and no cross-device promise yet, but personal data is not left publicly writable.
 > - This PRD is a focused increment of `prd.md`. If they conflict, the existing product-wide PRD and locked decisions remain authoritative unless a new decision is explicitly approved.
 
@@ -62,7 +62,7 @@ The daily checklist is currently a fixed local prototype: the owner cannot manag
 
 ## 8. Proposed Solution
 
-Add a “Successful Day Setup” control-panel surface within the existing book experience. Each recurring item has a label, optional period preference (`AM`, `PM`, or automatic), default duration, global sort position, effective start date, and optional archived date. The editor includes a live two-column preview and drag handles so the owner can see and change the actual order shown on daily pages.
+Add a “Successful Day Setup” control-panel surface within the existing book experience. Each recurring item has a label, optional period preference (`AM`, `PM`, or automatic), default duration, optional default quick-add time, global sort position, effective start date, and optional archived date. The editor includes a live two-column preview and drag handles so the owner can see and change the actual order shown on daily pages.
 
 Daily checklist rows are date-specific snapshots, linked back to their recurring definition. On first opening a date, the backend materializes that day's applicable item label, resolved AM/PM column, order, and default duration. Completion is stored on that daily instance. This prevents later master-list edits from rewriting history.
 
@@ -86,7 +86,7 @@ Use Supabase Postgres for persistence. On first use, create an anonymous Supabas
 
 1. Open “Successful Day Setup” from a small, paper-consistent edit/settings affordance near the checklist.
 2. See the two-column AM/PM preview in its current global order.
-3. Add an item with label, optional AM/PM choice, and expected duration.
+3. Add an item with label, optional AM/PM choice, and optional expected duration.
 4. If no period is selected, the preview automatically assigns the new item to the shorter column; tied automatic assignments alternate starting with AM.
 5. Drag rows within or between columns. A cross-column move makes that column an explicit preference; reordering changes the master sort order.
 6. Save. The new configuration becomes effective today and applies to all future dates, while earlier snapshots remain unchanged.
@@ -127,24 +127,25 @@ The configured order is reflected on today's page, past days remain unchanged, c
 | ID | Requirement | Priority | Notes / Acceptance Criteria |
 |----|-------------|----------|-----------------------------|
 | FR-1 | Checklist control-panel route or modal | P0 | Given the Daily Page, when the owner chooses the edit affordance, then a paper-consistent checklist editor opens without leaving the planner context. |
-| FR-2 | Add and edit recurring items | P0 | Each item supports a non-empty label, optional AM/PM preference, and default duration. Saving makes the revision effective today. |
+| FR-2 | Add and edit recurring items | P0 | Each item supports a non-empty label, optional AM/PM preference, optional duration, and optional default quick-add time. Saving makes the revision effective today. |
 | FR-3 | Archive/remove recurring items | P0 | Removing an item archives it from today onward; snapshots before today retain it and its completion. A confirmation explains this behavior. |
 | FR-4 | Manual global reordering | P0 | Given the control panel, when an item is dragged to a new position, then the preview and today/future daily layouts use that order after save. Past layouts do not change. |
 | FR-5 | Optional period auto-balancing | P0 | An automatic item is placed in the currently shorter column; ties alternate AM then PM. Resolution is deterministic for a given ordered configuration. |
 | FR-6 | Live AM/PM preview | P0 | The editor shows the same two-column ordering the Daily Page will render before the owner saves. |
-| FR-7 | Duration configuration | P0 | Duration is required, defaults to 30 minutes, and accepts 30-minute increments from 30 minutes through 8 hours. |
+| FR-7 | Duration configuration | P0 | Duration defaults to 30 minutes and accepts none, 5, 10, 15, or 30 minutes, then 1 hour through 5 hours in 30-minute increments. Items with no duration remain checkable but do not expose Time Alignment scheduling controls. |
 | FR-8 | Date-effective revisions | P0 | Editing label, period, duration, or order affects today and future daily snapshots only. Yesterday and earlier retain their prior snapshot values. |
 | FR-9 | Daily checklist snapshot | P0 | On first access to a date, applicable definitions are materialized once with label, resolved period, order, default duration, and source definition ID. Reopening does not regenerate or duplicate rows. |
 | FR-10 | Persist completion per date and item instance | P0 | Given a bubble toggle, refreshing and reopening the same date returns the last successfully saved state; other dates are unaffected. Both checked and unchecked writes persist. |
 | FR-11 | Backend persistence | P0 | Recurring definitions, revisions, daily instances/completion, and linked Time Alignment blocks are stored in Supabase rather than relying on `localStorage` as their source of truth. |
 | FR-12 | Invisible device identity and access control | P0 | The app creates an anonymous session without login UI; row-level security prevents other identities from reading or changing the owner's rows. No table permits public anonymous access without an owner ID. |
 | FR-13 | Checklist drag source | P0 | Dragging begins from a dedicated handle or long-press and never accidentally toggles completion. Keyboard users can invoke an equivalent “Add to Time Alignment” action. |
-| FR-14 | Default-size schedule block | P0 | Dropping an item creates a `routine` block whose slot count equals configured duration ÷ 30 minutes and links to that day's checklist instance. |
+| FR-14 | Default-size schedule block | P0 | Dropping an item with a duration creates a linked `routine` block with that exact configured duration, including 5-, 10-, and 15-minute defaults within the ruled 30-minute grid. |
 | FR-15 | Per-day block adjustment | P0 | Moving/resizing the block persists its date-specific start/end slots without changing the recurring item's configured duration. Minimum size is one slot. |
 | FR-16 | Duplicate scheduling behavior | P1 | The same checklist item may be placed more than once on a day, but the second placement requires a lightweight confirmation to avoid accidental duplicates. |
 | FR-17 | Save-state feedback and retry | P0 | Configuration, completion, and block mutations expose saving/saved/failed states. Failed operations can be retried without creating duplicates. |
 | FR-18 | Legacy-state migration | P1 | On first backend-enabled run, detect existing planner `localStorage`, preview/import supported routine and completion data once, and retain a migration marker. Never overwrite newer backend data. |
 | FR-19 | Responsive and accessible interactions | P0 | Control-panel editing, bubble toggling, reordering, and calendar placement work on desktop, tablet, and phone with visible focus and non-drag alternatives. |
+| FR-20 | Optional default quick-add time | P0 | When configured, pressing `+` places the daily routine block at that start time. Without a default, quick-add uses the next available slot. Dragging may still place the item anywhere. |
 
 ## 11. Non-Functional Requirements
 
@@ -164,8 +165,8 @@ No external product analytics are required. Operational logging may record reque
 Minimum entities:
 
 - `routine_definitions`: owner, stable routine identity, creation/archive timestamps.
-- `routine_revisions`: definition, effective date, label, period preference, duration minutes, global sort position.
-- `daily_routine_instances`: owner, date, source definition/revision, snapshotted label, resolved period, position, default duration, completed state, completion timestamp.
+- `routine_revisions`: definition, effective date, label, period preference, duration minutes, optional default start slot, global sort position.
+- `daily_routine_instances`: owner, date, source definition/revision, snapshotted label, resolved period, position, default duration, optional default start slot, completed state, completion timestamp.
 - `time_blocks`: owner, date, source daily routine instance, start/end slots, label snapshot, tag, fixed flag.
 - `profiles` or equivalent preferences row reserved for later scheduler data; no scheduler logic in this milestone.
 
@@ -218,7 +219,6 @@ Useful owner-facing measure for validation only: number of dates whose checklist
 
 - Should daily completion automatically mark a linked schedule block complete in a later milestone, or remain independent?
 - Before expanding to a second device, should the anonymous identity be upgraded through email magic link, passkey, or another recovery method?
-- Should configured duration eventually support 15-minute increments if Time Alignment becomes more granular?
 
 ## 17. Launch Plan
 
@@ -267,4 +267,3 @@ Later scheduler
   → automatic placement and conflict handling
   → category colors and natural-language adjustments
 ```
-

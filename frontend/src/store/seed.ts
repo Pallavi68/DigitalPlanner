@@ -1,4 +1,4 @@
-import type { PlannerState, DayState, RoutineHabit, HabitRow, TimeBlock } from '../types';
+import type { PlannerState, DayState, RoutineHabit, HabitRow, TimeBlock, DailyTodoLine } from '../types';
 import { todayISO, SLOT_COUNT } from '../lib/dates';
 
 export function uid(prefix = 'id'): string {
@@ -32,11 +32,15 @@ export const DEFAULT_HABIT_ROWS: Omit<HabitRow, 'id' | 'since'>[] = [
 
 export const DEFAULT_WINDDOWN_ITEMS = ['Tidy desk', 'Set out clothes', 'Plan tomorrow'];
 
+export function blankDailyTodo(): DailyTodoLine {
+  return { id: uid('dt'), text: '', done: false };
+}
+
 export function emptyDay(): DayState {
   return {
     routineDone: {},
     routineInstances: [],
-    todos: Array.from({ length: 15 }, () => ({ text: '', done: false })),
+    todos: Array.from({ length: 15 }, blankDailyTodo),
     blocks: [],
     windDown: {
       checklist: DEFAULT_WINDDOWN_ITEMS.map((label) => ({ id: uid('wd'), label, done: false })),
@@ -50,7 +54,7 @@ export function emptyDay(): DayState {
 export function initialState(): PlannerState {
   const since = todayISO();
   return {
-    version: 2,
+    version: 3,
     setupComplete: false,
     routineHabits: DEFAULT_ROUTINE.map((h, sortOrder) => ({
       ...h,
@@ -99,7 +103,7 @@ export function demoState(): PlannerState {
     'Finish expense tracker',
     '30 min job hunt',
   ];
-  sample.forEach((text, i) => (day.todos[i] = { text, done: i === 0 }));
+  sample.forEach((text, i) => (day.todos[i] = { ...day.todos[i], text, done: i === 0 }));
 
   // Time Alignment blocks
   const demoBlocks: TimeBlock[] = [
