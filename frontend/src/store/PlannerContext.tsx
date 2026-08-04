@@ -10,10 +10,21 @@ import type {
   Preferences,
   DailyRoutineInstance,
 } from '../types';
-import { storage } from './storage';
+import { migratePlannerState } from './storage';
+import {
+  BackendError,
+  createLegacyBackup,
+  hasCompletedLegacyMigration,
+  markLegacyMigrationComplete,
+  migrationIdempotencyKey,
+  plannerCache,
+  previewLegacyMigration,
+  supabasePlannerBackend,
+} from '../backend';
 import { blankDailyTodo, emptyDay, initialState, demoState, uid } from './seed';
 import { todayISO } from '../lib/dates';
 import { materializeRoutine } from './routines';
+import { dailyAutoBlockCandidates, materializeDailyChores, type DailyChoreOccurrence } from './recurringSchedule';
 
 /* ------------------------------------------------------------------ actions */
 
@@ -57,9 +68,15 @@ function reducer(state: PlannerState, action: Action): PlannerState {
     }
     case 'SET_GRID_MARK': {
       const gridMarks = { ...state.gridMarks };
+      const choreCompletions = { ...state.choreCompletions };
       if (action.mark === 'blank') delete gridMarks[action.key];
       else gridMarks[action.key] = action.mark;
-      return touched({ ...state, gridMarks });
+      if (action.mark === 'blank') delete choreCompletions[action.key];
+      else choreCompletions[action.key] = {
+        mark: action.mark,
+        ...(action.mark === 'check' ? { actualCompletionDate: action.key.split('|')[0] } : {}),
+      };
+      return touched({ ...state, gridMarks, choreCompletions });
     }
     case 'UPSERT_TODO': {
       const idx = state.todos.findIndex((t) => t.id === action.todo.id);
@@ -87,7 +104,7 @@ function reducer(state: PlannerState, action: Action): PlannerState {
           if (block.tag !== 'routine' || !block.sourceRefId) return [block];
           const linked = nextById.get(block.sourceRefId);
           if (!linked) return [];
-          return [{ ...block, label: linked.label, completed: linked.done }];
+          return [{ ...block, label: block.id.startsWith('auto_') ? linked.autoScheduleLabel ?? linked.label : linked.label, completed: linked.done }];
         });
         days[date] = { ...current, routineInstances, blocks };
       });
@@ -95,12 +112,15 @@ function reducer(state: PlannerState, action: Action): PlannerState {
     }
     case 'MATERIALIZE_ROUTINE': {
       const current = ensureDay(state, action.date);
-      if (current.routineInstances.length) return state;
-      const instances = materializeRoutine(state.routineHabits, action.date).map((instance) => ({
+      const routineInstances = current.routineInstances.length ? current.routineInstances : materializeRoutine(state.routineHabits, action.date).map((instance) => ({
         ...instance,
         done: !!current.routineDone[instance.sourceRoutineId],
       }));
-      return touched({ ...state, days: { ...state.days, [action.date]: { ...current, routineInstances: instances } } });
+      const withInstances = { ...current, routineInstances };
+      const base = { ...state, days: { ...state.days, [action.date]: withInstances } };
+      const automaticBlocks = dailyAutoBlockCandidates(base, action.date);
+      if (current.routineInstances.length && automaticBlocks.length === 0) return state;
+      return touched({ ...base, days: { ...base.days, [action.date]: { ...withInstances, blocks: [...withInstances.blocks, ...automaticBlocks] } } });
     }
     case 'SET_HABIT_ROWS':
       return touched({ ...state, habitRows: action.habitRows });
@@ -118,6 +138,9 @@ interface PlannerContextValue {
   status: SyncStatus;
   online: boolean;
   retrySave: () => void;
+  signOut: () => void;
+  syncDetail?: string;
+  cloudReady: boolean;
   getDay: (date: ISODate) => DayState;
   patchDay: (date: ISODate, patch: (day: DayState) => DayState) => void;
   setGridMark: (key: string, mark: CellMark) => void;
@@ -133,6 +156,8 @@ interface PlannerContextValue {
   saveRoutine: (r: RoutineHabit[], effectiveDate: ISODate) => void;
   materializeRoutine: (date: ISODate) => void;
   toggleRoutine: (date: ISODate, instance: DailyRoutineInstance) => void;
+  getChores: (date: ISODate) => DailyChoreOccurrence[];
+  toggleChore: (date: ISODate, occurrence: DailyChoreOccurrence) => void;
   setHabitRows: (r: HabitRow[]) => void;
   loadDemo: () => void;
   resetAll: () => void;
@@ -140,27 +165,82 @@ interface PlannerContextValue {
 
 const PlannerContext = createContext<PlannerContextValue | null>(null);
 
-export function PlannerProvider({ children }: { children: ReactNode }) {
+export function PlannerProvider({ children, userId, onSignOut }: { children: ReactNode; userId: string; onSignOut: () => void }) {
   const [state, dispatch] = useReducer(reducer, undefined as unknown as PlannerState, initialState);
   const [status, setStatus] = useState<SyncStatus>('loading');
   const [online, setOnline] = useState<boolean>(navigator.onLine);
   const [saveAttempt, setSaveAttempt] = useState(0);
   const hydrated = useRef(false);
   const saveTimer = useRef<number | undefined>(undefined);
+  const saveInFlight = useRef(false);
+  const saveQueued = useRef(false);
+  const latestState = useRef(state);
+  const revision = useRef<number | undefined>(undefined);
+  const suppressSave = useRef(true);
+  const [syncDetail, setSyncDetail] = useState<string>();
+  const [cloudReady, setCloudReady] = useState(false);
+  latestState.current = state;
 
-  // Initial hydrate from storage.
+  // Hydrate from the authoritative cloud state, with an explicitly labelled
+  // last-known cache when the network is unavailable.
   useEffect(() => {
     let alive = true;
-    storage.load().then((loaded) => {
-      if (!alive) return;
-      if (loaded) dispatch({ type: 'HYDRATE', state: loaded });
-      hydrated.current = true;
-      setStatus('synced');
-    });
+    const cached = plannerCache.read(userId);
+    const unsaved = plannerCache.readUnsaved(userId);
+    if (unsaved && !cached) {
+      dispatch({ type: 'HYDRATE', state: migratePlannerState(unsaved) });
+      setStatus(navigator.onLine ? 'loading' : 'offline');
+      setCloudReady(!navigator.onLine);
+    }
+    if (cached) {
+      dispatch({ type: 'HYDRATE', state: migratePlannerState(unsaved ?? cached.state) });
+      revision.current = cached.revision;
+      setStatus(navigator.onLine ? 'loading' : 'offline');
+      setSyncDetail('Showing the last cloud-synced copy stored on this device.');
+      setCloudReady(!navigator.onLine);
+    }
+    supabasePlannerBackend.load()
+      .then(async (remote) => {
+        if (!alive) return;
+        if (remote) {
+          dispatch({ type: 'HYDRATE', state: migratePlannerState(unsaved ?? remote.state) });
+          revision.current = remote.revision;
+        } else {
+          const legacy = !hasCompletedLegacyMigration(userId) ? previewLegacyMigration() : null;
+          if (legacy && window.confirm(`Import this browser's existing planner into Supabase? This includes ${legacy.summary.dailySnapshots} daily pages and ${legacy.summary.timeBlocks} time blocks. Existing cloud data will never be overwritten.`)) {
+            const migrated = migratePlannerState(legacy.state);
+            const key = migrationIdempotencyKey(userId, migrated);
+            createLegacyBackup(userId);
+            const result = await supabasePlannerBackend.importLegacy(migrated, key);
+            markLegacyMigrationComplete(userId, key);
+            dispatch({ type: 'HYDRATE', state: migrated });
+            revision.current = result.revision;
+          } else if (!legacy) {
+            const seeded = initialState();
+            const result = await supabasePlannerBackend.save({ state: seeded });
+            dispatch({ type: 'HYDRATE', state: seeded });
+            revision.current = result.revision;
+          } else {
+            throw new BackendError('migration_already_completed', 'Import was deferred. Retry when you are ready; no blank cloud planner was created.');
+          }
+        }
+        hydrated.current = true;
+        setCloudReady(true);
+        suppressSave.current = !unsaved;
+        setStatus(unsaved ? 'saving' : 'synced');
+        setSyncDetail(unsaved ? 'Restored unsynced changes from this device; saving them to Supabase.' : undefined);
+      })
+      .catch((error) => {
+        if (!alive) return;
+        hydrated.current = !!(cached || unsaved);
+        if (unsaved && !navigator.onLine) setCloudReady(true);
+        setStatus(navigator.onLine ? 'failed' : 'offline');
+        setSyncDetail(error instanceof Error ? error.message : 'Cloud planner data could not be loaded.');
+      });
     return () => {
       alive = false;
     };
-  }, []);
+  }, [userId]);
 
   // Online/offline tracking for the sync indicator.
   useEffect(() => {
@@ -174,26 +254,92 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  // Reflect edits from other tabs (stand-in for other devices).
+  // Realtime messages are invalidations; always refetch the authoritative
+  // aggregate to avoid applying partial or out-of-order row events.
   useEffect(() => {
-    return storage.subscribe((remote) => dispatch({ type: 'HYDRATE', state: remote }));
-  }, []);
+    return supabasePlannerBackend.subscribeInvalidation(userId, () => {
+      if (status === 'saving') return;
+      void supabasePlannerBackend.load().then((remote) => {
+        if (!remote || remote.revision === revision.current) return;
+        suppressSave.current = true;
+        revision.current = remote.revision;
+        dispatch({ type: 'HYDRATE', state: migratePlannerState(remote.state) });
+      }).catch(() => setSyncDetail('Live sync was interrupted; retry to refresh.'));
+    }, (error) => setSyncDetail(error.message));
+  }, [userId, status]);
 
   // Debounced persistence with a visible saving -> synced transition.
   useEffect(() => {
     if (!hydrated.current) return;
+    if (suppressSave.current) {
+      suppressSave.current = false;
+      return;
+    }
     setStatus(online ? 'saving' : 'offline');
     window.clearTimeout(saveTimer.current);
     saveTimer.current = window.setTimeout(() => {
-      storage.save(state)
-        .then(() => setStatus(online ? 'synced' : 'offline'))
-        .catch(() => setStatus('failed'));
+      if (!online) {
+        plannerCache.writeUnsaved(userId, state);
+        setSyncDetail('Changes are stored on this device and are not yet in Supabase.');
+        return;
+      }
+      if (saveInFlight.current) {
+        saveQueued.current = true;
+        return;
+      }
+      const snapshot = state;
+      saveInFlight.current = true;
+      supabasePlannerBackend.save({ state, expectedRevision: revision.current })
+        .then((result) => {
+          revision.current = result.revision;
+          saveInFlight.current = false;
+          const changedWhileSaving = latestState.current.lastEditedAt !== snapshot.lastEditedAt;
+          if (saveQueued.current || changedWhileSaving) {
+            saveQueued.current = false;
+            setStatus('saving');
+            setSaveAttempt((attempt) => attempt + 1);
+          } else {
+            setStatus('synced');
+            setSyncDetail(undefined);
+          }
+        })
+        .catch(async (error) => {
+          saveInFlight.current = false;
+          saveQueued.current = false;
+          if (error instanceof BackendError && error.code === 'conflict') {
+            try {
+              const remote = await supabasePlannerBackend.load();
+              if (!remote) throw error;
+              revision.current = remote.revision;
+              plannerCache.writeUnsaved(userId, state);
+              const keepThisDevice = window.confirm(
+                'Another device saved newer changes. Press OK to keep this device’s version (then choose Retry), or Cancel to keep the cloud version.',
+              );
+              if (keepThisDevice) {
+                setStatus('failed');
+                setSyncDetail('Your device version is preserved. Choose Retry to replace the cloud version.');
+              } else {
+                plannerCache.clearUnsaved(userId);
+                suppressSave.current = true;
+                dispatch({ type: 'HYDRATE', state: migratePlannerState(remote.state) });
+                setStatus('synced');
+                setSyncDetail('Kept the newer cloud version.');
+              }
+              return;
+            } catch {
+              // Preserve the original conflict message below.
+            }
+          }
+          setStatus('failed');
+          setSyncDetail(error instanceof Error ? error.message : 'Cloud save failed.');
+        });
     }, 350);
     return () => window.clearTimeout(saveTimer.current);
-  }, [state, online, saveAttempt]);
+  }, [state, online, saveAttempt, userId]);
 
   const value = useMemo<PlannerContextValue>(() => {
     const getDay = (date: ISODate) => state.days[date] ?? emptyDay();
+    const getChores = (date: ISODate) => materializeDailyChores(state.habitRows, date, state.gridMarks);
     const patchDay = (date: ISODate, patch: (day: DayState) => DayState) => dispatch({ type: 'PATCH_DAY', date, patch });
 
     const captureTodo: PlannerContextValue['captureTodo'] = ({ text, list, assignedDate, source = 'ui' }) => {
@@ -241,7 +387,10 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
       state,
       status,
       online,
-      retrySave: () => setSaveAttempt((attempt) => attempt + 1),
+      signOut: onSignOut,
+      syncDetail,
+      cloudReady,
+      retrySave: () => cloudReady ? setSaveAttempt((attempt) => attempt + 1) : window.location.reload(),
       getDay,
       patchDay,
       setGridMark: (key, mark) => dispatch({ type: 'SET_GRID_MARK', key, mark }),
@@ -264,11 +413,24 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
           blocks: day.blocks.map((block) => block.sourceRefId === instance.id ? { ...block, completed: !instance.done } : block),
         }),
       }),
+      getChores,
+      toggleChore: (date, occurrence) => {
+        const done = !occurrence.completed;
+        dispatch({ type: 'SET_GRID_MARK', key: `${date}|${occurrence.sourceChoreId}`, mark: done ? 'check' : 'blank' });
+        dispatch({
+          type: 'PATCH_DAY',
+          date,
+          patch: (day) => ({
+            ...day,
+            blocks: day.blocks.map((block) => block.sourceRefId === occurrence.id ? { ...block, completed: done } : block),
+          }),
+        });
+      },
       setHabitRows: (habitRows) => dispatch({ type: 'SET_HABIT_ROWS', habitRows }),
       loadDemo: () => dispatch({ type: 'RESET', state: demoState() }),
       resetAll: () => dispatch({ type: 'RESET', state: initialState() }),
     };
-  }, [state, status, online]);
+  }, [state, status, online, onSignOut, syncDetail, cloudReady]);
 
   return <PlannerContext.Provider value={value}>{children}</PlannerContext.Provider>;
 }

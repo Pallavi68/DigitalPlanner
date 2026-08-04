@@ -80,7 +80,7 @@ export function slotLabel(slot: number): string {
 
 /** Full clock time for a slot boundary, e.g. 0 -> '8:00', used in tooltips/labels. */
 export function slotTime(slot: number): string {
-  const totalMin = DAY_START_HOUR * 60 + slot * SLOT_MINUTES;
+  const totalMin = Math.round(DAY_START_HOUR * 60 + slot * SLOT_MINUTES);
   const h24 = Math.floor(totalMin / 60) % 24;
   const min = totalMin % 60;
   const ampm = h24 >= 12 && h24 < 24 ? 'pm' : 'am';

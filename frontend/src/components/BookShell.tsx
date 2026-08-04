@@ -50,7 +50,9 @@ export function BookShell({ children }: { children: ReactNode }) {
       >
         <div className="book-header-meta" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, minWidth: 0 }}>
-            <span style={{ font: `600 ${phone ? 18 : 22}px var(--serif)`, fontStyle: 'italic' }}>{monthName(selectedDate)}</span>
+            <span style={{ font: `600 ${phone ? 18 : 22}px var(--serif)`, fontStyle: 'italic' }}>
+              {monthName(selectedDate)}
+            </span>
             <Link
               to={`/month/${year}/${month}`}
               className="year-overview-link"
@@ -60,7 +62,9 @@ export function BookShell({ children }: { children: ReactNode }) {
               {year}
             </Link>
           </div>
-          <SyncIndicator />
+          <div className="book-header-actions">
+            <SyncIndicator />
+          </div>
         </div>
 
         {dailyRoute && (

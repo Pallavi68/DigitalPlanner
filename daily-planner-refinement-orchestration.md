@@ -104,4 +104,4 @@ No parallel write work is permitted because the data contracts, migration, App c
 
 ## 9. Exact kickoff/resume prompt
 
-> Resume `DAILY-PLANNER-REFINE-V2` in `/Users/pallavi/Documents/Projects/Digital Planner`. Read `AGENTS.md`, `daily-planner-refinement-orchestration.md`, `PROJECT_STATUS.md`, and `decision-list.md`; inspect repository evidence and continue from the first incomplete gate. Preserve existing uncommitted work, delegate only bounded non-overlapping tasks, run independent read-only QA, and update `PROJECT_STATUS.md`.
+> Resume `DAILY-PLANNER-REFINE-V2` in the repository root. Read `AGENTS.md`, `daily-planner-refinement-orchestration.md`, `PROJECT_STATUS.md`, and `decision-list.md`; inspect repository evidence and continue from the first incomplete gate. Preserve existing uncommitted work, delegate only bounded non-overlapping tasks, run independent read-only QA, and update `PROJECT_STATUS.md`.

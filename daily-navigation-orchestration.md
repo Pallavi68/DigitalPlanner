@@ -104,4 +104,4 @@ The work is incomplete until browser checks and independent QA pass and status e
 
 ## 9. Exact kickoff/resume prompt
 
-> Resume `DAILY-NAV-FLIP-V1` in `/Users/pallavi/Documents/Projects/Digital Planner`. Read `AGENTS.md`, `daily-navigation-orchestration.md`, `PROJECT_STATUS.md`, and `decision-list.md`; inspect repository evidence and continue from the first incomplete gate. Preserve existing uncommitted Daily Planner changes, delegate only bounded non-overlapping work, run independent read-only QA, and keep `PROJECT_STATUS.md` current.
+> Resume `DAILY-NAV-FLIP-V1` in the repository root. Read `AGENTS.md`, `daily-navigation-orchestration.md`, `PROJECT_STATUS.md`, and `decision-list.md`; inspect repository evidence and continue from the first incomplete gate. Preserve existing uncommitted Daily Planner changes, delegate only bounded non-overlapping work, run independent read-only QA, and keep `PROJECT_STATUS.md` current.

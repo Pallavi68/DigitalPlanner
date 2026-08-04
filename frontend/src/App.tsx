@@ -6,12 +6,11 @@ import { DateHeader } from './components/ui';
 import { RoutineChecklist } from './pages/daily/RoutineChecklist';
 import { TimeAlignment } from './pages/daily/TimeAlignment';
 import { ToDos } from './pages/daily/ToDos';
-import { WindDown } from './pages/daily/WindDown';
+import { ChoreChecklist } from './pages/daily/ChoreChecklist';
 import { usePlanner } from './store/PlannerContext';
 import { addDays, addMonths, dayOfMonth, fromISO, monthName, monthWeeks, ordinal, todayISO, weekdayLong, weekdayShort } from './lib/dates';
 import type { ISODate, TimeBlock } from './types';
 import { RoutineSetup } from './pages/daily/RoutineSetup';
-import { materializeRoutine as buildRoutineSnapshot } from './store/routines';
 import { blankDailyTodo, uid } from './store/seed';
 import { SLOT_COUNT } from './lib/dates';
 
@@ -26,20 +25,31 @@ function isValidISODate(value: string | undefined): value is ISODate {
 function DailyPage() {
   const { date: routeDate } = useParams();
   const navigate = useNavigate();
-  const { state, getDay, patchDay, materializeRoutine, toggleRoutine, saveRoutine } = usePlanner();
+  const { state, getDay, getChores, patchDay, materializeRoutine, toggleRoutine, toggleChore, saveRoutine, cloudReady, status, retrySave } = usePlanner();
   const [setupOpen, setSetupOpen] = useState(false);
 
   useEffect(() => {
-    if (isValidISODate(routeDate)) materializeRoutine(routeDate);
-  }, [routeDate, materializeRoutine]);
+    if (cloudReady && isValidISODate(routeDate)) materializeRoutine(routeDate);
+  }, [routeDate, materializeRoutine, cloudReady]);
 
   if (!isValidISODate(routeDate)) {
     return <Navigate to={`/day/${todayISO()}`} replace />;
   }
 
   const date = routeDate;
+  if (!cloudReady) {
+    return (
+      <Spread
+        ariaLabel="Planner cloud loading state"
+        turnLabel="Cloud planner"
+        left={<section className="cloud-page-state"><h1>{status === 'failed' ? 'This page could not be opened' : 'Opening this page…'}</h1><p>A historical page is never recreated when its cloud snapshot cannot be loaded.</p>{status === 'failed' && <button type="button" onClick={retrySave}>Retry</button>}</section>}
+        right={<div />}
+      />
+    );
+  }
   const day = getDay(date);
-  const routineItems = day.routineInstances.length ? day.routineInstances : buildRoutineSnapshot(state.routineHabits, date);
+  const routineItems = day.routineInstances;
+  const choreItems = getChores(date);
   const updateBlocks = (blocks: TimeBlock[]) => patchDay(date, (current) => ({ ...current, blocks }));
   const scheduleRoutine = (item: typeof routineItems[number]) => {
     const duplicates = day.blocks.some((block) => block.sourceRefId === item.id);
@@ -50,6 +60,22 @@ function DailyPage() {
     const endSlot = Math.min(SLOT_COUNT, startSlot + span);
     if (endSlot - startSlot < item.durationMinutes / 30) window.alert('The block was shortened to fit at the end of the day.');
     updateBlocks([...day.blocks, { id: uid('blk'), date, startSlot, endSlot, label: item.label, tag: 'routine', sourceRefId: item.id, completed: item.done }]);
+  };
+  const scheduleChore = (item: typeof choreItems[number]) => {
+    if (day.blocks.some((block) => block.sourceRefId === item.id) && !window.confirm(`“${item.label}” is already on this day. Add it again?`)) return;
+    const span = Math.max(1, Math.ceil((item.durationMinutes ?? 60) / 30));
+    const startSlot = item.defaultStartSlot ?? Array.from({ length: Math.max(1, SLOT_COUNT - span + 1) }, (_, slot) => slot)
+      .find((slot) => !day.blocks.some((block) => slot < block.endSlot && slot + span > block.startSlot)) ?? 0;
+    updateBlocks([...day.blocks, {
+      id: uid('blk'),
+      date,
+      startSlot,
+      endSlot: Math.min(SLOT_COUNT, startSlot + span),
+      label: item.label,
+      tag: 'chore',
+      sourceRefId: item.id,
+      completed: item.completed,
+    }]);
   };
 
   return (
@@ -76,6 +102,7 @@ function DailyPage() {
             habits={state.routineHabits}
             onSave={(habits) => saveRoutine(habits, todayISO())}
           />
+          <ChoreChecklist items={choreItems} onToggle={(item) => toggleChore(date, item)} onSchedule={scheduleChore} />
           <ToDos
             day={day}
             onEdit={(id, text) =>
@@ -112,27 +139,6 @@ function DailyPage() {
               patchDay(date, (current) => ({ ...current, todos: [...current.todos, blankDailyTodo()] }))
             }
           />
-          <WindDown
-            date={date}
-            day={day}
-            onToggleItem={(itemId) =>
-              patchDay(date, (current) => ({
-                ...current,
-                windDown: {
-                  ...current.windDown,
-                  checklist: current.windDown.checklist.map((item) =>
-                    item.id === itemId ? { ...item, done: !item.done } : item,
-                  ),
-                },
-              }))
-            }
-            onField={(field, value) =>
-              patchDay(date, (current) => ({
-                ...current,
-                windDown: { ...current.windDown, [field]: value },
-              }))
-            }
-          />
         </>
       }
       right={
@@ -141,10 +147,33 @@ function DailyPage() {
             date={date}
             day={day}
             onChange={updateBlocks}
-            onDeleteBlock={(block) => updateBlocks(day.blocks.filter((candidate) => candidate.id !== block.id))}
+            onDeleteBlock={(block) => patchDay(date, (current) => ({
+              ...current,
+              blocks: current.blocks.filter((candidate) => candidate.id !== block.id),
+              suppressedAutoBlockIds: block.id.startsWith('auto_')
+                ? [...new Set([...(current.suppressedAutoBlockIds ?? []), block.id])]
+                : current.suppressedAutoBlockIds,
+            }))}
+            onUpdateBlock={(block) => patchDay(date, (current) => ({
+              ...current,
+              blocks: current.blocks.map((candidate) => candidate.id === block.id ? block : candidate),
+            }))}
             onToggleBlock={(block) => {
               const linked = routineItems.find((item) => item.id === block.sourceRefId);
               if (linked) toggleRoutine(date, linked);
+              else if (block.tag === 'chore' && block.sourceRefId) {
+                const chore = choreItems.find((item) => item.id === block.sourceRefId);
+                if (chore) toggleChore(date, chore);
+              } else if (block.sourceRefId && day.windDown.checklist.some((item) => item.id === block.sourceRefId)) {
+                patchDay(date, (current) => ({
+                  ...current,
+                  windDown: {
+                    ...current.windDown,
+                    checklist: current.windDown.checklist.map((item) => item.id === block.sourceRefId ? { ...item, done: !item.done } : item),
+                  },
+                  blocks: current.blocks.map((candidate) => candidate.sourceRefId === block.sourceRefId ? { ...candidate, completed: !block.completed } : candidate),
+                }));
+              }
               else if (block.tag === 'todo' && block.sourceRefId) {
                 const todo = day.todos.find((line) => line.id === block.sourceRefId);
                 if (todo) {
@@ -247,7 +276,7 @@ function MonthOverview() {
   );
 }
 
-export default function App() {
+export default function App({ userId: _userId }: { userId: string }) {
   return (
     <BookShell>
       <Routes>

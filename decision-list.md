@@ -2,7 +2,7 @@
 
 A running log of locked product/scope decisions. When a decision changes, update it here and note the date. See `PRD.md` for full context.
 
-_Last updated: 2026-07-23_
+_Last updated: 2026-08-04_
 
 ---
 
@@ -28,6 +28,12 @@ _Last updated: 2026-07-23_
 | D16 | **Linked completion** | A daily checklist or to-do item and every Time Alignment block linked to it share one completion outcome; toggling either surface updates the others. | Prevents the left-page record and right-page schedule from disagreeing. |
 | D17 | **Directional to-do deletion** | Deleting a daily to-do removes its linked Time Alignment blocks. Deleting or unscheduling only a Time Alignment block does not delete its source to-do. | The list is the durable intent; the schedule is only that day's placement. |
 | D18 | **Daily spread balance and routine defaults** | Wind-down sits on the left beneath Daily To Dos; the right page is reserved for Time Alignment. Successful Day routines may optionally define a default quick-add time; otherwise `+` uses the next free slot. | Uses the physical spread efficiently and makes routine quick-add predictable without making time selection mandatory. |
+| D19 | **Cloud backend and owner identity** | Supabase is the approved cloud backend. Planner rows are owned by a recoverable Supabase Auth user (`auth.uid()`), using email OTP/magic-link sign-in for the single owner; row-level security is mandatory on every planner table. | Fulfills hard cross-device sync while keeping account UI minimal. This supersedes D9's deferred provider and the focused checklist PRD's device-only anonymous-session assumption. |
+| D20 | **Vision-to-Action Bingo geometry and launch scope** | August 2026 is the first interactive board and its seeded actions are approved. For `N` generated actions, use the smallest containing square: `S = ceil(sqrt(N))`; create an `S×S` board and fill the remaining `S² − N` positions with unique, randomly placed, automatically filled free squares. Every full horizontal row, vertical column, and both corner-to-corner diagonals are valid reward lines. January–June remain analysis inputs only. | Produces a true square without inventing or discarding action occurrences. Random free-square placement preserves the mixed bingo feel, while frozen positions and explicit line rules make completion deterministic and testable. |
+| D21 | **Vision-to-Action Bingo interaction details** | Completion reversal requires confirmation only when it affects a previously earned line; ordinary reversals use a short undo path. V1 stores one plain-text note per occurrence with audited timestamps. Dense phone boards use a bounded fit/zoom/pan view plus a persistent accessible list alternative. | Preserves tactile low-friction use, keeps earned rewards durable, avoids prematurely building a journaling system, and makes large frozen boards usable without changing their geometry or excluding assistive-technology users. |
+| D22 | **Recurring daily schedule materialization** | Use an anchored repeating two-week chore pattern with Week 1 beginning Monday, 2026-08-10. Applicable untimed chores surface for manual placement. Explicitly timed recurring items auto-create one linked block per date: Gym Monday/Tuesday/Thursday/Friday 9:30 AM–12:00 PM, while daily movement remains visible seven days; Night wind-down runs daily 11:00 PM–12:00 AM. Successful Day/Gym blocks are blue and chore blocks purple. | Gets the owner to a usable planner without waiting for the full Two-Week Habit Planner editor, prevents duplicate scheduling, and preserves stable dated completion identity for later scheduler and Bingo integration. |
+| D23 | **Moneymaker completion source** | Keep Moneymaker only in the Successful Day checklist. Exclude the four transcribed weekday entries from generated chore definitions and remove obsolete Moneymaker chore state during migration. | Prevents two independent completion records while retaining Moneymaker in the owner's primary daily-success view. |
+| D24 | **Daily acceptance scheduling details** | Successful Day uses the label `Movement`; Gym remains the default Time Alignment label on Monday/Tuesday/Thursday/Friday. Replace the aggregate Night wind-down block and left-page section with four individually timed blocks: Mobility 11:00–11:15 PM, Vitamins 11:15–11:20 PM, Clean down 11:20–11:30 PM, and Night-time skincare 11:30–11:40 PM. Automatic blocks may be explicitly removed for one date, and every Time Alignment block supports a persisted ad-hoc note with interactive `[ ]`/`[x]` checklist lines. | Matches the owner's actual execution ritual, preserves useful defaults without making them undeletable, and keeps small contextual details and sub-checks attached to the scheduled action. |
 
 ## Page types
 
@@ -38,7 +44,6 @@ _Last updated: 2026-07-23_
 
 ## Open questions (not yet decided)
 
-- Which cloud provider will supply the deferred cross-device sync requirement (Firebase vs. Supabase vs. other).
 - v1.5 scheduler brain: rule-based only vs. hybrid (rules + AI). Leaning rule-based first.
 - Whether to add a real-ink (stylus) layer on tablet eventually.
 

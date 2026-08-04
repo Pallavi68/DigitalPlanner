@@ -33,6 +33,8 @@ export function materializeRoutine(habits: RoutineHabit[], date: ISODate): Daily
       period,
       durationMinutes: revision.durationMinutes,
       defaultStartSlot: revision.defaultStartSlot,
+      autoScheduleWeekdays: revision.autoScheduleWeekdays,
+      autoScheduleLabel: revision.autoScheduleLabel,
       sortOrder: revision.sortOrder,
       done: false,
     };

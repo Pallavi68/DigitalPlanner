@@ -20,6 +20,10 @@ export interface RoutineRevision {
   durationMinutes: number;
   /** Optional preferred quick-add start within the Time Alignment grid. */
   defaultStartSlot?: number;
+  /** Optional subset of weekdays on which the routine is auto-slotted. It remains checkable every day. */
+  autoScheduleWeekdays?: Weekday[];
+  /** Optional timeline label when the scheduled activity is more specific than the checklist outcome. */
+  autoScheduleLabel?: string;
   sortOrder: number;
   archived: boolean;
 }
@@ -31,6 +35,8 @@ export interface RoutineHabit {
   period: RoutinePeriod;
   durationMinutes: number;
   defaultStartSlot?: number;
+  autoScheduleWeekdays?: Weekday[];
+  autoScheduleLabel?: string;
   sortOrder: number;
   /** Date the habit started applying (recurring changes are forward-only). */
   since: ISODate;
@@ -46,6 +52,8 @@ export interface DailyRoutineInstance {
   period: 'AM' | 'PM';
   durationMinutes: number;
   defaultStartSlot?: number;
+  autoScheduleWeekdays?: Weekday[];
+  autoScheduleLabel?: string;
   sortOrder: number;
   done: boolean;
 }
@@ -58,6 +66,13 @@ export interface HabitRow {
   category: 'Workout' | 'Moneymaker' | 'Walk' | 'Chores' | 'Self-care' | 'Finance' | 'Social' | 'Other';
   /** If set, this row only appears on that weekday; otherwise every day. */
   weekday?: Weekday;
+  /** Week(s) in the anchored repeating two-week cycle. Missing means both weeks. */
+  cycleWeeks?: Array<1 | 2>;
+  /** Anchor Monday for Week 1 of the repeating two-week cycle. */
+  cycleAnchorDate?: ISODate;
+  durationMinutes?: number;
+  defaultStartSlot?: number;
+  autoSchedule?: boolean;
   since: ISODate;
   archived?: boolean;
 }
@@ -103,6 +118,8 @@ export interface TimeBlock {
   sourceRefId?: string;
   /** Completion mirrors a linked Successful Day item when one exists. */
   completed?: boolean;
+  /** Optional ad-hoc context shown as subordinate pencil text in Time Alignment. */
+  note?: string;
 }
 
 export interface WindDown {
@@ -127,6 +144,11 @@ export interface Preferences {
   breakCadenceMins: number;
   energyWindows: string; // free text for now, consumed by v1.5 scheduler
   fixedCommitments: FixedCommitment[];
+  windDownSchedule?: {
+    startSlot: number;
+    durationMinutes: number;
+    autoSchedule: boolean;
+  };
 }
 
 /** Per-day, mutable state the owner fills in. */
@@ -137,6 +159,8 @@ export interface DayState {
   todos: DailyTodoLine[]; // starts with 15 ruled lines and grows as needed
   blocks: TimeBlock[];
   windDown: WindDown;
+  /** Auto-created block IDs explicitly removed for this date. */
+  suppressedAutoBlockIds?: string[];
 }
 
 /** Per-day grid marks for the Two-Week Habit Planner. */
@@ -150,6 +174,8 @@ export interface PlannerState {
   todos: Todo[];
   days: Record<ISODate, DayState>;
   gridMarks: GridMarks;
+  /** Full chore outcome metadata; `gridMarks` remains the rendering seam. */
+  choreCompletions?: Record<string, { mark: CellMark; actualCompletionDate?: ISODate }>;
   preferences: Preferences;
   /** Bumped on every mutation; used by the sync indicator. */
   lastEditedAt: number;
