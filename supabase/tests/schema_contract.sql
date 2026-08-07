@@ -77,6 +77,19 @@ begin
 end $$;
 
 do $$
+begin
+  if not exists (
+    select 1
+    from pg_publication_tables
+    where pubname='supabase_realtime'
+      and schemaname='public'
+      and tablename='planner_profiles'
+  ) then
+    raise exception 'planner_profiles is missing from the Supabase Realtime publication';
+  end if;
+end $$;
+
+do $$
 declare missing text[];
 begin
   select array_agg(required.column_name) into missing

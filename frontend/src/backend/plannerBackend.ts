@@ -1,6 +1,7 @@
 import type { RealtimeChannel } from '@supabase/supabase-js';
 import type { PlannerState } from '../types';
 import { getSupabaseClient } from './client';
+import { requireUser } from './auth';
 import { plannerCache } from './cache';
 import {
   normalizeImportResult,
@@ -17,8 +18,7 @@ import { asBackendError, BackendError } from './errors';
 export class SupabasePlannerBackend {
   async load(): Promise<RemotePlannerEnvelope | null> {
     const client = getSupabaseClient();
-    const { data: auth } = await client.auth.getUser();
-    if (!auth.user) throw new BackendError('not_authenticated', 'Sign in to load cloud planner data.');
+    const user = await requireUser();
     const { data, error } = await client.rpc(RPC.load);
     if (error) throw asBackendError(error, 'Could not load planner data.');
     let envelope: RemotePlannerEnvelope | null;
@@ -28,15 +28,14 @@ export class SupabasePlannerBackend {
       throw new BackendError('invalid_data', 'Supabase returned an invalid planner response.', { cause: error });
     }
     if (!envelope) return null;
-    plannerCache.write(auth.user.id, { ...envelope, cachedAt: new Date().toISOString() });
+    plannerCache.write(user.id, { ...envelope, cachedAt: new Date().toISOString() });
     return envelope;
   }
 
   async save(input: SavePlannerInput): Promise<SavePlannerResult> {
     const client = getSupabaseClient();
-    const { data: auth } = await client.auth.getUser();
-    if (!auth.user) throw new BackendError('not_authenticated', 'Sign in to save planner data.');
-    plannerCache.writeUnsaved(auth.user.id, input.state);
+    const user = await requireUser();
+    plannerCache.writeUnsaved(user.id, input.state);
     const { data, error } = await client.rpc(RPC.save, {
       payload: input.state,
       expected_edited_at: input.expectedRevision ?? null,
@@ -48,13 +47,13 @@ export class SupabasePlannerBackend {
     } catch (error) {
       throw new BackendError('invalid_data', 'Supabase returned an invalid save response.', { cause: error });
     }
-    plannerCache.write(auth.user.id, {
+    plannerCache.write(user.id, {
       state: input.state,
       revision: result.revision,
       updatedAt: result.updatedAt,
       cachedAt: new Date().toISOString(),
     });
-    plannerCache.clearUnsaved(auth.user.id);
+    plannerCache.clearUnsaved(user.id);
     return result;
   }
 
@@ -71,7 +70,12 @@ export class SupabasePlannerBackend {
     }
   }
 
-  subscribeInvalidation(userId: string, onInvalidate: () => void, onError?: (error: BackendError) => void): () => void {
+  subscribeInvalidation(
+    userId: string,
+    onInvalidate: () => void,
+    onError?: (error: BackendError) => void,
+    onConnected?: () => void,
+  ): () => void {
     let channel: RealtimeChannel | null = getSupabaseClient()
       .channel(`planner-sync:${userId}`)
       .on(
@@ -80,6 +84,7 @@ export class SupabasePlannerBackend {
         () => onInvalidate(),
       )
       .subscribe((status, error) => {
+        if (status === 'SUBSCRIBED') onConnected?.();
         if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
           onError?.(asBackendError(error, 'Live planner updates were interrupted.'));
         }

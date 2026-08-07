@@ -177,9 +177,12 @@ export function PlannerProvider({ children, userId, onSignOut }: { children: Rea
   const latestState = useRef(state);
   const revision = useRef<number | undefined>(undefined);
   const suppressSave = useRef(true);
+  const statusRef = useRef<SyncStatus>(status);
+  const invalidationQueued = useRef(false);
   const [syncDetail, setSyncDetail] = useState<string>();
   const [cloudReady, setCloudReady] = useState(false);
   latestState.current = state;
+  statusRef.current = status;
 
   // Hydrate from the authoritative cloud state, with an explicitly labelled
   // last-known cache when the network is unavailable.
@@ -255,18 +258,58 @@ export function PlannerProvider({ children, userId, onSignOut }: { children: Rea
   }, []);
 
   // Realtime messages are invalidations; always refetch the authoritative
-  // aggregate to avoid applying partial or out-of-order row events.
+  // aggregate to avoid applying partial or out-of-order row events. An event
+  // received during a local save is queued instead of being silently lost.
   useEffect(() => {
-    return supabasePlannerBackend.subscribeInvalidation(userId, () => {
-      if (status === 'saving') return;
+    let alive = true;
+    let loadingRemote = false;
+
+    const catchUp = () => {
+      if (!alive || loadingRemote) return;
+      if (statusRef.current === 'saving') {
+        invalidationQueued.current = true;
+        return;
+      }
+      loadingRemote = true;
       void supabasePlannerBackend.load().then((remote) => {
-        if (!remote || remote.revision === revision.current) return;
+        if (!alive || !remote || remote.revision === revision.current) return;
+        // Never replace edits which this device has explicitly preserved for a
+        // retry after a failed save.
+        if (plannerCache.readUnsaved(userId)) {
+          invalidationQueued.current = true;
+          return;
+        }
         suppressSave.current = true;
         revision.current = remote.revision;
         dispatch({ type: 'HYDRATE', state: migratePlannerState(remote.state) });
-      }).catch(() => setSyncDetail('Live sync was interrupted; retry to refresh.'));
-    }, (error) => setSyncDetail(error.message));
-  }, [userId, status]);
+        setStatus('synced');
+        setSyncDetail(undefined);
+      }).catch(() => setSyncDetail('Live sync was interrupted; the app will retry when it reconnects or becomes active.'))
+        .finally(() => {
+          loadingRemote = false;
+        });
+    };
+
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') catchUp();
+    };
+    window.addEventListener('focus', catchUp);
+    window.addEventListener('planner-sync-catch-up', catchUp);
+    document.addEventListener('visibilitychange', onVisible);
+    const unsubscribe = supabasePlannerBackend.subscribeInvalidation(
+      userId,
+      catchUp,
+      (error) => setSyncDetail(`${error.message} The app will retry automatically.`),
+      catchUp,
+    );
+    return () => {
+      alive = false;
+      unsubscribe();
+      window.removeEventListener('focus', catchUp);
+      window.removeEventListener('planner-sync-catch-up', catchUp);
+      document.removeEventListener('visibilitychange', onVisible);
+    };
+  }, [userId]);
 
   // Debounced persistence with a visible saving -> synced transition.
   useEffect(() => {
@@ -299,8 +342,13 @@ export function PlannerProvider({ children, userId, onSignOut }: { children: Rea
             setStatus('saving');
             setSaveAttempt((attempt) => attempt + 1);
           } else {
+            statusRef.current = 'synced';
             setStatus('synced');
             setSyncDetail(undefined);
+            if (invalidationQueued.current) {
+              invalidationQueued.current = false;
+              window.dispatchEvent(new Event('planner-sync-catch-up'));
+            }
           }
         })
         .catch(async (error) => {

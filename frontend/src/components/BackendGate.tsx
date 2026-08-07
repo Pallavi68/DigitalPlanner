@@ -40,7 +40,7 @@ export function BackendGate({ children }: { children: (userId: string, onSignOut
     setBusy(true);
     setMessage('');
     try {
-      await sendMagicLink({ email, redirectTo: window.location.href });
+      await sendMagicLink({ email, redirectTo: window.location.origin });
       setMessage('Check your email for the secure sign-in link. You can use the same email on every device.');
     } catch (error) {
       setMessage(error instanceof Error ? error.message : 'The sign-in link could not be sent.');

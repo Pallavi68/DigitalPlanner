@@ -29,6 +29,9 @@ export function TimeAlignment({ date, day, onChange, onDeleteBlock, onToggleBloc
   const slotH = phone ? 32 : 30;
   const [interaction, setInteraction] = useState<Interaction | null>(null);
   const [detailId, setDetailId] = useState<string | null>(null);
+  const [createStartSlot, setCreateStartSlot] = useState<number | null>(null);
+  const [createLabel, setCreateLabel] = useState('');
+  const [createDurationSlots, setCreateDurationSlots] = useState(2);
   const blocksRef = useRef(day.blocks);
   useLayoutEffect(() => {
     blocksRef.current = day.blocks;
@@ -106,11 +109,41 @@ export function TimeAlignment({ date, day, onChange, onDeleteBlock, onToggleBloc
   const minimumVisualHeight = phone ? 20 : 18;
   const laidOut = layoutBlocks(day.blocks, minimumVisualHeight / slotH);
 
+  const openCreate = (startSlot: number) => {
+    setCreateStartSlot(startSlot);
+    setCreateLabel('');
+    setCreateDurationSlots(Math.min(2, SLOT_COUNT - startSlot));
+  };
+
+  const createStandaloneBlock = () => {
+    const label = createLabel.trim();
+    if (createStartSlot === null || !label) return;
+    const endSlot = Math.min(SLOT_COUNT, createStartSlot + createDurationSlots);
+    onChange([...day.blocks, {
+      id: uid('blk'),
+      date,
+      startSlot: createStartSlot,
+      endSlot,
+      label,
+      tag: 'todo',
+      completed: false,
+    }]);
+    setCreateStartSlot(null);
+    setCreateLabel('');
+  };
+
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', borderBottom: '1px solid var(--gold)', paddingBottom: 10, marginBottom: 12 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--gold)', paddingBottom: 10, marginBottom: 12 }}>
         <span style={{ font: "600 12px var(--serif)", letterSpacing: '2.5px', color: 'var(--navy)', textTransform: 'uppercase' }}>Time Alignment</span>
-        <span style={{ font: "500 10px var(--serif)", letterSpacing: '2px', color: 'var(--ink-soft)' }}>8AM — 2AM</span>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <button
+            type="button"
+            onClick={() => openCreate(firstAvailableSlot(day.blocks))}
+            style={{ border: 0, borderBottom: '1px solid var(--gold)', background: 'transparent', color: 'var(--navy)', padding: '6px 2px', font: "600 10px var(--serif)", letterSpacing: '1.2px', textTransform: 'uppercase', cursor: 'pointer' }}
+          >+ Add item</button>
+          <span style={{ font: "500 10px var(--serif)", letterSpacing: '2px', color: 'var(--ink-soft)' }}>8AM — 2AM</span>
+        </span>
       </div>
 
       <div
@@ -127,6 +160,13 @@ export function TimeAlignment({ date, day, onChange, onDeleteBlock, onToggleBloc
         {Array.from({ length: SLOT_COUNT }, (_, i) => (
           <div key={i} style={{ height: slotH, borderTop: `1px solid ${i % 2 === 0 ? 'var(--rule)' : 'var(--rule-half)'}`, position: 'relative' }}>
             <span style={{ position: 'absolute', left: 0, top: -6, font: "500 9px var(--serif)", color: 'var(--ink-soft)', width: 44 }}>{slotLabel(i)}</span>
+            <button
+              type="button"
+              aria-label={`Add a standalone item at ${slotTime(i)}`}
+              title={`Add item at ${slotTime(i)}`}
+              onClick={() => openCreate(i)}
+              style={{ position: 'absolute', inset: '0 0 0 44px', width: 'calc(100% - 44px)', border: 0, background: 'transparent', cursor: 'text', padding: 0 }}
+            />
           </div>
         ))}
 
@@ -224,8 +264,64 @@ export function TimeAlignment({ date, day, onChange, onDeleteBlock, onToggleBloc
         })}
       </div>
       <p style={{ font: "italic 13px var(--hand)", color: 'var(--placeholder)', marginTop: 10 }}>
-        click a block for notes · drag to move · drag edges to resize · ◆ fixed blocks are locked
+        tap an empty line to add · click a block for notes · drag to move · drag edges to resize · ◆ fixed blocks are locked
       </p>
+      <Modal open={createStartSlot !== null} onClose={() => setCreateStartSlot(null)} title="Add to Time Alignment">
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+            createStandaloneBlock();
+          }}
+          style={{ display: 'grid', gap: 12 }}
+        >
+          <label htmlFor="standalone-block-label" style={{ display: 'grid', gap: 5, font: '500 12px var(--serif)', color: 'var(--navy)' }}>
+            What are you planning?
+            <input
+              id="standalone-block-label"
+              data-autofocus
+              required
+              maxLength={240}
+              value={createLabel}
+              onChange={(event) => setCreateLabel(event.target.value)}
+              placeholder="Write an appointment, break, errand…"
+              style={{ width: '100%', padding: 10, border: '1px solid var(--rule)', background: 'rgba(255,255,255,.45)', color: 'var(--ink)', font: '16px var(--hand)' }}
+            />
+          </label>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            <label htmlFor="standalone-block-start" style={{ display: 'grid', gap: 5, font: '500 12px var(--serif)', color: 'var(--navy)' }}>
+              Starts at
+              <select
+                id="standalone-block-start"
+                value={createStartSlot ?? 0}
+                onChange={(event) => {
+                  const start = Number(event.target.value);
+                  setCreateStartSlot(start);
+                  setCreateDurationSlots((duration) => Math.min(duration, SLOT_COUNT - start));
+                }}
+                style={{ padding: 9, border: '1px solid var(--rule)', background: 'var(--paper)', color: 'var(--ink)', font: '13px var(--serif)' }}
+              >
+                {Array.from({ length: SLOT_COUNT }, (_, slot) => <option key={slot} value={slot}>{slotTime(slot)}</option>)}
+              </select>
+            </label>
+            <label htmlFor="standalone-block-duration" style={{ display: 'grid', gap: 5, font: '500 12px var(--serif)', color: 'var(--navy)' }}>
+              Duration
+              <select
+                id="standalone-block-duration"
+                value={createDurationSlots}
+                onChange={(event) => setCreateDurationSlots(Number(event.target.value))}
+                style={{ padding: 9, border: '1px solid var(--rule)', background: 'var(--paper)', color: 'var(--ink)', font: '13px var(--serif)' }}
+              >
+                {Array.from({ length: Math.min(8, SLOT_COUNT - (createStartSlot ?? 0)) }, (_, index) => index + 1).map((slots) => (
+                  <option key={slots} value={slots}>{slots * 30} minutes</option>
+                ))}
+              </select>
+            </label>
+          </div>
+          <button type="submit" disabled={!createLabel.trim()} style={{ justifySelf: 'end', border: '1px solid var(--gold)', background: 'var(--navy)', color: 'var(--cream)', padding: '9px 16px', font: '600 11px var(--serif)', letterSpacing: '1.2px', textTransform: 'uppercase', cursor: createLabel.trim() ? 'pointer' : 'not-allowed', opacity: createLabel.trim() ? 1 : .55 }}>
+            Add to schedule
+          </button>
+        </form>
+      </Modal>
       {(() => {
         const block = day.blocks.find((candidate) => candidate.id === detailId);
         return (
@@ -252,6 +348,11 @@ export function TimeAlignment({ date, day, onChange, onDeleteBlock, onToggleBloc
       })()}
     </div>
   );
+}
+
+function firstAvailableSlot(blocks: TimeBlock[]): number {
+  return Array.from({ length: SLOT_COUNT }, (_, slot) => slot)
+    .find((slot) => !blocks.some((block) => slot >= block.startSlot && slot < block.endSlot)) ?? 0;
 }
 
 const CHECKBOX_LINE = /^(\s*(?:-\s*)?)\[([ xX])\](\s+.*)$/;

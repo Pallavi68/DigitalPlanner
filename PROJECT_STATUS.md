@@ -1,29 +1,33 @@
 # Project Status
 
-Last updated: 2026-08-04
+Last updated: 2026-08-07
 
 ## Current objective
 
-The accepted Daily Planner is prepared on `release/daily-planner-v1` for its first production deployment. The release contains the Supabase-backed Daily Planner, recurring schedule, sync/timeout fixes, notes with persistent checklist lines, nightly exact-time blocks, Vercel SPA configuration, and planner-only database migrations. The paused Bingo prototype is neither routed nor bundled and its source/migration/tests remain unstaged. Local checks pass; Git publication, Vercel deployment, Supabase production Auth URL configuration, and production acceptance remain.
+The Daily Planner is live at `https://digital-planner-plum.vercel.app` from the pushed `release/daily-planner-v1` baseline plus two currently uncommitted launch fixes. Vercel production environment variables and Supabase Auth Site URL/redirect URLs are configured. Email magic-link authentication, production writes, reload persistence, and cross-device persistence were owner-verified. The paused Bingo prototype is neither routed nor bundled and remains unapplied/uncommitted.
 
-`DAILY-RECURRING-SCHEDULE-V1` is implemented locally and its planner-only Supabase migration is applied. It adds the owner's anchored two-week chore pattern, automatic Gym blocks on Monday/Tuesday/Thursday/Friday from 9:30 AM–12:00 PM, a daily 11:00 PM–12:00 AM wind-down block, draggable untimed chores, completion linkage, and blue Successful Day/purple chore treatments. `Moneymaker` is authoritative in Successful Day only; obsolete chore state is removed during migration. The paused Bingo migration remains unapplied. Authenticated browser round-trip verification is the remaining acceptance gate.
+Production testing exposed two launch defects. Missing Realtime publication membership was fixed by `20260805000100_enable_planner_realtime.sql`, which is applied to the linked Supabase project; the post-apply dry run reports the database up to date and linked schema lint passes. A laptop tab later failed with `InvalidJWTToken: Token has expired`; `frontend/src/backend/auth.ts` and `frontend/src/backend/plannerBackend.ts` now explicitly refresh sessions that are expired or within 60 seconds of expiry before planner loads/saves. That frontend fix is deployed and locally verified, but the owner paused before repeating the final no-refresh laptop-to-phone Realtime test.
+
+On 2026-08-07 the owner reported a laptop showing `Sync failed` while the phone showed `Synced` without the laptop's new items. The frontend's Realtime invalidation could be silently missed while a local save was in flight, and a disconnected/stale phone could retain the `Synced` label because that label described only its last confirmed write. The working-tree fix now keeps one stable Realtime subscription, queues invalidations received during saves, catches up after subscription/reconnection and whenever the tab becomes visible or focused, and preserves explicit unsaved-device recovery data instead of overwriting it with a refetch. Magic-link authentication now returns to the root route, which opens today's page, rather than preserving an old dated URL.
+
+The 2026-08-07 recovery is now complete. The production laptop's newer unsaved payload was backed up before any mutation, then uploaded as the authoritative owner state and read back from Supabase at the identical revision. The recovered permanent state contains 20 dated planner pages, 29 written Daily To Dos, and 40 Time Alignment blocks. The original 30-second planner-save limit was insufficient for this payload, so `20260807000100_extend_planner_save_timeout.sql` raises only the authenticated aggregate-save RPC to a bounded 120 seconds; the isolated migration was applied without Bingo and the post-apply dry run reports the remote database up to date. The Realtime/default-today frontend fix is deployed and aliased to the permanent production URL.
+
+`DAILY-RECURRING-SCHEDULE-V1` is implemented and its planner-only Supabase migration is applied. Authenticated browser round-trip and cross-device persistence verification pass. Final Realtime-after-token-refresh, offline/conflict, historical-boundary, and representative recurring-schedule browser acceptance remain.
 
 Resume remote validation from `DAILY_RECURRING_SCHEDULE_HANDOFF.md`; do not redo completed implementation/QA work.
 
-The Supabase backend implementation is locally complete and the four approved planner migrations are applied to the linked `Digital-Planner` Supabase project. Local frontend credentials are configured, email auth is enabled, remote schema lint passes, and unauthenticated planner access is rejected. The next objective is to deploy the frontend to one stable production URL with the existing magic-link method unchanged and the paused Bingo prototype hidden but preserved, then complete owner-authenticated data-flow, Realtime, offline/conflict, historical-boundary, and two-device verification.
+The Supabase backend and planner migrations are applied to the linked `Digital-Planner` project. The exact resume checklist and protected working-tree state are in `PRODUCTION_LAUNCH_HANDOFF.md`.
 
 `VISION-ACTION-BINGO-V1` is paused. A substantial first prototype exists uncommitted on `feature/vision-action-bingo-v1`, but the owner explicitly did not approve its latest cadence/board direction and chose to return later. Do not treat the 22×22/four-quadrant design or current action semantics as settled. The canonical pause/restart details are in `VISION_ACTION_BINGO_IMPLEMENTATION_STATUS.md`.
 
 For the next separate chat, the prior Supabase backend thread is the intended workstream. Start from `BACKEND_IMPLEMENTATION_STATUS.md` and `digital-planner-backend-orchestration.md`, preserve every existing uncommitted file, and re-inspect actual repository state before taking action.
 
-The next session should prepare production deployment in this order:
+The next session should resume in this order:
 
-1. Hide/disable Bingo routes and navigation while preserving all existing Bingo files and backend work; do not apply the Bingo migration.
-2. Add hosting configuration for the current frontend without changing the email magic-link authentication method.
-3. Run typecheck, all tests, production build, and browser verification.
-4. Review the full deployment diff and complete the Git skill's sensitive-data scan.
-5. Request explicit approval before staging, committing, or pushing the exact deployment source.
-6. Deploy to one permanent URL, add it to Supabase Auth redirect configuration, and run the authenticated/two-device checklist in `supabase/README.md`.
+1. Refresh/sign in on laptop and phone, confirm both show `Synced`, then repeat a no-refresh laptop-to-phone edit and record latency.
+2. If Realtime succeeds, run offline/reconnect/conflict, historical-boundary, and representative Week 1/Week 2 recurring-schedule checks from `PRODUCTION_LAUNCH_HANDOFF.md` and `supabase/README.md`.
+3. Update status with results, review the focused launch-fix diff, scan it for sensitive data, and request approval before staging/committing/pushing it.
+4. Connect Vercel to GitHub after the owner adds a GitHub Login Connection in Vercel; the production deployment is live but future GitHub auto-deploy is not configured.
 
 ## Current working state
 
@@ -70,6 +74,8 @@ The maintained app is locally runnable and currently provides:
 * persistent pencil control for reopening and extending any block's notes
 * normalized Supabase schema/RPCs for planner data with forced RLS
 * cloud persistence, Realtime invalidation, last-known cache, offline unsaved recovery, retry, and conflict feedback
+* queued Realtime catch-up after local saves, reconnects, tab focus, and tab visibility changes
+* standalone Time Alignment items created directly from any ruled time slot or the `+ Add item` control, with configurable start time and 30-minute-step duration
 * safe confirmed one-time migration with local backup and non-overwrite protection
 * separate daily morning and evening skincare actions
 
@@ -133,6 +139,27 @@ npm run preview
 ```
 
 ## Verification status
+
+Verified during production launch on 2026-08-05/06:
+
+* Vercel production deployment — READY at `https://digital-planner-plum.vercel.app`.
+* Production root and direct `/day/2026-08-05` route — HTTP 200.
+* Supabase Auth Site URL and allowed redirects — configured for the permanent Vercel URL; localhost retained for development.
+* Owner email magic-link authentication — passed on laptop and phone.
+* Production write, successful-save indicator, refresh persistence — passed.
+* Cross-device persistence after refresh — passed in both directions; phone save was noticeably slow.
+* No-refresh Realtime before database fix — failed; `planner_profiles` was absent from `supabase_realtime`.
+* Planner-only Realtime migration dry run — listed only `20260805000100_enable_planner_realtime.sql`; Bingo excluded.
+* Realtime migration application — passed; post-apply dry run reports remote database up to date.
+* Linked Supabase schema lint after Realtime migration — passed with no errors.
+* Token-refresh frontend fix: `npm run typecheck`, `npm test` (9 files, 47 tests), and `npm run build` (107 modules) — passed.
+* Token-refresh frontend production deployment — READY and aliased to the permanent URL.
+* Final fresh-session no-refresh Realtime retest — pending because the owner paused.
+* 2026-08-07 Realtime catch-up/default-today fix: `npm run typecheck`, `npm test` (9 files, 47 tests), and `npm run build` (107 modules) — passed; two-device production recovery/retest remains pending deployment.
+* 2026-08-07 laptop recovery — passed: protected local payload extracted from a copied browser profile, Supabase save/read-back revisions matched exactly, and read-back contained 20 dated pages, 29 written Daily To Dos, 40 time blocks, and 140 routine instances.
+* 2026-08-07 production redeployment — READY and aliased to `https://digital-planner-plum.vercel.app`; root returned HTTP 200.
+* `20260807000100_extend_planner_save_timeout.sql` — isolated dry run listed only this planner migration, application passed, and the post-apply dry run reports the remote database up to date.
+* 2026-08-07 standalone Time Alignment creation: `npm run typecheck`, `npm test` (9 files, 47 tests), and `npm run build` (107 modules) — passed; Vercel production deployment is READY, aliased to the permanent URL, and returns HTTP 200.
 
 Verified on 2026-08-04 for `DAILY-PLANNER-ACCEPTANCE-FIXES-V1`:
 
@@ -205,7 +232,8 @@ The following intentionally remain unavailable pending review and later mileston
 * chore drag sources and manual fixed-commitment UI
 * automated migration/validation tests
 * linting and automated tests
-* complete owner-authenticated magic-link, planner data-flow, Realtime, offline/conflict, historical-boundary, and two-device verification; planner migrations and local environment variables are already configured
+* finish no-refresh Realtime verification after the deployed token-refresh fix
+* complete offline/conflict and historical-boundary verification; authenticated login, reload persistence, and cross-device persistence already pass
 * browser-verify Week 1/Week 2 materialization, automatic blocks, colors, linked completion, and reopen deduplication against live Supabase
 * revisit the paused Bingo product direction before resuming any Bingo implementation or deployment
 
@@ -221,7 +249,9 @@ Backend implementation source of truth:
 
 ## Known limitations
 
-* Planner migrations and local Supabase configuration exist, but the permanent production URL and its authenticated cross-device behavior remain unverified until Vercel deployment and Supabase Auth URL configuration are complete.
+* The permanent production URL and Auth redirects are configured. Realtime publication and expired-session recovery fixes are live, but their combined no-refresh two-device behavior needs the final fresh-session retest.
+* Phone persistence works but saves were noticeably slow, and the owner deferred phone UI refinement to a later milestone.
+* Vercel is not connected to GitHub because the Vercel account needs a GitHub Login Connection; deployments currently use the authenticated CLI.
 * Owner-local historical guards use a validated timezone with an Asia/Kolkata fallback, but midnight-boundary behavior still needs live verification.
 * The Time Alignment window is still fixed at its approved default of 8:00 AM–2:00 AM until Settings is implemented.
 * The recurring checklist has an editor, but the broader first-run setup flow is not implemented; unavailable pages are not linked.

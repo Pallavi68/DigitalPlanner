@@ -27,7 +27,17 @@ export async function getSession(): Promise<Session | null> {
 }
 
 export async function requireUser(): Promise<User> {
-  const { data, error } = await getSupabaseClient().auth.getUser();
+  const client = getSupabaseClient();
+  const { data: sessionData, error: sessionError } = await client.auth.getSession();
+  if (sessionError) throw asBackendError(sessionError, 'Could not restore the sign-in session.');
+
+  const expiresAt = sessionData.session?.expires_at;
+  if (expiresAt !== undefined && expiresAt * 1000 <= Date.now() + 60_000) {
+    const { error: refreshError } = await client.auth.refreshSession();
+    if (refreshError) throw asBackendError(refreshError, 'Your sign-in session expired and could not be refreshed.');
+  }
+
+  const { data, error } = await client.auth.getUser();
   if (error) throw asBackendError(error, 'Could not verify the signed-in user.');
   if (!data.user) throw new BackendError('not_authenticated', 'Sign in to use cloud sync.');
   return data.user;
