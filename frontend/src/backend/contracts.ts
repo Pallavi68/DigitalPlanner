@@ -1,8 +1,9 @@
 import type { PlannerState } from '../types';
 
 export const RPC = {
-  load: 'get_planner_state',
-  save: 'save_planner_state',
+  load: 'get_planner_document',
+  save: 'save_planner_document',
+  loadLegacy: 'get_planner_state',
   importLegacy: 'import_legacy_planner_state',
 } as const;
 
@@ -195,6 +196,17 @@ export function normalizeLoadResult(value: unknown): RemotePlannerEnvelope | nul
     state,
     revision: Number(profile.client_edited_at),
     updatedAt: String(profile.updated_at),
+  };
+}
+
+export function normalizeDocumentResult(value: unknown): RemotePlannerEnvelope | null {
+  if (value === null || (Array.isArray(value) && value.length === 0)) return null;
+  const result = record(value, RPC.load);
+  if (!result.state || typeof result.state !== 'object') throw new TypeError('Missing planner state.');
+  return {
+    state: result.state as PlannerState,
+    revision: numberField(result, 'revision', 'revision'),
+    updatedAt: stringField(result, 'updatedAt', 'updated_at'),
   };
 }
 

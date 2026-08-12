@@ -1,8 +1,18 @@
 # Project Status
 
-Last updated: 2026-08-07
+Last updated: 2026-08-12
 
 ## Current objective
+
+`PLANNER-SYNC-RELIABILITY-V1` has replaced the slow per-edit normalized aggregate rewrite with a fast owner-scoped planner document while preserving all existing normalized rows as rollback evidence. Before any mutation, the laptop cache and Supabase were audited at the same revision with no unsaved laptop payload: 24 dated pages, 50 written Daily To Dos, 64 Time Alignment blocks, and 180 routine instances. A protected browser-storage snapshot was created outside the repository.
+
+Important 2026-08-12 incident and recovery: the first document client automatically preferred any device-local unsaved recovery payload during startup. A stale phone payload subsequently overwrote the correct document with an older 21-day/29-to-do state, removing the visible August 12 content. The bad document and current laptop storage were backed up. The document was restored under optimistic revision control from the laptop cache, which matched the untouched legacy database. Final verified state is again 24 days, 50 written to-dos, 64 blocks, and 180 routines; August 12 has the same six written to-do IDs, six block IDs, and three completed routines as the protected source. The deployed prevention build no longer auto-promotes local recovery data: it requires explicit confirmation and explicit Retry before any cloud replacement.
+
+The additive migration `20260812000100_planner_document_sync.sql` is applied and the new frontend is deployed at the permanent production URL. Each save now uses atomic optimistic revision control and an independent remote read-back before clearing the local unsaved journal or showing `Synced`. Convergence no longer depends on Realtime alone: reconnect, focus, visibility, and a 15-second visible-tab poll all trigger authoritative catch-up.
+
+Owner acceptance on 2026-08-12: after the emergency restoration and prevention deployment, the owner confirmed that syncing is happening correctly across the laptop and phone. `PLANNER-SYNC-RELIABILITY-V1` is complete. Do not remove the legacy normalized data or recovery safeguards without explicit approval.
+
+Production RPC verification passed six alternating client cycles (three each direction), with saves in 211–377 ms and reads in 168–297 ms; the reversible test edit was removed and the final content counts remain unchanged. Local typecheck, 50 tests, build, isolated migration dry run/application, and linked schema lint all pass. Physical-device acceptance also passed. See `PLANNER_SYNC_RELIABILITY_STATUS.md`.
 
 The Daily Planner is live at `https://digital-planner-plum.vercel.app` from the pushed `release/daily-planner-v1` baseline plus two currently uncommitted launch fixes. Vercel production environment variables and Supabase Auth Site URL/redirect URLs are configured. Email magic-link authentication, production writes, reload persistence, and cross-device persistence were owner-verified. The paused Bingo prototype is neither routed nor bundled and remains unapplied/uncommitted.
 

@@ -2,6 +2,29 @@
 begin;
 
 do $$
+begin
+  if to_regclass('public.planner_documents') is null then
+    raise exception 'planner_documents table is missing';
+  end if;
+  if not (select relrowsecurity and relforcerowsecurity from pg_class where oid='public.planner_documents'::regclass) then
+    raise exception 'planner_documents must use forced RLS';
+  end if;
+  if has_table_privilege('anon','public.planner_documents','SELECT') then
+    raise exception 'anon must not read planner_documents';
+  end if;
+  if not has_function_privilege('authenticated','public.get_planner_document()','EXECUTE')
+     or not has_function_privilege('authenticated','public.save_planner_document(jsonb,bigint)','EXECUTE') then
+    raise exception 'authenticated document RPC grants are missing';
+  end if;
+  if not exists (
+    select 1 from pg_publication_tables
+    where pubname='supabase_realtime' and schemaname='public' and tablename='planner_documents'
+  ) then
+    raise exception 'planner_documents is missing from supabase_realtime';
+  end if;
+end $$;
+
+do $$
 declare missing text[];
 begin
   select array_agg(required.name) into missing

@@ -179,6 +179,7 @@ export function PlannerProvider({ children, userId, onSignOut }: { children: Rea
   const suppressSave = useRef(true);
   const statusRef = useRef<SyncStatus>(status);
   const invalidationQueued = useRef(false);
+  const recoveryAwaitingRetry = useRef(false);
   const [syncDetail, setSyncDetail] = useState<string>();
   const [cloudReady, setCloudReady] = useState(false);
   latestState.current = state;
@@ -206,7 +207,21 @@ export function PlannerProvider({ children, userId, onSignOut }: { children: Rea
       .then(async (remote) => {
         if (!alive) return;
         if (remote) {
-          dispatch({ type: 'HYDRATE', state: migratePlannerState(unsaved ?? remote.state) });
+          let stateToHydrate = remote.state;
+          if (unsaved) {
+            const keepDeviceRecovery = window.confirm(
+              'This device has an older unsynced recovery copy. Press OK only if you intentionally want to replace the cloud planner with this device copy. Press Cancel to keep the cloud planner. Neither copy will be deleted automatically.',
+            );
+            if (keepDeviceRecovery) {
+              stateToHydrate = unsaved;
+              recoveryAwaitingRetry.current = true;
+              setSyncDetail('Device recovery copy selected. It will remain protected until the cloud save is verified.');
+            } else {
+              plannerCache.clearUnsaved(userId);
+              setSyncDetail('Kept the cloud planner. The stale device recovery copy was discarded from this browser.');
+            }
+          }
+          dispatch({ type: 'HYDRATE', state: migratePlannerState(stateToHydrate) });
           revision.current = remote.revision;
         } else {
           const legacy = !hasCompletedLegacyMigration(userId) ? previewLegacyMigration() : null;
@@ -229,9 +244,10 @@ export function PlannerProvider({ children, userId, onSignOut }: { children: Rea
         }
         hydrated.current = true;
         setCloudReady(true);
-        suppressSave.current = !unsaved;
-        setStatus(unsaved ? 'saving' : 'synced');
-        setSyncDetail(unsaved ? 'Restored unsynced changes from this device; saving them to Supabase.' : undefined);
+        const selectedDeviceRecovery = Boolean(unsaved && plannerCache.readUnsaved(userId));
+        suppressSave.current = true;
+        setStatus(selectedDeviceRecovery ? 'failed' : 'synced');
+        if (selectedDeviceRecovery) setSyncDetail('Device recovery copy is protected. Choose Retry only when you are ready to replace the cloud planner.');
       })
       .catch((error) => {
         if (!alive) return;
@@ -293,9 +309,14 @@ export function PlannerProvider({ children, userId, onSignOut }: { children: Rea
     const onVisible = () => {
       if (document.visibilityState === 'visible') catchUp();
     };
+    const onOnline = () => catchUp();
     window.addEventListener('focus', catchUp);
+    window.addEventListener('online', onOnline);
     window.addEventListener('planner-sync-catch-up', catchUp);
     document.addEventListener('visibilitychange', onVisible);
+    const poll = window.setInterval(() => {
+      if (navigator.onLine && document.visibilityState === 'visible') catchUp();
+    }, 15_000);
     const unsubscribe = supabasePlannerBackend.subscribeInvalidation(
       userId,
       catchUp,
@@ -306,8 +327,10 @@ export function PlannerProvider({ children, userId, onSignOut }: { children: Rea
       alive = false;
       unsubscribe();
       window.removeEventListener('focus', catchUp);
+      window.removeEventListener('online', onOnline);
       window.removeEventListener('planner-sync-catch-up', catchUp);
       document.removeEventListener('visibilitychange', onVisible);
+      window.clearInterval(poll);
     };
   }, [userId]);
 
@@ -316,6 +339,12 @@ export function PlannerProvider({ children, userId, onSignOut }: { children: Rea
     if (!hydrated.current) return;
     if (suppressSave.current) {
       suppressSave.current = false;
+      return;
+    }
+    if (recoveryAwaitingRetry.current) {
+      plannerCache.writeUnsaved(userId, state);
+      setStatus('failed');
+      setSyncDetail('Device recovery copy is protected. Choose Retry only when you are ready to replace the cloud planner.');
       return;
     }
     setStatus(online ? 'saving' : 'offline');
@@ -438,7 +467,17 @@ export function PlannerProvider({ children, userId, onSignOut }: { children: Rea
       signOut: onSignOut,
       syncDetail,
       cloudReady,
-      retrySave: () => cloudReady ? setSaveAttempt((attempt) => attempt + 1) : window.location.reload(),
+      retrySave: () => {
+        if (!cloudReady) {
+          window.location.reload();
+          return;
+        }
+        if (recoveryAwaitingRetry.current) {
+          recoveryAwaitingRetry.current = false;
+          suppressSave.current = false;
+        }
+        setSaveAttempt((attempt) => attempt + 1);
+      },
       getDay,
       patchDay,
       setGridMark: (key, mark) => dispatch({ type: 'SET_GRID_MARK', key, mark }),

@@ -5,6 +5,7 @@ import { requireUser } from './auth';
 import { plannerCache } from './cache';
 import {
   normalizeImportResult,
+  normalizeDocumentResult,
   normalizeLoadResult,
   normalizeSaveResult,
   RPC,
@@ -14,6 +15,7 @@ import {
   type SavePlannerResult,
 } from './contracts';
 import { asBackendError, BackendError } from './errors';
+import { plannerStatesMatch } from './syncVerification';
 
 export class SupabasePlannerBackend {
   async load(): Promise<RemotePlannerEnvelope | null> {
@@ -23,28 +25,51 @@ export class SupabasePlannerBackend {
     if (error) throw asBackendError(error, 'Could not load planner data.');
     let envelope: RemotePlannerEnvelope | null;
     try {
-      envelope = normalizeLoadResult(data);
+      envelope = normalizeDocumentResult(data);
     } catch (error) {
       throw new BackendError('invalid_data', 'Supabase returned an invalid planner response.', { cause: error });
     }
-    if (!envelope) return null;
+    if (!envelope) {
+      const { data: legacyData, error: legacyError } = await client.rpc(RPC.loadLegacy);
+      if (legacyError) throw asBackendError(legacyError, 'Could not load existing planner data.');
+      const legacy = normalizeLoadResult(legacyData);
+      if (!legacy) return null;
+      try {
+        const bootstrapped = await this.saveDocument(legacy.state, undefined);
+        envelope = { state: legacy.state, revision: bootstrapped.revision, updatedAt: bootstrapped.updatedAt };
+      } catch (bootstrapError) {
+        if (!(bootstrapError instanceof BackendError) || bootstrapError.code !== 'conflict') throw bootstrapError;
+        const { data: concurrentData, error: concurrentError } = await client.rpc(RPC.load);
+        if (concurrentError) throw asBackendError(concurrentError, 'Could not load the concurrently created planner document.');
+        envelope = normalizeDocumentResult(concurrentData);
+        if (!envelope) throw bootstrapError;
+      }
+    }
     plannerCache.write(user.id, { ...envelope, cachedAt: new Date().toISOString() });
     return envelope;
   }
 
-  async save(input: SavePlannerInput): Promise<SavePlannerResult> {
-    const client = getSupabaseClient();
-    const user = await requireUser();
-    plannerCache.writeUnsaved(user.id, input.state);
-    const { data, error } = await client.rpc(RPC.save, {
-      payload: input.state,
-      expected_edited_at: input.expectedRevision ?? null,
+  private async saveDocument(state: PlannerState, expectedRevision?: number): Promise<SavePlannerResult> {
+    const { data, error } = await getSupabaseClient().rpc(RPC.save, {
+      payload: state,
+      expected_revision: expectedRevision ?? null,
     });
     if (error) throw asBackendError(error, 'Could not save planner data.');
+    return normalizeSaveResult(data);
+  }
+
+  async save(input: SavePlannerInput): Promise<SavePlannerResult> {
+    const user = await requireUser();
+    plannerCache.writeUnsaved(user.id, input.state);
     let result: SavePlannerResult;
     try {
-      result = normalizeSaveResult(data);
+      result = await this.saveDocument(input.state, input.expectedRevision);
+      const verified = await this.load();
+      if (!verified || verified.revision !== result.revision || !plannerStatesMatch(verified.state, input.state)) {
+        throw new BackendError('remote', 'Supabase saved the request but read-back verification did not match. Your device copy is preserved for retry.', { retryable: true });
+      }
     } catch (error) {
+      if (error instanceof BackendError) throw error;
       throw new BackendError('invalid_data', 'Supabase returned an invalid save response.', { cause: error });
     }
     plannerCache.write(user.id, {
@@ -80,7 +105,7 @@ export class SupabasePlannerBackend {
       .channel(`planner-sync:${userId}`)
       .on(
         'postgres_changes',
-        { event: '*', schema: 'public', table: 'planner_profiles', filter: `owner_id=eq.${userId}` },
+        { event: '*', schema: 'public', table: 'planner_documents', filter: `owner_id=eq.${userId}` },
         () => onInvalidate(),
       )
       .subscribe((status, error) => {

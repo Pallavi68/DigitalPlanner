@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { normalizeLoadResult, normalizeSaveResult } from './contracts';
+import { normalizeDocumentResult, normalizeLoadResult, normalizeSaveResult } from './contracts';
 
 describe('Supabase planner contract', () => {
   it('reconstructs linked daily state and running lists from normalized rows', () => {
@@ -34,5 +34,14 @@ describe('Supabase planner contract', () => {
 
   it('accepts the bigint save result returned by the SQL RPC', () => {
     expect(normalizeSaveResult(81).revision).toBe(81);
+  });
+
+  it('reads the fast owner document envelope without rebuilding normalized rows', () => {
+    const state = { version: 3, setupComplete: true, lastEditedAt: 99 } as never;
+    expect(normalizeDocumentResult({ state, revision: 101, updated_at: '2026-08-12T00:00:00Z' })).toEqual({
+      state,
+      revision: 101,
+      updatedAt: '2026-08-12T00:00:00Z',
+    });
   });
 });
