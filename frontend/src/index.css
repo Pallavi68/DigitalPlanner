@@ -265,6 +265,10 @@ textarea.hand-input {
 .todo-drag { font-size: 15px; touch-action: none; cursor: grab; }
 .todo-delete { font: 18px var(--serif); }
 .todo-delete:hover { color: var(--cross); }
+.todo-overflow-controls { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 14px; padding: 10px 0 2px 27px; }
+.todo-overflow-toggle, .todo-add-extra { min-height: 44px; border: 0; padding: 6px 0; background: transparent; cursor: pointer; font: 600 14px var(--serif); color: var(--ink-soft); text-underline-offset: 3px; }
+.todo-add-extra { margin-left: auto; color: var(--terracotta); }
+.todo-overflow-toggle:focus-visible, .todo-add-extra:focus-visible { outline: 2px solid var(--terracotta); outline-offset: 3px; border-radius: 2px; }
 @media (min-width: 1100px) {
   .book-header { min-height: 46px; padding-top: 0 !important; }
   .book-header-meta { position: absolute; inset: 0 18px auto; height: 44px; pointer-events: none; }

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { DayState } from '../../types';
 import { InkBubble } from '../../components/InkBubble';
 import { SectionLabel } from '../../components/ui';
@@ -17,6 +17,10 @@ export function ToDos({ day, onEdit, onToggle, onDelete, onAdd }: Props) {
   const { startDrag } = useDrag();
   const inputs = useRef<Array<HTMLInputElement | null>>([]);
   const focusNewest = useRef(false);
+  const [overflowOpen, setOverflowOpen] = useState(false);
+  const baseRowCount = 15;
+  const overflowCount = Math.max(0, day.todos.length - baseRowCount);
+  const visibleTodos = overflowOpen ? day.todos : day.todos.slice(0, baseRowCount);
 
   useEffect(() => {
     if (!focusNewest.current) return;
@@ -27,7 +31,7 @@ export function ToDos({ day, onEdit, onToggle, onDelete, onAdd }: Props) {
   return (
     <div>
       <SectionLabel>To Dos</SectionLabel>
-      {day.todos.map((line, i) => {
+      {visibleTodos.map((line, i) => {
         const filled = line.text.trim() !== '';
         return (
           <div className="todo-row" key={line.id}>
@@ -43,9 +47,13 @@ export function ToDos({ day, onEdit, onToggle, onDelete, onAdd }: Props) {
               onKeyDown={(event) => {
                 if (event.key !== 'Enter') return;
                 event.preventDefault();
-                if (i < day.todos.length - 1) inputs.current[i + 1]?.focus();
+                if (i < day.todos.length - 1) {
+                  if (i + 1 >= baseRowCount && !overflowOpen) setOverflowOpen(true);
+                  window.requestAnimationFrame(() => inputs.current[i + 1]?.focus());
+                }
                 else {
                   focusNewest.current = true;
+                  setOverflowOpen(true);
                   onAdd();
                 }
               }}
@@ -76,6 +84,29 @@ export function ToDos({ day, onEdit, onToggle, onDelete, onAdd }: Props) {
           </div>
         );
       })}
+      <div className="todo-overflow-controls">
+        {overflowCount > 0 && (
+          <button
+            type="button"
+            className="paper-link todo-overflow-toggle"
+            aria-expanded={overflowOpen}
+            onClick={() => setOverflowOpen((open) => !open)}
+          >
+            {overflowOpen ? 'Collapse extra to-dos' : `Show ${overflowCount} more ${overflowCount === 1 ? 'to-do' : 'to-dos'}`}
+          </button>
+        )}
+        <button
+          type="button"
+          className="paper-link todo-add-extra"
+          onClick={() => {
+            focusNewest.current = true;
+            setOverflowOpen(true);
+            onAdd();
+          }}
+        >
+          + Add another to-do
+        </button>
+      </div>
     </div>
   );
 }

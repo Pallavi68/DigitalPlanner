@@ -4,6 +4,8 @@ Last updated: 2026-08-12
 
 ## Current objective
 
+`DAILY-TODO-OVERFLOW-V1` is implemented locally. The Daily To Dos still open with the paper-like 01–15 rows, while an explicit `+ Add another to-do` control now creates, reveals, and focuses row 16 and later rows. Extra rows are collapsed by default and can be shown or collapsed without deleting their persisted content. The existing Enter-to-continue behavior, stable IDs, linked Time Alignment behavior, and planner persistence contracts are unchanged. See `daily-todo-overflow-orchestration.md`.
+
 `PLANNER-SYNC-RELIABILITY-V1` has replaced the slow per-edit normalized aggregate rewrite with a fast owner-scoped planner document while preserving all existing normalized rows as rollback evidence. Before any mutation, the laptop cache and Supabase were audited at the same revision with no unsaved laptop payload: 24 dated pages, 50 written Daily To Dos, 64 Time Alignment blocks, and 180 routine instances. A protected browser-storage snapshot was created outside the repository.
 
 Important 2026-08-12 incident and recovery: the first document client automatically preferred any device-local unsaved recovery payload during startup. A stale phone payload subsequently overwrote the correct document with an older 21-day/29-to-do state, removing the visible August 12 content. The bad document and current laptop storage were backed up. The document was restored under optimistic revision control from the laptop cache, which matched the untouched legacy database. Final verified state is again 24 days, 50 written to-dos, 64 blocks, and 180 routines; August 12 has the same six written to-do IDs, six block IDs, and three completed routines as the protected source. The deployed prevention build no longer auto-promotes local recovery data: it requires explicit confirmation and explicit Retry before any cloud replacement.
@@ -54,7 +56,7 @@ The maintained app is locally runnable and currently provides:
 * directional two-sided half-page leaf turns based on the archived Claude prototype, without animating the whole spread
 * the existing book shell and responsive spread
 * the Successful Day routine checklist
-* numbered Daily To Dos beginning with `01–15`, with Enter-to-add growth and per-item deletion
+* numbered Daily To Dos beginning with `01–15`, with Enter-to-add growth, an explicit add-beyond-15 control, collapsible overflow rows, and per-item deletion
 * the 8:00 AM–2:00 AM Time Alignment grid
 * evening wind-down controls on the left page beneath Daily To Dos
 * local persistence through the existing `localStorage` adapter
@@ -149,6 +151,14 @@ npm run preview
 ```
 
 ## Verification status
+
+Verified locally on 2026-08-12 for `DAILY-TODO-OVERFLOW-V1`:
+
+* Root/today behavior — confirmed by code inspection: `/` and invalid routes intentionally redirect to `/day/${todayISO()}`, and `todayISO()` uses the device-local `new Date()` value.
+* `npm run typecheck` — passed.
+* `npm test` — passed: 10 files, 50 tests.
+* `npm run build` — passed: 108 modules transformed.
+* Headless Chrome local startup/render — reached the expected authentication screen; the authenticated add/collapse/reopen interaction could not be exercised from the clean profile without initiating owner sign-in.
 
 Verified during production launch on 2026-08-05/06:
 
