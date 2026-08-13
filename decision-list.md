@@ -2,7 +2,7 @@
 
 A running log of locked product/scope decisions. When a decision changes, update it here and note the date. See `PRD.md` for full context.
 
-_Last updated: 2026-08-04_
+_Last updated: 2026-08-13_
 
 ---
 
@@ -34,6 +34,7 @@ _Last updated: 2026-08-04_
 | D22 | **Recurring daily schedule materialization** | Use an anchored repeating two-week chore pattern with Week 1 beginning Monday, 2026-08-10. Applicable untimed chores surface for manual placement. Explicitly timed recurring items auto-create one linked block per date: Gym Monday/Tuesday/Thursday/Friday 9:30 AM–12:00 PM, while daily movement remains visible seven days; Night wind-down runs daily 11:00 PM–12:00 AM. Successful Day/Gym blocks are blue and chore blocks purple. | Gets the owner to a usable planner without waiting for the full Two-Week Habit Planner editor, prevents duplicate scheduling, and preserves stable dated completion identity for later scheduler and Bingo integration. |
 | D23 | **Moneymaker completion source** | Keep Moneymaker only in the Successful Day checklist. Exclude the four transcribed weekday entries from generated chore definitions and remove obsolete Moneymaker chore state during migration. | Prevents two independent completion records while retaining Moneymaker in the owner's primary daily-success view. |
 | D24 | **Daily acceptance scheduling details** | Successful Day uses the label `Movement`; Gym remains the default Time Alignment label on Monday/Tuesday/Thursday/Friday. Replace the aggregate Night wind-down block and left-page section with four individually timed blocks: Mobility 11:00–11:15 PM, Vitamins 11:15–11:20 PM, Clean down 11:20–11:30 PM, and Night-time skincare 11:30–11:40 PM. Automatic blocks may be explicitly removed for one date, and every Time Alignment block supports a persisted ad-hoc note with interactive `[ ]`/`[x]` checklist lines. | Matches the owner's actual execution ritual, preserves useful defaults without making them undeletable, and keeps small contextual details and sub-checks attached to the scheduled action. |
+| D25 | **Two-week habit-sheet ownership and daily sync** | Habit sheets are consecutive, non-overlapping 14-day dated windows anchored on 1 August 2026. A window crossing a month boundary is the same record and is linked from both month views. Categories are owner-named and owner-ordered. Each dated activity is a durable source item that is automatically surfaced in that date's Daily To Dos; text and ✓ completion are shared between both surfaces, while an explicit ✕ records a missed activity without completing its Daily To Do. | Prevents duplicated August/September sheets, preserves the owner's preferred visual order, and ensures the two-week planning ritual directly drives daily execution without a separate chore-list section. |
 
 ## Page types
 

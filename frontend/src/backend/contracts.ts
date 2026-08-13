@@ -89,6 +89,9 @@ export function normalizeLoadResult(value: unknown): RemotePlannerEnvelope | nul
     // The retired relational backend never stored weekly planner actions. New
     // aggregate documents carry this collection as part of their JSON payload.
     weeklyActions: [],
+    // The retired relational backend predates the aggregate two-week sheet.
+    habitCategories: [],
+    habitPlanItems: [],
     routineHabits: routineDefinitions.map((definition) => {
       const revisions = routineRevisions
         .filter((revision) => revision.routine_id === definition.id)

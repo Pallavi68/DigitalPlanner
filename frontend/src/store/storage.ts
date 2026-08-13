@@ -1,4 +1,5 @@
-import type { DailyTodoLine, DayState, PlannerState, RoutineHabit, WeeklyAction } from '../types';
+import type { DailyTodoLine, DayState, HabitCategory, HabitPlanItem, PlannerState, RoutineHabit, WeeklyAction } from '../types';
+import { DEFAULT_HABIT_CATEGORIES } from './habitPlanner';
 import { DEFAULT_HABIT_ROWS, DEFAULT_WINDDOWN_ITEMS, TWO_WEEK_CYCLE_ANCHOR } from './seed';
 
 /**
@@ -53,6 +54,14 @@ class LocalStorageAdapter implements StorageAdapter {
 
 export function migratePlannerState(input: PlannerState): PlannerState {
   const state = { ...input };
+  const habitCategories: HabitCategory[] = Array.isArray(state.habitCategories) && state.habitCategories.length
+    ? state.habitCategories.filter((item) => item && typeof item.id === 'string' && typeof item.label === 'string')
+    : DEFAULT_HABIT_CATEGORIES.map((label, sortOrder) => ({ id: `habit_category_${sortOrder + 1}`, label, sortOrder }));
+  const categoryIds = new Set(habitCategories.map((item) => item.id));
+  const habitPlanItems: HabitPlanItem[] = Array.isArray(state.habitPlanItems)
+    ? state.habitPlanItems.filter((item) => item && categoryIds.has(item.categoryId) && /^\d{4}-\d{2}-\d{2}$/.test(item.date) && !!item.text?.trim() && !!item.linkedDailyTodoId)
+      .map((item) => ({ ...item, text: item.text.trim(), done: item.done === true, mark: item.mark === 'cross' ? 'cross' as const : item.done === true || item.mark === 'check' ? 'check' as const : 'blank' as const, source: 'habit-planner' as const }))
+    : [];
   const rawWeeklyActions: unknown = state.weeklyActions;
   const weeklyActions: WeeklyAction[] = Array.isArray(rawWeeklyActions)
     ? rawWeeklyActions.flatMap((candidate, index) => {
@@ -207,7 +216,7 @@ export function migratePlannerState(input: PlannerState): PlannerState {
   const choreCompletions = state.choreCompletions
     ? Object.fromEntries(Object.entries(state.choreCompletions).filter(([key]) => keepActiveChoreKey(key)))
     : undefined;
-  return { ...state, version: 6, weeklyActions, routineHabits, habitRows, gridMarks, choreCompletions, preferences, days };
+  return { ...state, version: 7, weeklyActions, habitCategories, habitPlanItems, routineHabits, habitRows, gridMarks, choreCompletions, preferences, days };
 }
 
 export const storage: StorageAdapter = new LocalStorageAdapter();

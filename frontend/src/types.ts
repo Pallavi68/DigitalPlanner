@@ -105,6 +105,27 @@ export interface WeeklyAction {
   source: 'weekly-planner';
 }
 
+export interface HabitCategory {
+  id: string;
+  label: string;
+  sortOrder: number;
+}
+
+/** One dated activity written into a category cell on a two-week habit sheet. */
+export interface HabitPlanItem {
+  id: string;
+  categoryId: string;
+  date: ISODate;
+  text: string;
+  done: boolean;
+  mark: CellMark;
+  linkedDailyTodoId: string;
+  createdAt: number;
+  updatedAt: number;
+  completedAt?: number;
+  source: 'habit-planner';
+}
+
 /** A running-list item (short or long). Persists across days until done. */
 export interface Todo {
   id: string;
@@ -189,6 +210,8 @@ export interface PlannerState {
   habitRows: HabitRow[];
   todos: Todo[];
   weeklyActions: WeeklyAction[];
+  habitCategories: HabitCategory[];
+  habitPlanItems: HabitPlanItem[];
   days: Record<ISODate, DayState>;
   gridMarks: GridMarks;
   /** Full chore outcome metadata; `gridMarks` remains the rendering seam. */

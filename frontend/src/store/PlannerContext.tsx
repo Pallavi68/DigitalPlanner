@@ -36,6 +36,16 @@ import {
   reconcileWeeklyActionsFromDailyPatch,
   toggleWeeklyAction as toggleWeeklyActionInState,
 } from './weeklyPlanner';
+import {
+  addHabitCategory as addHabitCategoryInState,
+  addHabitPlanItem as addHabitPlanItemInState,
+  deleteHabitPlanItem as deleteHabitPlanItemInState,
+  editHabitPlanItem as editHabitPlanItemInState,
+  moveHabitCategory as moveHabitCategoryInState,
+  reconcileHabitItemsFromDailyPatch,
+  renameHabitCategory as renameHabitCategoryInState,
+  setHabitPlanItemMark as setHabitPlanItemMarkInState,
+} from './habitPlanner';
 
 /* ------------------------------------------------------------------ actions */
 
@@ -78,7 +88,7 @@ function reducer(state: PlannerState, action: Action): PlannerState {
       const previousDay = ensureDay(state, action.date);
       const day = action.patch(previousDay);
       const withDay = { ...state, days: { ...state.days, [action.date]: day } };
-      return touched(reconcileWeeklyActionsFromDailyPatch(withDay, action.date, previousDay, day));
+      return touched(reconcileHabitItemsFromDailyPatch(reconcileWeeklyActionsFromDailyPatch(withDay, action.date, previousDay, day), action.date));
     }
     case 'APPLY_WEEKLY_MUTATION':
       return touched(action.mutation(state));
@@ -173,6 +183,13 @@ interface PlannerContextValue {
   deleteWeeklyAction: (actionId: string) => boolean;
   assignWeeklyAction: (actionId: string, date: ISODate) => boolean;
   toggleWeeklyAction: (actionId: string) => boolean;
+  addHabitCategory: (label: string) => boolean;
+  renameHabitCategory: (categoryId: string, label: string) => boolean;
+  moveHabitCategory: (categoryId: string, direction: -1 | 1) => boolean;
+  addHabitPlanItem: (categoryId: string, date: ISODate, text: string) => boolean;
+  editHabitPlanItem: (itemId: string, text: string) => boolean;
+  deleteHabitPlanItem: (itemId: string) => boolean;
+  setHabitPlanItemMark: (itemId: string, mark: CellMark) => boolean;
   completeSetup: (p: { routineHabits: RoutineHabit[]; habitRows: HabitRow[]; preferences: Preferences }) => void;
   setPreferences: (p: Preferences) => void;
   setRoutine: (r: RoutineHabit[]) => void;
@@ -539,6 +556,41 @@ export function PlannerProvider({ children, userId, onSignOut }: { children: Rea
       return true;
     };
 
+    const addHabitCategory: PlannerContextValue['addHabitCategory'] = (label) => {
+      if (!label.trim()) return false;
+      const id = uid('hc');
+      dispatch({ type: 'APPLY_WEEKLY_MUTATION', mutation: (current) => addHabitCategoryInState(current, label, id) });
+      return true;
+    };
+    const renameHabitCategory: PlannerContextValue['renameHabitCategory'] = (categoryId, label) => {
+      if (!label.trim()) return false;
+      dispatch({ type: 'APPLY_WEEKLY_MUTATION', mutation: (current) => renameHabitCategoryInState(current, categoryId, label) });
+      return true;
+    };
+    const moveHabitCategory: PlannerContextValue['moveHabitCategory'] = (categoryId, direction) => {
+      dispatch({ type: 'APPLY_WEEKLY_MUTATION', mutation: (current) => moveHabitCategoryInState(current, categoryId, direction) });
+      return true;
+    };
+    const addHabitPlanItem: PlannerContextValue['addHabitPlanItem'] = (categoryId, date, text) => {
+      if (!text.trim()) return false;
+      const ids = { itemId: uid('hp'), dailyTodoId: uid('dt') };
+      dispatch({ type: 'APPLY_WEEKLY_MUTATION', mutation: (current) => addHabitPlanItemInState(current, categoryId, date, text, ids) });
+      return true;
+    };
+    const editHabitPlanItem: PlannerContextValue['editHabitPlanItem'] = (itemId, text) => {
+      if (!text.trim()) return false;
+      dispatch({ type: 'APPLY_WEEKLY_MUTATION', mutation: (current) => editHabitPlanItemInState(current, itemId, text) });
+      return true;
+    };
+    const deleteHabitPlanItem: PlannerContextValue['deleteHabitPlanItem'] = (itemId) => {
+      dispatch({ type: 'APPLY_WEEKLY_MUTATION', mutation: (current) => deleteHabitPlanItemInState(current, itemId) });
+      return true;
+    };
+    const setHabitPlanItemMark: PlannerContextValue['setHabitPlanItemMark'] = (itemId, mark) => {
+      dispatch({ type: 'APPLY_WEEKLY_MUTATION', mutation: (current) => setHabitPlanItemMarkInState(current, itemId, mark) });
+      return true;
+    };
+
     return {
       state,
       status,
@@ -571,6 +623,13 @@ export function PlannerProvider({ children, userId, onSignOut }: { children: Rea
       deleteWeeklyAction,
       assignWeeklyAction,
       toggleWeeklyAction,
+      addHabitCategory,
+      renameHabitCategory,
+      moveHabitCategory,
+      addHabitPlanItem,
+      editHabitPlanItem,
+      deleteHabitPlanItem,
+      setHabitPlanItemMark,
       completeSetup: (p) => dispatch({ type: 'COMPLETE_SETUP', ...p }),
       setPreferences: (preferences) => dispatch({ type: 'SET_PREFERENCES', preferences }),
       setRoutine: (routineHabits) => dispatch({ type: 'SET_ROUTINE', routineHabits }),

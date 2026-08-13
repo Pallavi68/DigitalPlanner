@@ -9,6 +9,8 @@ function routeDate(pathname: string): string {
   if (dayMatch?.[1]) return dayMatch[1];
   const weekMatch = pathname.match(/^\/week\/(\d{4}-\d{2}-\d{2})/);
   if (weekMatch?.[1]) return weekMatch[1];
+  const habitMatch = pathname.match(/^\/habits\/(\d{4}-\d{2}-\d{2})/);
+  if (habitMatch?.[1]) return habitMatch[1];
   const monthMatch = pathname.match(/^\/month\/(\d{4})\/(\d{1,2})/);
   if (monthMatch) return `${monthMatch[1]}-${monthMatch[2].padStart(2, '0')}-01`;
   return todayISO();
@@ -35,6 +37,7 @@ export function BookShell({ children }: { children: ReactNode }) {
   const month = selected.getMonth() + 1;
   const dailyRoute = loc.pathname.startsWith('/day/');
   const weeklyRoute = loc.pathname.startsWith('/week/');
+  const habitRoute = loc.pathname.startsWith('/habits/');
 
   return (
     <div style={{ minHeight: '100%', display: 'flex', flexDirection: 'column', background: '#d9d3c6' }}>
@@ -122,6 +125,11 @@ export function BookShell({ children }: { children: ReactNode }) {
                 <small>{weekLabel(selectedMonday)}</small>
               </Link>
             </div>
+          </nav>
+        )}
+        {habitRoute && (
+          <nav aria-label="Current two-week habit sheet" className="calendar-tabs">
+            <div className="week-tabs"><Link to={loc.pathname} className="week-tab active" aria-current="page"><span>Habit sheet</span><small>Two-week view</small></Link></div>
           </nav>
         )}
       </header>

@@ -8,6 +8,7 @@ import { TimeAlignment } from './pages/daily/TimeAlignment';
 import { ToDos } from './pages/daily/ToDos';
 import { ChoreChecklist } from './pages/daily/ChoreChecklist';
 import { WeeklyPlannerPage } from './pages/weekly';
+import { TwoWeekHabitPage } from './pages/habits/TwoWeekHabitPage';
 import { usePlanner } from './store/PlannerContext';
 import { addDays, addMonths, dayOfMonth, fromISO, monthName, monthWeeks, ordinal, todayISO, weekday, weekdayLong, weekdayShort } from './lib/dates';
 import type { ISODate, TimeBlock } from './types';
@@ -226,6 +227,22 @@ function WeeklyPlannerRoute() {
   );
 }
 
+const HABIT_WINDOW_ANCHOR: ISODate = '2026-08-01';
+
+function habitWindowFor(date: ISODate): ISODate {
+  const elapsed = Math.floor((fromISO(date).getTime() - fromISO(HABIT_WINDOW_ANCHOR).getTime()) / 86_400_000);
+  return addDays(HABIT_WINDOW_ANCHOR, Math.floor(elapsed / 14) * 14);
+}
+
+function HabitPlannerRoute() {
+  const { start: routeStart } = useParams();
+  const navigate = useNavigate();
+  if (!isValidISODate(routeStart)) return <Navigate to={`/habits/${habitWindowFor(todayISO())}`} replace />;
+  const start = habitWindowFor(routeStart);
+  if (start !== routeStart) return <Navigate to={`/habits/${start}`} replace />;
+  return <TwoWeekHabitPage start={start} onPrevious={() => navigate(`/habits/${addDays(start, -14)}`)} onNext={() => navigate(`/habits/${addDays(start, 14)}`)} />;
+}
+
 function MonthOverview() {
   const { year: routeYear, month: routeMonth } = useParams();
   const navigate = useNavigate();
@@ -238,6 +255,10 @@ function MonthOverview() {
 
   const monthDate = `${year}-${String(month).padStart(2, '0')}-01`;
   const weeks = monthWeeks(monthDate);
+  const monthEnd = addDays(addMonths(monthDate, 1), -1);
+  const firstHabitWindow = habitWindowFor(monthDate);
+  const habitWindows: ISODate[] = [];
+  for (let start = firstHabitWindow; start <= monthEnd; start = addDays(start, 14)) habitWindows.push(start);
   const today = todayISO();
   const monthIndex = fromISO(monthDate).getMonth();
   const previousMonth = addMonths(monthDate, -1);
@@ -262,6 +283,7 @@ function MonthOverview() {
           <strong>{year}</strong>
           <span>Select a week, then open the exact day you want to plan.</span>
           <Link to={`/day/${today}`} className="paper-link month-today-link">return to today</Link>
+          <Link to={`/habits/${habitWindowFor(monthDate)}`} className="paper-link month-today-link">open two-week habit sheets</Link>
         </div>
       }
       right={
@@ -269,6 +291,12 @@ function MonthOverview() {
           <div className="month-weeks-heading">
             <span>Weeks</span>
             <small>{weeks.length} calendar weeks</small>
+          </div>
+          <div className="month-habit-windows" aria-label="Two-week habit sheets">
+            {habitWindows.map((start) => {
+              const end = addDays(start, 13);
+              return <Link key={start} to={`/habits/${start}`}><span>Habit sheet</span><small>{dayOfMonth(start)} {monthName(start).slice(0, 3)} – {dayOfMonth(end)} {monthName(end).slice(0, 3)}</small></Link>;
+            })}
           </div>
           {weeks.map((week, weekIndex) => {
             const monday = week[0];
@@ -311,6 +339,7 @@ export default function App({ userId: _userId }: { userId: string }) {
         <Route path="/" element={<Navigate to={`/day/${todayISO()}`} replace />} />
         <Route path="/day/:date" element={<DailyPage />} />
         <Route path="/week/:monday" element={<WeeklyPlannerRoute />} />
+        <Route path="/habits/:start" element={<HabitPlannerRoute />} />
         <Route path="/month/:year/:month" element={<MonthOverview />} />
         <Route path="*" element={<Navigate to={`/day/${todayISO()}`} replace />} />
       </Routes>

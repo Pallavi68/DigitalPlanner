@@ -152,6 +152,19 @@ npm run preview
 
 ## Verification status
 
+Verified locally on 2026-08-13 for the Two-Week Habit Sheet:
+
+* Added consecutive 14-day habit sheets reachable from Month Overview and at `/habits/:start`; cross-month windows are linked from both months as one shared record.
+* Added the six requested default categories, owner-added categories, multiple activities in every category/day cell, direct day links, editing, deletion, and completion.
+* Refined the sheet with a category manager for renaming and up/down reordering, a single compact `+` entry affordance per cell, alternating pastel day headers and category labels, and explicit blank/✓/✕ activity outcomes.
+* Every habit-sheet activity automatically surfaces in that date's existing Daily To Dos; edits and completion reconcile bidirectionally, including linked Time Alignment completion.
+* A ✕ remains a habit-sheet miss and deliberately leaves the corresponding Daily To Do incomplete; completing from either surface produces ✓.
+* Aggregate planner schema migration now safely defaults the new collections for existing cloud documents.
+* `npm run typecheck` — passed.
+* `npm test` — passed: 12 files, 70 tests.
+* `npm run build` — passed: 115 modules transformed.
+* Local Vite startup — passed at `http://127.0.0.1:5173/`; authenticated interactive browser acceptance remains pending.
+
 Verified locally on 2026-08-13 for the Weekly Planner navigation shortcut:
 
 * Every Daily Page now shows a persistent `Plan week` link beside sync status and targets the Monday-anchored week containing the displayed date.
@@ -268,7 +281,6 @@ Verified on 2026-07-23:
 The following intentionally remain unavailable pending review and later milestones:
 
 * Vision-to-Action Bingo (`VISION-ACTION-BINGO-V1`) — paused; current prototype direction is not owner-approved
-* Two-Week Habit Planner
 * Running Short To-Do List
 * Running Long To-Do List
 * first-run setup
@@ -293,6 +305,8 @@ Backend implementation source of truth:
 * `supabase/README.md` and ordered migrations under `supabase/migrations/`
 
 ## Known limitations
+
+* The Two-Week Habit Sheet uses a wide paper grid with horizontal scrolling on phone; hands-on touch-device approval and authenticated cross-device persistence verification remain pending.
 
 * The permanent production URL and Auth redirects are configured. Realtime publication and expired-session recovery fixes are live, but their combined no-refresh two-device behavior needs the final fresh-session retest.
 * Phone persistence works but saves were noticeably slow, and the owner deferred phone UI refinement to a later milestone.

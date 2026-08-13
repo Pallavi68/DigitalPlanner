@@ -186,7 +186,7 @@ describe('migration', () => {
     old.version = 5;
     old.setupComplete = true;
     const migrated = migratePlannerState(old as unknown as PlannerState);
-    expect(migrated.version).toBe(6);
+    expect(migrated.version).toBe(7);
     expect(migrated.weeklyActions).toEqual([]);
     expect(migrated.setupComplete).toBe(true);
   });

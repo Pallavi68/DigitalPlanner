@@ -255,6 +255,10 @@ textarea.hand-input {
 .month-week-link span { font: 600 12px var(--serif); letter-spacing: 1px; color: var(--navy); }
 .month-week-link small { font: italic 13px var(--hand); color: var(--ink-soft); }
 .month-week-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; margin-top: 8px; }
+.month-habit-windows { display: flex; flex-wrap: wrap; gap: 7px; padding: 10px 0; border-bottom: 1px solid var(--gold); }
+.month-habit-windows a { display: flex; flex-direction: column; min-height: 44px; justify-content: center; padding: 5px 10px; border: 1px solid var(--gold); border-radius: 3px; color: var(--navy); text-decoration: none; }
+.month-habit-windows span { font: 600 10px var(--serif); letter-spacing: 1px; text-transform: uppercase; }
+.month-habit-windows small { margin-top: 2px; font: 13px var(--hand); color: var(--ink-soft); }
 .month-day { min-height: 48px; padding: 5px 2px; border-radius: 3px; color: var(--ink); text-align: center; text-decoration: none; }
 .month-day span { display: block; font: 600 8px var(--serif); letter-spacing: 1px; color: var(--ink-soft); text-transform: uppercase; }
 .month-day strong { display: block; margin-top: 2px; font: 600 16px var(--serif); }
