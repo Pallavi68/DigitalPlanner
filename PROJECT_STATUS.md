@@ -164,6 +164,10 @@ Verified locally on 2026-08-13 for the Two-Week Habit Sheet:
 * `npm test` — passed: 12 files, 70 tests.
 * `npm run build` — passed: 115 modules transformed.
 * Local Vite startup — passed at `http://127.0.0.1:5173/`; authenticated interactive browser acceptance remains pending.
+* Git feature release — committed as `89029c5 Add two-week habit planner` on `release/daily-planner-v1` after the required sensitive-data scan.
+* Vercel production deployment — READY as deployment `dpl_2SR5vfJSq99NUB57rGTQEGFfbNcn` and aliased to `https://digital-planner-plum.vercel.app`.
+* Production route verification — root, `/month/2026/8`, and `/habits/2026-08-29` return HTTP 200; the deployed bundle contains the two-week sheet, category manager, and ✓/✕ interactions.
+* Deployment isolation — production was built from a clean archive of commit `89029c5`; paused Bingo files, the unrelated working-tree lockfile change, and other uncommitted files were excluded.
 
 Verified locally on 2026-08-13 for the Weekly Planner navigation shortcut:
 
