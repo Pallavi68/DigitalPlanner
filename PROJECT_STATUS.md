@@ -152,6 +152,26 @@ npm run preview
 
 ## Verification status
 
+Verified locally on 2026-08-13 for the Weekly Planner navigation shortcut:
+
+* Every Daily Page now shows a persistent `Plan week` link beside sync status and targets the Monday-anchored week containing the displayed date.
+* `npm run typecheck` — passed.
+* `npm test` — passed: 11 files, 66 tests.
+* `npm run build` — passed: 112 modules transformed.
+
+Verified locally on 2026-08-12 for `WEEKLY-PLANNER-V1`:
+
+* Implemented a Monday–Sunday Weekly Planner at `/week/:monday`, reached from each Month Overview week while preserving individual day links.
+* Added flat single-entry and multiline-paste weekly capture, scheduled/completed markers, day summaries, previous/next week navigation, desktop drag/drop, explicit touch drag handle, and accessible Assign/Move controls.
+* Assigning appends one linked item after the destination day's written Daily To Dos; supported moves preserve identity/completion and remove the old daily surface and its linked Time Alignment blocks.
+* Daily edit, completion, and deletion reconcile back to the weekly source; stale IDs and duplicate daily source references are repaired without silent duplication.
+* Weekly actions persist inside the existing versioned aggregate planner document; old and malformed payloads hydrate safely without a new SQL migration.
+* `npm run typecheck` — passed.
+* `npm test` — passed: 11 files, 66 tests.
+* `npm run build` — passed: 112 modules transformed.
+* Independent UX/data-integrity reviews — prior high-severity stale-link defect fixed and re-review clear of blocking/high findings.
+* Local Vite startup — passed. Isolated headless Chrome reached the Supabase sign-in page; authenticated Weekly Planner browser interaction, cross-device persistence, and hands-on phone/tablet touch acceptance remain pending owner-session verification.
+
 Verified locally on 2026-08-12 for `DAILY-TODO-OVERFLOW-V1`:
 
 * Root/today behavior — confirmed by code inspection: `/` and invalid routes intentionally redirect to `/day/${todayISO()}`, and `todayISO()` uses the device-local `new Date()` value.
@@ -256,6 +276,7 @@ The following intentionally remain unavailable pending review and later mileston
 * complete offline/conflict and historical-boundary verification; authenticated login, reload persistence, and cross-device persistence already pass
 * browser-verify Week 1/Week 2 materialization, automatic blocks, colors, linked completion, and reopen deduplication against live Supabase
 * revisit the paused Bingo product direction before resuming any Bingo implementation or deployment
+* owner-verify the Weekly Planner in an authenticated browser and on a touch device, including paste, drag/Assign, move, Daily completion/edit/delete reconciliation, refresh persistence, and second-device sync
 
 ## Backend handoff
 
@@ -292,3 +313,5 @@ Backend implementation source of truth:
 * Maintained implementation: `frontend/`
 * Current navigation orchestration: `daily-navigation-orchestration.md`
 * Current Daily Planner refinement orchestration: `daily-planner-refinement-orchestration.md`
+* Weekly Planner specification: `weekly-planner-feature-prd.md`
+* Weekly Planner execution plan/status: `weekly-planner-orchestration.md`, `weekly-planner-implementation-status.md`

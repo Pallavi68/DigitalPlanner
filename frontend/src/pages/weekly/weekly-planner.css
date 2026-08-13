@@ -1,0 +1,68 @@
+.weekly-source-page, .weekly-days-page { min-height: 660px; color: var(--ink); }
+.weekly-heading { text-align: center; padding: 24px 0 18px; border-bottom: 1px solid var(--gold); }
+.weekly-heading p, .weekly-days-heading p { margin: 0; color: var(--navy); font: 600 11px var(--serif); letter-spacing: 3px; text-transform: uppercase; }
+.weekly-heading h1 { margin: 5px 0 0; color: var(--navy); font: italic 42px var(--serif); }
+.weekly-heading span, .weekly-days-heading span { color: var(--ink-soft); font: 15px var(--hand); }
+.weekly-capture { padding: 20px 0 12px; }
+.weekly-capture > label { display: block; margin-bottom: 7px; font: 600 12px var(--serif); letter-spacing: 1.6px; text-transform: uppercase; }
+.weekly-capture > div { display: flex; border-bottom: 1px solid var(--rule); }
+.weekly-capture input { flex: 1; min-width: 0; min-height: 42px; border: 0; background: transparent; color: var(--ink); font: 18px var(--hand); }
+.weekly-capture button, .weekly-row-actions button, .weekly-text-button { border: 0; background: transparent; color: var(--ink-soft); min-height: 40px; text-decoration: underline; text-underline-offset: 3px; }
+.weekly-capture button:disabled { opacity: .35; cursor: default; }
+.weekly-text-button { margin-top: 4px; padding: 0; font: italic 14px var(--hand); }
+.weekly-list-summary { display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid var(--gold); color: var(--ink-soft); font: 11px var(--serif); letter-spacing: 1px; text-transform: uppercase; }
+.weekly-action-list { list-style: none; margin: 0; padding: 0; max-height: 390px; overflow: auto; }
+.weekly-action-row { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 9px; align-items: start; padding: 7px 2px; border-bottom: 1px solid var(--rule-faint); }
+.weekly-action-row > button:first-child { width: 44px !important; height: 44px !important; }
+.weekly-action-row.is-dragging { opacity: .48; }
+.weekly-action-copy { min-width: 0; }
+.weekly-action-copy > span { display: block; overflow-wrap: anywhere; font: 18px/1.2 var(--hand); }
+.weekly-action-copy small { color: var(--terracotta); font: 11px var(--serif); letter-spacing: .6px; }
+.weekly-action-row.is-done .weekly-action-copy > span { color: var(--ink-soft); text-decoration: line-through; }
+.weekly-row-actions { display: flex; gap: 2px; }
+.weekly-row-actions button { min-width: 44px; min-height: 44px; padding: 0 6px; font-size: 11px; }
+.weekly-touch-drag { touch-action: none; cursor: grab; font-size: 16px !important; color: var(--terracotta) !important; }
+.weekly-empty { min-height: 90px; padding: 28px 15px; margin: 0; text-align: center; color: var(--placeholder); font: 18px var(--hand); background: repeating-linear-gradient(transparent 0 31px,var(--rule-half) 32px); }
+.weekly-drag-note { margin: 16px 0 0; color: var(--ink-soft); font: italic 13px var(--hand); }
+.weekly-days-heading { display: flex; align-items: baseline; justify-content: space-between; padding: 13px 0 12px; border-bottom: 1px solid var(--gold); }
+.weekly-day-list { display: grid; }
+.weekly-day { min-height: 82px; padding: 8px 5px; border-bottom: 1px solid var(--rule); transition: background-color 80ms ease; }
+.weekly-day.is-drop-target { background: rgba(194,107,74,.13); box-shadow: inset 3px 0 var(--terracotta); }
+.weekly-day > header { display: flex; align-items: center; justify-content: space-between; }
+.weekly-day > header button { display: flex; align-items: center; gap: 9px; min-height: 44px; padding: 0 4px; border: 0; background: transparent; color: var(--navy); }
+.weekly-day > header button span { font: 600 12px var(--serif); letter-spacing: 1.4px; text-transform: uppercase; }
+.weekly-day > header button strong { font: 20px var(--serif); }
+.weekly-day > header small { color: var(--ink-soft); font: italic 12px var(--hand); }
+.weekly-day ul { display: flex; flex-wrap: wrap; gap: 5px 14px; list-style: none; margin: 0 0 2px; padding: 0 0 0 8px; }
+.weekly-day li { display: flex; gap: 5px; max-width: 100%; color: var(--ink); font: 15px/1.2 var(--hand); overflow-wrap: anywhere; }
+.weekly-day li.is-done { color: var(--ink-soft); text-decoration: line-through; }
+.weekly-day > p { margin: 2px 0 0 28px; color: var(--placeholder); font: italic 13px var(--hand); }
+.weekly-dialog { display: grid; gap: 12px; color: var(--ink); }
+.weekly-dialog label { font: 600 12px var(--serif); letter-spacing: 1px; text-transform: uppercase; }
+.weekly-dialog input, .weekly-dialog textarea { width: 100%; border: 1px solid var(--rule); border-radius: 3px; background: rgba(255,255,255,.3); padding: 9px 10px; color: var(--ink); font: 18px var(--hand); resize: vertical; }
+.weekly-dialog > div:last-child { display: flex; justify-content: flex-end; gap: 8px; }
+.weekly-dialog button { min-height: 44px; padding: 7px 14px; border: 1px solid var(--rule); border-radius: 3px; background: transparent; color: var(--ink); }
+.weekly-dialog button[type='submit'] { border-color: var(--navy); background: var(--navy); color: var(--paper); }
+.weekly-dialog button:disabled { opacity: .4; cursor: default; }
+.weekly-dialog .weekly-danger { border-color: var(--cross); color: var(--cross); }
+.weekly-date-picker { display: grid !important; grid-template-columns: repeat(7, 1fr); gap: 6px !important; }
+.weekly-date-picker button { display: grid; place-items: center; padding: 7px 3px; }
+.weekly-date-picker button[aria-pressed='true'] { border-color: var(--terracotta); background: rgba(194,107,74,.12); }
+.weekly-date-picker span { font: 10px var(--serif); text-transform: uppercase; }
+.weekly-date-picker strong { font: 19px var(--serif); }
+
+@media (max-width: 720px) {
+  .weekly-source-page, .weekly-days-page { min-height: auto; }
+  .weekly-action-list { max-height: none; }
+  .weekly-action-row { grid-template-columns: 44px minmax(0,1fr); }
+  .weekly-row-actions { grid-column: 2; flex-wrap: wrap; }
+  .weekly-row-actions button { min-height: 44px; }
+  .weekly-drag-note { display: none; }
+  .weekly-days-page { padding-top: 8px; }
+  .weekly-day { min-height: 92px; }
+  .weekly-date-picker { grid-template-columns: repeat(4, 1fr); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .weekly-day { transition: none; }
+}

@@ -86,6 +86,9 @@ export function normalizeLoadResult(value: unknown): RemotePlannerEnvelope | nul
       createdAt: Number(todo.captured_at_ms),
       source: todo.source as PlannerState['todos'][number]['source'],
     })),
+    // The retired relational backend never stored weekly planner actions. New
+    // aggregate documents carry this collection as part of their JSON payload.
+    weeklyActions: [],
     routineHabits: routineDefinitions.map((definition) => {
       const revisions = routineRevisions
         .filter((revision) => revision.routine_id === definition.id)

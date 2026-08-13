@@ -27,6 +27,7 @@ describe('Supabase planner contract', () => {
     expect(envelope?.state.days['2026-07-23'].blocks[0]).toMatchObject({ sourceRefId: 'dt1', completed: true, startSlot: 2.1667, note: 'Ask about the morning slot' });
     expect(envelope?.state.days['2026-07-23'].suppressedAutoBlockIds).toEqual(['auto_gym']);
     expect(envelope?.state.todos[0]).toMatchObject({ id: 't1', list: 'long', createdAt: 10 });
+    expect(envelope?.state.weeklyActions).toEqual([]);
     expect(envelope?.state.gridMarks['2026-07-23|c1']).toBe('check');
     expect(envelope?.state.routineHabits[0]).toMatchObject({ defaultStartSlot: 3, autoScheduleWeekdays: [0, 1, 3, 4], autoScheduleLabel: 'Gym' });
     expect(envelope?.state.habitRows[0]).toMatchObject({ cycleWeeks: [1], cycleAnchorDate: '2026-08-10', durationMinutes: 60, defaultStartSlot: 12, autoSchedule: true });
@@ -37,11 +38,38 @@ describe('Supabase planner contract', () => {
   });
 
   it('reads the fast owner document envelope without rebuilding normalized rows', () => {
-    const state = { version: 3, setupComplete: true, lastEditedAt: 99 } as never;
+    const weeklyActions = [
+      {
+        id: 'weekly-2',
+        weekStart: '2026-08-10',
+        text: 'Doctor appointment',
+        sortOrder: 1,
+        done: true,
+        assignedDate: '2026-08-13',
+        linkedDailyTodoId: 'daily-9',
+        createdAt: 10,
+        updatedAt: 20,
+        completedAt: 20,
+        source: 'weekly-planner',
+      },
+      {
+        id: 'weekly-1',
+        weekStart: '2026-08-10',
+        text: 'Draft proposal',
+        sortOrder: 0,
+        done: false,
+        createdAt: 5,
+        updatedAt: 5,
+        source: 'weekly-planner',
+      },
+    ];
+    const state = { version: 6, setupComplete: true, weeklyActions, lastEditedAt: 99 } as never;
     expect(normalizeDocumentResult({ state, revision: 101, updated_at: '2026-08-12T00:00:00Z' })).toEqual({
       state,
       revision: 101,
       updatedAt: '2026-08-12T00:00:00Z',
     });
+    expect(normalizeDocumentResult({ state, revision: 101, updated_at: '2026-08-12T00:00:00Z' })?.state.weeklyActions)
+      .toBe(weeklyActions);
   });
 });

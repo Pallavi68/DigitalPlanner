@@ -7,8 +7,9 @@ import { RoutineChecklist } from './pages/daily/RoutineChecklist';
 import { TimeAlignment } from './pages/daily/TimeAlignment';
 import { ToDos } from './pages/daily/ToDos';
 import { ChoreChecklist } from './pages/daily/ChoreChecklist';
+import { WeeklyPlannerPage } from './pages/weekly';
 import { usePlanner } from './store/PlannerContext';
-import { addDays, addMonths, dayOfMonth, fromISO, monthName, monthWeeks, ordinal, todayISO, weekdayLong, weekdayShort } from './lib/dates';
+import { addDays, addMonths, dayOfMonth, fromISO, monthName, monthWeeks, ordinal, todayISO, weekday, weekdayLong, weekdayShort } from './lib/dates';
 import type { ISODate, TimeBlock } from './types';
 import { RoutineSetup } from './pages/daily/RoutineSetup';
 import { blankDailyTodo, uid } from './store/seed';
@@ -197,6 +198,34 @@ function DailyPage() {
   );
 }
 
+function mondayContaining(date: ISODate): ISODate {
+  return addDays(date, -weekday(date));
+}
+
+function WeeklyPlannerRoute() {
+  const { monday: routeMonday } = useParams();
+  const navigate = useNavigate();
+  const fallbackMonday = mondayContaining(todayISO());
+
+  if (!isValidISODate(routeMonday)) {
+    return <Navigate to={`/week/${fallbackMonday}`} replace />;
+  }
+
+  const monday = mondayContaining(routeMonday);
+  if (monday !== routeMonday) {
+    return <Navigate to={`/week/${monday}`} replace />;
+  }
+
+  return (
+    <WeeklyPlannerPage
+      weekStart={monday}
+      onPrevious={() => navigate(`/week/${addDays(monday, -7)}`)}
+      onNext={() => navigate(`/week/${addDays(monday, 7)}`)}
+      onOpenDay={(date) => navigate(`/day/${date}`)}
+    />
+  );
+}
+
 function MonthOverview() {
   const { year: routeYear, month: routeMonth } = useParams();
   const navigate = useNavigate();
@@ -244,11 +273,10 @@ function MonthOverview() {
           {weeks.map((week, weekIndex) => {
             const monday = week[0];
             const sunday = week[6];
-            const inMonthTarget = week.find((date) => fromISO(date).getMonth() === monthIndex) ?? monday;
             return (
               <section className="month-week-tab" key={monday}>
-                <Link to={`/day/${inMonthTarget}`} className="month-week-link">
-                  <span>Week {weekIndex + 1}</span>
+                <Link to={`/week/${monday}`} className="month-week-link" aria-label={`Open Weekly Planner for week ${weekIndex + 1}`}>
+                  <span>Week {weekIndex + 1} · Weekly Planner</span>
                   <small>{dayOfMonth(monday)} {monthName(monday).slice(0, 3)} – {dayOfMonth(sunday)} {monthName(sunday).slice(0, 3)}</small>
                 </Link>
                 <div className="month-week-days">
@@ -282,6 +310,7 @@ export default function App({ userId: _userId }: { userId: string }) {
       <Routes>
         <Route path="/" element={<Navigate to={`/day/${todayISO()}`} replace />} />
         <Route path="/day/:date" element={<DailyPage />} />
+        <Route path="/week/:monday" element={<WeeklyPlannerRoute />} />
         <Route path="/month/:year/:month" element={<MonthOverview />} />
         <Route path="*" element={<Navigate to={`/day/${todayISO()}`} replace />} />
       </Routes>

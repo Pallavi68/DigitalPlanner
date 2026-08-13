@@ -74,7 +74,7 @@ export function emptyDay(): DayState {
 export function initialState(): PlannerState {
   const since = todayISO();
   return {
-    version: 5,
+    version: 6,
     setupComplete: false,
     routineHabits: DEFAULT_ROUTINE.map((h, sortOrder) => ({
       ...h,
@@ -89,6 +89,7 @@ export function initialState(): PlannerState {
     })),
     habitRows: DEFAULT_HABIT_ROWS.map((r) => ({ ...r, since: TWO_WEEK_CYCLE_ANCHOR })),
     todos: [],
+    weeklyActions: [],
     days: {},
     gridMarks: {},
     preferences: {

@@ -7,6 +7,8 @@ import { addDays, dayOfMonth, fromISO, monthName, monthWeeks, todayISO, weekday,
 function routeDate(pathname: string): string {
   const dayMatch = pathname.match(/^\/day\/(\d{4}-\d{2}-\d{2})/);
   if (dayMatch?.[1]) return dayMatch[1];
+  const weekMatch = pathname.match(/^\/week\/(\d{4}-\d{2}-\d{2})/);
+  if (weekMatch?.[1]) return weekMatch[1];
   const monthMatch = pathname.match(/^\/month\/(\d{4})\/(\d{1,2})/);
   if (monthMatch) return `${monthMatch[1]}-${monthMatch[2].padStart(2, '0')}-01`;
   return todayISO();
@@ -32,6 +34,7 @@ export function BookShell({ children }: { children: ReactNode }) {
   const year = selected.getFullYear();
   const month = selected.getMonth() + 1;
   const dailyRoute = loc.pathname.startsWith('/day/');
+  const weeklyRoute = loc.pathname.startsWith('/week/');
 
   return (
     <div style={{ minHeight: '100%', display: 'flex', flexDirection: 'column', background: '#d9d3c6' }}>
@@ -63,6 +66,15 @@ export function BookShell({ children }: { children: ReactNode }) {
             </Link>
           </div>
           <div className="book-header-actions">
+            {dailyRoute && (
+              <Link
+                to={`/week/${selectedMonday}`}
+                className="plan-week-link"
+                aria-label={`Plan the week of ${weekLabel(selectedMonday)}`}
+              >
+                Plan week
+              </Link>
+            )}
             <SyncIndicator />
           </div>
         </div>
@@ -99,6 +111,16 @@ export function BookShell({ children }: { children: ReactNode }) {
                   <strong>{dayOfMonth(date)}</strong>
                 </Link>
               ))}
+            </div>
+          </nav>
+        )}
+        {weeklyRoute && (
+          <nav aria-label="Current weekly planner" className="calendar-tabs">
+            <div className="week-tabs">
+              <Link to={`/week/${selectedMonday}`} className="week-tab active" aria-current="page">
+                <span>Weekly planner</span>
+                <small>{weekLabel(selectedMonday)}</small>
+              </Link>
             </div>
           </nav>
         )}

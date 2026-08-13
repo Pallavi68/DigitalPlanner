@@ -205,6 +205,8 @@ textarea.hand-input {
 .year-overview-link { min-width: 44px; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; color: rgba(243,235,218,.74); font: 500 10px var(--serif); letter-spacing: 4px; text-decoration: none; border-bottom: 1px solid rgba(243,235,218,.4); padding-left: 4px; }
 .year-overview-link:hover { color: var(--cream); border-bottom-color: var(--gold); }
 .book-header-actions { display: flex; align-items: center; gap: 10px; }
+.plan-week-link { min-height: 36px; display: inline-flex; align-items: center; padding: 0 10px; border: 1px solid rgba(243,235,218,.42); border-radius: 3px; color: var(--cream); font: 600 10px var(--serif); letter-spacing: 1px; text-decoration: none; text-transform: uppercase; white-space: nowrap; }
+.plan-week-link:hover, .plan-week-link:focus-visible { border-color: var(--gold); outline: none; }
 .vision-header-link { min-height: 36px; display: inline-flex; align-items: center; padding: 0 10px; border: 1px solid rgba(243,235,218,.42); border-radius: 3px; color: var(--cream); font: 600 10px var(--serif); letter-spacing: 1px; text-decoration: none; text-transform: uppercase; }
 .vision-header-link:hover, .vision-header-link:focus-visible { border-color: var(--gold); outline: none; }
 .week-tabs, .day-tabs { display: flex; justify-content: center; min-width: max-content; }

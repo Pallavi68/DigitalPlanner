@@ -1,4 +1,4 @@
-import type { DailyTodoLine, DayState, PlannerState, RoutineHabit } from '../types';
+import type { DailyTodoLine, DayState, PlannerState, RoutineHabit, WeeklyAction } from '../types';
 import { DEFAULT_HABIT_ROWS, DEFAULT_WINDDOWN_ITEMS, TWO_WEEK_CYCLE_ANCHOR } from './seed';
 
 /**
@@ -53,6 +53,36 @@ class LocalStorageAdapter implements StorageAdapter {
 
 export function migratePlannerState(input: PlannerState): PlannerState {
   const state = { ...input };
+  const rawWeeklyActions: unknown = state.weeklyActions;
+  const weeklyActions: WeeklyAction[] = Array.isArray(rawWeeklyActions)
+    ? rawWeeklyActions.flatMap((candidate, index) => {
+      if (!candidate || typeof candidate !== 'object') return [];
+      const item = candidate as Partial<WeeklyAction>;
+      if (typeof item.id !== 'string' || !item.id
+        || typeof item.weekStart !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(item.weekStart)
+        || typeof item.text !== 'string' || !item.text.trim()) return [];
+      const assignedDate = typeof item.assignedDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(item.assignedDate)
+        ? item.assignedDate
+        : undefined;
+      return [{
+        id: item.id,
+        weekStart: item.weekStart,
+        text: item.text.trim(),
+        sortOrder: typeof item.sortOrder === 'number' && Number.isFinite(item.sortOrder) ? item.sortOrder : index,
+        done: item.done === true,
+        assignedDate,
+        linkedDailyTodoId: assignedDate && typeof item.linkedDailyTodoId === 'string' && item.linkedDailyTodoId
+          ? item.linkedDailyTodoId
+          : undefined,
+        createdAt: typeof item.createdAt === 'number' && Number.isFinite(item.createdAt) ? item.createdAt : 0,
+        updatedAt: typeof item.updatedAt === 'number' && Number.isFinite(item.updatedAt) ? item.updatedAt : 0,
+        completedAt: item.done === true && typeof item.completedAt === 'number' && Number.isFinite(item.completedAt)
+          ? item.completedAt
+          : undefined,
+        source: 'weekly-planner' as const,
+      }];
+    })
+    : [];
   const retiredMoneymakerChoreIds = new Set([
     'chore_moneymaker_mon',
     'chore_moneymaker_tue',
@@ -177,7 +207,7 @@ export function migratePlannerState(input: PlannerState): PlannerState {
   const choreCompletions = state.choreCompletions
     ? Object.fromEntries(Object.entries(state.choreCompletions).filter(([key]) => keepActiveChoreKey(key)))
     : undefined;
-  return { ...state, version: 5, routineHabits, habitRows, gridMarks, choreCompletions, preferences, days };
+  return { ...state, version: 6, weeklyActions, routineHabits, habitRows, gridMarks, choreCompletions, preferences, days };
 }
 
 export const storage: StorageAdapter = new LocalStorageAdapter();

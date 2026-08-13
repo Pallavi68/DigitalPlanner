@@ -9,6 +9,7 @@ import type {
   HabitRow,
   Preferences,
   DailyRoutineInstance,
+  WeeklyAction,
 } from '../types';
 import { migratePlannerState } from './storage';
 import {
@@ -25,6 +26,16 @@ import { blankDailyTodo, emptyDay, initialState, demoState, uid } from './seed';
 import { todayISO } from '../lib/dates';
 import { materializeRoutine } from './routines';
 import { dailyAutoBlockCandidates, materializeDailyChores, type DailyChoreOccurrence } from './recurringSchedule';
+import {
+  assignWeeklyAction as assignWeeklyActionInState,
+  createWeeklyAction as createWeeklyActionInState,
+  deleteWeeklyAction as deleteWeeklyActionInState,
+  editWeeklyAction as editWeeklyActionInState,
+  normalizeWeeklyActionLines,
+  pasteWeeklyActions as pasteWeeklyActionsInState,
+  reconcileWeeklyActionsFromDailyPatch,
+  toggleWeeklyAction as toggleWeeklyActionInState,
+} from './weeklyPlanner';
 
 /* ------------------------------------------------------------------ actions */
 
@@ -33,6 +44,7 @@ type Action =
   | { type: 'RESET'; state: PlannerState }
   | { type: 'COMPLETE_SETUP'; routineHabits: RoutineHabit[]; habitRows: HabitRow[]; preferences: Preferences }
   | { type: 'PATCH_DAY'; date: ISODate; patch: (day: DayState) => DayState }
+  | { type: 'APPLY_WEEKLY_MUTATION'; mutation: (state: PlannerState) => PlannerState }
   | { type: 'SET_GRID_MARK'; key: string; mark: CellMark }
   | { type: 'UPSERT_TODO'; todo: Todo }
   | { type: 'DELETE_TODO'; id: string }
@@ -63,9 +75,13 @@ function reducer(state: PlannerState, action: Action): PlannerState {
         preferences: action.preferences,
       });
     case 'PATCH_DAY': {
-      const day = action.patch(ensureDay(state, action.date));
-      return touched({ ...state, days: { ...state.days, [action.date]: day } });
+      const previousDay = ensureDay(state, action.date);
+      const day = action.patch(previousDay);
+      const withDay = { ...state, days: { ...state.days, [action.date]: day } };
+      return touched(reconcileWeeklyActionsFromDailyPatch(withDay, action.date, previousDay, day));
     }
+    case 'APPLY_WEEKLY_MUTATION':
+      return touched(action.mutation(state));
     case 'SET_GRID_MARK': {
       const gridMarks = { ...state.gridMarks };
       const choreCompletions = { ...state.choreCompletions };
@@ -150,6 +166,13 @@ interface PlannerContextValue {
   deleteTodo: (id: string) => void;
   /** FR-10: surface a running-list item onto a specific day's To Dos. */
   assignTodoToDay: (todoId: string, date: ISODate) => boolean;
+  getWeeklyActions: (weekStart: ISODate) => WeeklyAction[];
+  createWeeklyAction: (weekStart: ISODate, text: string) => WeeklyAction | null;
+  pasteWeeklyActions: (weekStart: ISODate, input: string) => number;
+  editWeeklyAction: (actionId: string, text: string) => boolean;
+  deleteWeeklyAction: (actionId: string) => boolean;
+  assignWeeklyAction: (actionId: string, date: ISODate) => boolean;
+  toggleWeeklyAction: (actionId: string) => boolean;
   completeSetup: (p: { routineHabits: RoutineHabit[]; habitRows: HabitRow[]; preferences: Preferences }) => void;
   setPreferences: (p: Preferences) => void;
   setRoutine: (r: RoutineHabit[]) => void;
@@ -460,6 +483,62 @@ export function PlannerProvider({ children, userId, onSignOut }: { children: Rea
       return true;
     };
 
+    const getWeeklyActions = (weekStart: ISODate) => state.weeklyActions
+      .filter((action) => action.weekStart === weekStart)
+      .sort((left, right) => left.sortOrder - right.sortOrder || left.createdAt - right.createdAt);
+
+    const createWeeklyAction: PlannerContextValue['createWeeklyAction'] = (weekStart, text) => {
+      const normalized = text.trim();
+      if (!normalized) return null;
+      const now = Date.now();
+      const actionId = uid('wa');
+      const next = createWeeklyActionInState(state, weekStart, normalized, { now, actionId });
+      if (next === state) return null;
+      const created = next.weeklyActions.find((action) => action.id === actionId) ?? null;
+      dispatch({ type: 'APPLY_WEEKLY_MUTATION', mutation: (current) => createWeeklyActionInState(current, weekStart, normalized, { now, actionId }) });
+      return created;
+    };
+
+    const pasteWeeklyActions: PlannerContextValue['pasteWeeklyActions'] = (weekStart, input) => {
+      const lines = normalizeWeeklyActionLines(input);
+      if (!lines.length) return 0;
+      const now = Date.now();
+      const ids = lines.map(() => uid('wa'));
+      const preview = pasteWeeklyActionsInState(state, weekStart, input, { now, ids });
+      if (preview === state) return 0;
+      dispatch({ type: 'APPLY_WEEKLY_MUTATION', mutation: (current) => pasteWeeklyActionsInState(current, weekStart, input, { now, ids }) });
+      return lines.length;
+    };
+
+    const editWeeklyAction: PlannerContextValue['editWeeklyAction'] = (actionId, text) => {
+      if (!state.weeklyActions.some((action) => action.id === actionId) || !text.trim()) return false;
+      dispatch({ type: 'APPLY_WEEKLY_MUTATION', mutation: (current) => editWeeklyActionInState(current, actionId, text) });
+      return true;
+    };
+
+    const deleteWeeklyAction: PlannerContextValue['deleteWeeklyAction'] = (actionId) => {
+      if (!state.weeklyActions.some((action) => action.id === actionId)) return false;
+      dispatch({ type: 'APPLY_WEEKLY_MUTATION', mutation: (current) => deleteWeeklyActionInState(current, actionId) });
+      return true;
+    };
+
+    const assignWeeklyAction: PlannerContextValue['assignWeeklyAction'] = (actionId, date) => {
+      const action = state.weeklyActions.find((item) => item.id === actionId);
+      if (!action || action.assignedDate === date) return false;
+      const now = Date.now();
+      const dailyTodoId = action.linkedDailyTodoId ?? uid('dt');
+      const preview = assignWeeklyActionInState(state, actionId, date, { now, dailyTodoId });
+      if (preview === state) return false;
+      dispatch({ type: 'APPLY_WEEKLY_MUTATION', mutation: (current) => assignWeeklyActionInState(current, actionId, date, { now, dailyTodoId }) });
+      return true;
+    };
+
+    const toggleWeeklyAction: PlannerContextValue['toggleWeeklyAction'] = (actionId) => {
+      if (!state.weeklyActions.some((action) => action.id === actionId)) return false;
+      dispatch({ type: 'APPLY_WEEKLY_MUTATION', mutation: (current) => toggleWeeklyActionInState(current, actionId) });
+      return true;
+    };
+
     return {
       state,
       status,
@@ -485,6 +564,13 @@ export function PlannerProvider({ children, userId, onSignOut }: { children: Rea
       upsertTodo: (todo) => dispatch({ type: 'UPSERT_TODO', todo }),
       deleteTodo: (id) => dispatch({ type: 'DELETE_TODO', id }),
       assignTodoToDay,
+      getWeeklyActions,
+      createWeeklyAction,
+      pasteWeeklyActions,
+      editWeeklyAction,
+      deleteWeeklyAction,
+      assignWeeklyAction,
+      toggleWeeklyAction,
       completeSetup: (p) => dispatch({ type: 'COMPLETE_SETUP', ...p }),
       setPreferences: (preferences) => dispatch({ type: 'SET_PREFERENCES', preferences }),
       setRoutine: (routineHabits) => dispatch({ type: 'SET_ROUTINE', routineHabits }),

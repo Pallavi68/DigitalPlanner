@@ -89,6 +89,22 @@ export interface DailyTodoLine {
   sourceRefId?: string;
 }
 
+/** Durable weekly source item surfaced into at most one Daily To Do. */
+export interface WeeklyAction {
+  id: string;
+  /** Monday that owns this action. */
+  weekStart: ISODate;
+  text: string;
+  sortOrder: number;
+  done: boolean;
+  assignedDate?: ISODate;
+  linkedDailyTodoId?: string;
+  createdAt: number;
+  updatedAt: number;
+  completedAt?: number;
+  source: 'weekly-planner';
+}
+
 /** A running-list item (short or long). Persists across days until done. */
 export interface Todo {
   id: string;
@@ -172,6 +188,7 @@ export interface PlannerState {
   routineHabits: RoutineHabit[];
   habitRows: HabitRow[];
   todos: Todo[];
+  weeklyActions: WeeklyAction[];
   days: Record<ISODate, DayState>;
   gridMarks: GridMarks;
   /** Full chore outcome metadata; `gridMarks` remains the rendering seam. */
