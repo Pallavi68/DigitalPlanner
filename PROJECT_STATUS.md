@@ -158,6 +158,10 @@ Verified locally on 2026-08-13 for the Weekly Planner navigation shortcut:
 * `npm run typecheck` — passed.
 * `npm test` — passed: 11 files, 66 tests.
 * `npm run build` — passed: 112 modules transformed.
+* Owner local acceptance — passed for the Weekly Planner appearance and the new direct navigation shortcut.
+* Git release — committed and pushed to `release/daily-planner-v1` as `a1e9923 Add weekly action planner` after the repository Git-skill sensitive-data scan.
+* Vercel production deployment — READY and aliased to `https://digital-planner-plum.vercel.app`; root and direct `/week/2026-08-10` routes return HTTP 200, and the deployed bundle contains the Weekly Planner route and navigation labels.
+* Deployment isolation — production was built from a clean archive of commit `a1e9923`; paused uncommitted Bingo files and unrelated working-tree files were not uploaded.
 
 Verified locally on 2026-08-12 for `WEEKLY-PLANNER-V1`:
 

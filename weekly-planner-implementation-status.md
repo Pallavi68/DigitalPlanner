@@ -5,11 +5,11 @@
 > **Orchestration:** [weekly-planner-orchestration.md](weekly-planner-orchestration.md)
 > **Repository instructions:** [AGENTS.md](AGENTS.md)
 > **Last updated:** 2026-08-12
-> **Overall state:** Implementation complete; authenticated owner acceptance pending
+> **Overall state:** Implemented, committed, and deployed; remaining cross-device/touch acceptance is optional follow-up verification
 
 ## Current phase
 
-Phase 7 — implementation, automated verification, independent review, and targeted fixes are complete. No product-code gate remains; owner-authenticated browser/touch and two-device acceptance remain external verification items.
+Phase 7 — implementation, automated verification, independent review, targeted fixes, owner local visual acceptance, commit/push, and production deployment are complete. The live app includes a direct `Plan week` shortcut from every Daily Page. Full two-device persistence and hands-on phone/tablet touch acceptance remain follow-up verification items.
 
 ## Completed gates and evidence
 
@@ -74,4 +74,4 @@ Unrelated uncommitted Vision Action Bingo work is known to exist and must be enu
 
 ## Next exact action
 
-Open the locally running app in an authenticated owner session and exercise one real week: paste five-to-seven actions, assign and move them, open a Daily Page, complete/edit/delete linked items, return to the week, refresh, and verify on a second device. Record results here before deployment or commit handoff.
+Use the production app for one real week. Verify persistence on a second authenticated device and exercise touch drag/Assign, move, Daily completion/edit/delete reconciliation, and refresh recovery. Record any failures before making further feature changes.
