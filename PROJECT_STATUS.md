@@ -154,6 +154,8 @@ npm run preview
 
 Verified locally on 2026-08-13 for the Two-Week Habit Sheet:
 
+* New activity drafts commit once on Enter or when their field loses focus, including immediately before page navigation; neither path saves per keystroke and no explicit Save action is required.
+* Cell activity text is larger and centered, ✓/✕ controls sit to its right, and each cell's add control is a corner affordance shown on hover/focus (always visible on touch devices) rather than a permanent extra row.
 * Two-week habit-sheet windows are Monday-anchored, so each sheet now begins on Monday and ends on Sunday.
 * Added consecutive 14-day habit sheets reachable from Month Overview and at `/habits/:start`; cross-month windows are linked from both months as one shared record.
 * Added the six requested default categories, owner-added categories, multiple activities in every category/day cell, direct day links, editing, deletion, and completion.

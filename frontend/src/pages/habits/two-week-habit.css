@@ -28,25 +28,27 @@
 .habit-category-row:nth-child(4n + 4) .habit-category-name { background: #f0ddd8; }
 .habit-category-row:nth-child(4n + 5) .habit-category-name { background: #e8e0ee; }
 .habit-category-row:nth-child(4n + 6) .habit-category-name { background: #ece7cf; }
-.habit-cell { min-height: 42px; padding: 4px; background: linear-gradient(transparent calc(100% - 1px),var(--rule-faint) 1px); }
-.habit-cell form input { width: 100%; min-height: 28px; border: 0; background: transparent; color: var(--ink); font: 14px var(--hand); }
+.habit-cell { position: relative; min-height: 42px; padding: 4px; background: linear-gradient(transparent calc(100% - 1px),var(--rule-faint) 1px); }
+.habit-cell form input { width: 100%; min-height: 32px; border: 0; background: transparent; color: var(--ink); text-align: center; font: 16px var(--hand); }
 .habit-cell form input::placeholder { color: var(--placeholder); }
-.habit-activity { display: grid; grid-template-columns: 43px minmax(0,1fr) 25px; align-items: start; min-height: 28px; }
-.habit-activity button { min-height: 28px; border: 0; padding: 0; background: transparent; color: var(--ink); }
-.habit-mark-controls { display: flex; }
-.habit-mark-controls button { width: 21px; color: var(--ink-soft); font: 15px var(--hand); }
+.habit-activity { display: grid; grid-template-columns: 23px minmax(0,1fr) 43px; align-items: center; min-height: 32px; }
+.habit-activity button { min-height: 32px; border: 0; padding: 0; background: transparent; color: var(--ink); }
+.habit-mark-controls { display: flex; justify-content: flex-end; }
+.habit-mark-controls button { width: 21px; color: var(--ink-soft); font: 16px var(--hand); }
 .habit-mark-controls button[aria-pressed="true"].habit-check { border-radius: 50%; background: var(--navy); color: var(--paper); }
 .habit-mark-controls button[aria-pressed="true"].habit-cross { border-radius: 50%; background: var(--terracotta); color: var(--paper); }
-.habit-activity-text { overflow-wrap: anywhere; text-align: left; font: 14px/1.2 var(--hand); }
+.habit-activity-text { overflow-wrap: anywhere; text-align: center; font: 16px/1.25 var(--hand); }
 .habit-remove { opacity: 0; color: var(--cross) !important; font-size: 17px; }
 .habit-activity:hover .habit-remove, .habit-remove:focus-visible { opacity: 1; }
-.habit-activity input { width: 100%; border: 0; border-bottom: 1px solid var(--terracotta); background: transparent; font: 14px var(--hand); }
+.habit-activity input { width: 100%; border: 0; border-bottom: 1px solid var(--terracotta); background: transparent; text-align: center; font: 16px var(--hand); }
 .habit-activity.is-check .habit-activity-text { color: var(--ink-soft); text-decoration: line-through; }
 .habit-activity.is-cross .habit-activity-text { color: var(--cross); text-decoration: line-through; text-decoration-style: wavy; }
-.habit-add-item { width: 30px; min-height: 30px; border: 0; border-radius: 50%; background: transparent; color: var(--terracotta); font: 20px var(--serif); }
+.habit-add-item { position: absolute; z-index: 2; top: -13px; right: -13px; width: 26px; min-height: 26px; border: 1px solid var(--rule); border-radius: 50%; background: var(--paper); color: var(--terracotta); opacity: 0; font: 20px var(--serif); transition: opacity .15s ease, background .15s ease; }
+.habit-cell:hover .habit-add-item, .habit-cell:focus-within .habit-add-item, .habit-add-item:focus-visible { opacity: 1; }
 .habit-add-item:hover, .habit-add-item:focus-visible { background: rgba(194,107,74,.12); }
 .habit-add-category { min-width: 1020px; display: flex; align-items: center; gap: 8px; padding: 18px 0 4px; }
 .habit-add-category label { font: 600 11px var(--serif); letter-spacing: 1px; text-transform: uppercase; }
 .habit-add-category input { min-width: 220px; border: 0; border-bottom: 1px solid var(--gold); background: transparent; padding: 8px; font: 16px var(--hand); }
 .habit-add-category button { min-height: 40px; border: 0; background: transparent; color: var(--terracotta); font: 600 12px var(--serif); }
+@media (hover: none) { .habit-add-item { opacity: 1; } }
 @media (max-width: 720px) { .habit-sheet { padding: 12px; } .habit-remove { opacity: 1; } .habit-category-manager { grid-template-columns: 1fr 1fr; } }

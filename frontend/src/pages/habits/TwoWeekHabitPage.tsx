@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { addDays, dayOfMonth, monthName, weekdayShort } from '../../lib/dates';
 import { usePlanner } from '../../store/PlannerContext';
@@ -11,14 +11,14 @@ function Activity({ item }: { item: HabitPlanItem }) {
   const [text, setText] = useState(item.text);
   return (
     <div className={`habit-activity is-${item.mark}`}>
+      <button type="button" className="habit-remove" aria-label={`Delete ${item.text}`} onClick={() => planner.deleteHabitPlanItem(item.id)}>⌫</button>
+      {editing ? (
+        <input autoFocus value={text} onChange={(event) => setText(event.target.value)} onBlur={() => { if (text.trim()) planner.editHabitPlanItem(item.id, text); setEditing(false); }} onKeyDown={(event) => { if (event.key === 'Enter') event.currentTarget.blur(); }} />
+      ) : <button type="button" className="habit-activity-text" onClick={() => setEditing(true)}>{item.text}</button>}
       <div className="habit-mark-controls">
         <button type="button" className="habit-check" aria-pressed={item.mark === 'check'} aria-label={`Mark ${item.text} done`} onClick={() => planner.setHabitPlanItemMark(item.id, item.mark === 'check' ? 'blank' : 'check')}>✓</button>
         <button type="button" className="habit-cross" aria-pressed={item.mark === 'cross'} aria-label={`Mark ${item.text} not done`} onClick={() => planner.setHabitPlanItemMark(item.id, item.mark === 'cross' ? 'blank' : 'cross')}>×</button>
       </div>
-      {editing ? (
-        <input autoFocus value={text} onChange={(event) => setText(event.target.value)} onBlur={() => { if (text.trim()) planner.editHabitPlanItem(item.id, text); setEditing(false); }} onKeyDown={(event) => { if (event.key === 'Enter') event.currentTarget.blur(); }} />
-      ) : <button type="button" className="habit-activity-text" onClick={() => setEditing(true)}>{item.text}</button>}
-      <button type="button" className="habit-remove" aria-label={`Delete ${item.text}`} onClick={() => planner.deleteHabitPlanItem(item.id)}>⌫</button>
     </div>
   );
 }
@@ -27,12 +27,28 @@ function Cell({ categoryId, date, items }: { categoryId: string; date: ISODate; 
   const planner = usePlanner();
   const [draft, setDraft] = useState('');
   const [adding, setAdding] = useState(false);
+  const committing = useRef(false);
+  const commitDraft = () => {
+    if (committing.current) return;
+    const text = draft.trim();
+    if (!text) {
+      setAdding(false);
+      return;
+    }
+    committing.current = true;
+    if (planner.addHabitPlanItem(categoryId, date, text)) {
+      setDraft('');
+      setAdding(false);
+    } else {
+      committing.current = false;
+    }
+  };
   return (
     <div className="habit-cell">
       {items.map((item) => <Activity key={item.id} item={item} />)}
-      {adding ? <form onSubmit={(event) => { event.preventDefault(); if (planner.addHabitPlanItem(categoryId, date, draft)) { setDraft(''); setAdding(false); } }}>
-        <input autoFocus aria-label={`Add activity for ${date}`} value={draft} onChange={(event) => setDraft(event.target.value)} onBlur={() => { if (!draft.trim()) setAdding(false); }} placeholder="Write activity" />
-      </form> : <button type="button" className="habit-add-item" onClick={() => setAdding(true)} aria-label={`Add another activity for ${date}`}>+</button>}
+      {adding ? <form onSubmit={(event) => { event.preventDefault(); commitDraft(); }}>
+        <input autoFocus aria-label={`Add activity for ${date}`} value={draft} onChange={(event) => setDraft(event.target.value)} onBlur={commitDraft} placeholder="Write activity" />
+      </form> : <button type="button" className="habit-add-item" onClick={() => { committing.current = false; setAdding(true); }} aria-label={`Add another activity for ${date}`}>+</button>}
     </div>
   );
 }
