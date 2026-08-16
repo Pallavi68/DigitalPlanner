@@ -227,7 +227,8 @@ function WeeklyPlannerRoute() {
   );
 }
 
-const HABIT_WINDOW_ANCHOR: ISODate = '2026-08-01';
+// Keep every consecutive 14-day habit sheet aligned to Monday–Sunday weeks.
+const HABIT_WINDOW_ANCHOR: ISODate = '2026-08-03';
 
 function habitWindowFor(date: ISODate): ISODate {
   const elapsed = Math.floor((fromISO(date).getTime() - fromISO(HABIT_WINDOW_ANCHOR).getTime()) / 86_400_000);

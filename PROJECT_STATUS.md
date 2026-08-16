@@ -154,6 +154,7 @@ npm run preview
 
 Verified locally on 2026-08-13 for the Two-Week Habit Sheet:
 
+* Two-week habit-sheet windows are Monday-anchored, so each sheet now begins on Monday and ends on Sunday.
 * Added consecutive 14-day habit sheets reachable from Month Overview and at `/habits/:start`; cross-month windows are linked from both months as one shared record.
 * Added the six requested default categories, owner-added categories, multiple activities in every category/day cell, direct day links, editing, deletion, and completion.
 * Refined the sheet with a category manager for renaming and up/down reordering, a single compact `+` entry affordance per cell, alternating pastel day headers and category labels, and explicit blank/✓/✕ activity outcomes.
