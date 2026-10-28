@@ -1,26 +1,32 @@
 import { usePlanner } from '../store/PlannerContext';
 
 /**
- * Local-save indicator — lives quietly in the book chrome. Cloud sync is a
- * future storage-adapter concern and must not be implied by this milestone.
+ * Honest cloud-sync indicator that distinguishes cached/offline state from
+ * writes confirmed by Supabase.
  */
 export function SyncIndicator() {
-  const { status, online } = usePlanner();
+  const { status, online, retrySave, downloadRecoveryBackup, signOut, syncDetail } = usePlanner();
 
   const label =
-    !online || status === 'offline'
-      ? 'Saved locally — offline'
+    status === 'failed'
+      ? 'Sync failed'
+      : !online || status === 'offline'
+      ? 'Offline — will sync'
       : status === 'saving'
-      ? 'Saving locally…'
+      ? 'Saving…'
       : status === 'loading'
       ? 'Opening…'
-      : 'Saved locally';
+      : 'Synced';
 
-  const dot = !online || status === 'offline' ? 'var(--terracotta)' : status === 'synced' ? 'var(--check)' : 'var(--gold)';
+  const dot = status === 'failed' || !online || status === 'offline' ? 'var(--terracotta)' : status === 'synced' ? 'var(--check)' : 'var(--gold)';
+  const detail = syncDetail ?? (status === 'synced'
+    ? 'All planner changes are saved to Supabase.'
+    : `${label}. Unsynced changes remain on this device until a cloud save succeeds.`);
 
   return (
     <span
-      title={label}
+      title={detail}
+      aria-label={detail}
       style={{
         display: 'inline-flex',
         alignItems: 'center',
@@ -43,6 +49,9 @@ export function SyncIndicator() {
         }}
       />
       {label}
+      {status === 'failed' && <button type="button" onClick={retrySave} style={{ border: 0, background: 'transparent', color: 'var(--cream)', textDecoration: 'underline', cursor: 'pointer', font: 'inherit', letterSpacing: 'inherit', padding: 4 }}>Retry</button>}
+      {status === 'failed' && <button type="button" onClick={downloadRecoveryBackup} style={{ border: 0, background: 'transparent', color: 'var(--cream)', textDecoration: 'underline', cursor: 'pointer', font: 'inherit', letterSpacing: 'inherit', padding: 4 }}>Back up</button>}
+      <button type="button" onClick={signOut} aria-label="Sign out of cloud planner" title="Sign out" style={{ border: 0, background: 'transparent', color: 'var(--cream)', cursor: 'pointer', font: 'inherit', padding: 4 }}>↪</button>
     </span>
   );
 }

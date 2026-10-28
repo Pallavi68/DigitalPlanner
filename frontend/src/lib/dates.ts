@@ -28,6 +28,16 @@ export function addDays(iso: ISODate, n: number): ISODate {
   return toISO(d);
 }
 
+export function addMonths(iso: ISODate, n: number): ISODate {
+  const d = fromISO(iso);
+  const intendedDay = d.getDate();
+  d.setDate(1);
+  d.setMonth(d.getMonth() + n);
+  const lastDay = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+  d.setDate(Math.min(intendedDay, lastDay));
+  return toISO(d);
+}
+
 /** 0 = Monday ... 6 = Sunday */
 export function weekday(iso: ISODate): Weekday {
   const js = fromISO(iso).getDay(); // 0 = Sunday
@@ -70,7 +80,7 @@ export function slotLabel(slot: number): string {
 
 /** Full clock time for a slot boundary, e.g. 0 -> '8:00', used in tooltips/labels. */
 export function slotTime(slot: number): string {
-  const totalMin = DAY_START_HOUR * 60 + slot * SLOT_MINUTES;
+  const totalMin = Math.round(DAY_START_HOUR * 60 + slot * SLOT_MINUTES);
   const h24 = Math.floor(totalMin / 60) % 24;
   const min = totalMin % 60;
   const ampm = h24 >= 12 && h24 < 24 ? 'pm' : 'am';
@@ -83,4 +93,18 @@ export function twoWeekWindow(iso: ISODate): ISODate[] {
   const wd = weekday(iso);
   const monday = addDays(iso, -wd);
   return Array.from({ length: 14 }, (_, i) => addDays(monday, i));
+}
+
+/** Every Monday–Sunday row touching the calendar month containing `iso`. */
+export function monthWeeks(iso: ISODate): ISODate[][] {
+  const monthDate = fromISO(iso);
+  const first = toISO(new Date(monthDate.getFullYear(), monthDate.getMonth(), 1));
+  const last = toISO(new Date(monthDate.getFullYear(), monthDate.getMonth() + 1, 0));
+  const gridStart = addDays(first, -weekday(first));
+  const gridEnd = addDays(last, 6 - weekday(last));
+  const inclusiveDays = Math.round((fromISO(gridEnd).getTime() - fromISO(gridStart).getTime()) / 86_400_000) + 1;
+  const weekCount = inclusiveDays / 7;
+  return Array.from({ length: weekCount }, (_, weekIndex) =>
+    Array.from({ length: 7 }, (_, dayIndex) => addDays(gridStart, weekIndex * 7 + dayIndex)),
+  );
 }

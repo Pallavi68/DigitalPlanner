@@ -5,12 +5,15 @@ import { tokens } from '../../lib/tokens';
 import { useDrag, type DragPayload } from '../../lib/DragContext';
 import { uid } from '../../store/seed';
 import { useViewport } from '../../hooks/useViewport';
+import { Modal } from '../../components/Modal';
 
 interface Props {
   date: ISODate;
   day: DayState;
   onChange: (blocks: TimeBlock[]) => void;
   onDeleteBlock: (block: TimeBlock) => void;
+  onToggleBlock: (block: TimeBlock) => void;
+  onUpdateBlock: (block: TimeBlock) => void;
 }
 
 type Interaction =
@@ -18,13 +21,17 @@ type Interaction =
   | { kind: 'resize'; id: string; edge: 'top' | 'bottom'; startY: number; origStart: number; origEnd: number };
 
 /** Zone 3 — full-day 30-min Time Alignment grid with drag-drop / move / resize (FR-4, FR-5, FR-15). */
-export function TimeAlignment({ date, day, onChange, onDeleteBlock }: Props) {
+export function TimeAlignment({ date, day, onChange, onDeleteBlock, onToggleBlock, onUpdateBlock }: Props) {
   const gridRef = useRef<HTMLDivElement>(null);
   const { registerGrid } = useDrag();
   const vp = useViewport();
   const phone = vp === 'phone';
-  const slotH = phone ? 26 : 19;
+  const slotH = phone ? 32 : 30;
   const [interaction, setInteraction] = useState<Interaction | null>(null);
+  const [detailId, setDetailId] = useState<string | null>(null);
+  const [createStartSlot, setCreateStartSlot] = useState<number | null>(null);
+  const [createLabel, setCreateLabel] = useState('');
+  const [createDurationSlots, setCreateDurationSlots] = useState(2);
   const blocksRef = useRef(day.blocks);
   useLayoutEffect(() => {
     blocksRef.current = day.blocks;
@@ -40,14 +47,18 @@ export function TimeAlignment({ date, day, onChange, onDeleteBlock }: Props) {
 
   // Register as the global drop target for items dragged from the To Dos / pool.
   useEffect(() => {
-    return registerGrid((payload: DragPayload, _x, clientY) => {
+    return registerGrid((payload: DragPayload, clientX, clientY) => {
       const el = gridRef.current;
       if (!el) return false;
       const rect = el.getBoundingClientRect();
-      if (clientY < rect.top || clientY > rect.bottom) return false;
+      if (clientX < rect.left || clientX > rect.right || clientY < rect.top || clientY > rect.bottom) return false;
+      if ((payload.tag === 'routine' || payload.tag === 'chore') && payload.sourceRefId && blocksRef.current.some((block) => block.sourceRefId === payload.sourceRefId)) {
+        if (!window.confirm(`“${payload.label}” is already on this day. Add it again?`)) return true;
+      }
       const start = slotFromClientY(clientY);
       const span = payload.slots ?? 2;
       const endSlot = Math.min(SLOT_COUNT, start + span);
+      if (endSlot - start < span) window.alert('The block was shortened to fit at the end of the day.');
       const block: TimeBlock = {
         id: uid('blk'),
         date,
@@ -56,6 +67,7 @@ export function TimeAlignment({ date, day, onChange, onDeleteBlock }: Props) {
         label: payload.label,
         tag: payload.tag,
         sourceRefId: payload.sourceRefId,
+        completed: payload.completed,
       };
       onChange([...blocksRef.current, block]);
       return true;
@@ -94,13 +106,44 @@ export function TimeAlignment({ date, day, onChange, onDeleteBlock }: Props) {
   }, [interaction, onChange, slotH]);
 
   // Overlap detection → render conflicting blocks side by side (manual double-book allowed).
-  const laidOut = layoutBlocks(day.blocks);
+  const minimumVisualHeight = phone ? 20 : 18;
+  const laidOut = layoutBlocks(day.blocks, minimumVisualHeight / slotH);
+
+  const openCreate = (startSlot: number) => {
+    setCreateStartSlot(startSlot);
+    setCreateLabel('');
+    setCreateDurationSlots(Math.min(2, SLOT_COUNT - startSlot));
+  };
+
+  const createStandaloneBlock = () => {
+    const label = createLabel.trim();
+    if (createStartSlot === null || !label) return;
+    const endSlot = Math.min(SLOT_COUNT, createStartSlot + createDurationSlots);
+    onChange([...day.blocks, {
+      id: uid('blk'),
+      date,
+      startSlot: createStartSlot,
+      endSlot,
+      label,
+      tag: 'todo',
+      completed: false,
+    }]);
+    setCreateStartSlot(null);
+    setCreateLabel('');
+  };
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', borderBottom: '1px solid var(--gold)', paddingBottom: 10, marginBottom: 12 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--gold)', paddingBottom: 10, marginBottom: 12 }}>
         <span style={{ font: "600 12px var(--serif)", letterSpacing: '2.5px', color: 'var(--navy)', textTransform: 'uppercase' }}>Time Alignment</span>
-        <span style={{ font: "500 10px var(--serif)", letterSpacing: '2px', color: 'var(--ink-soft)' }}>8AM — 2AM</span>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <button
+            type="button"
+            onClick={() => openCreate(firstAvailableSlot(day.blocks))}
+            style={{ border: 0, borderBottom: '1px solid var(--gold)', background: 'transparent', color: 'var(--navy)', padding: '6px 2px', font: "600 10px var(--serif)", letterSpacing: '1.2px', textTransform: 'uppercase', cursor: 'pointer' }}
+          >+ Add item</button>
+          <span style={{ font: "500 10px var(--serif)", letterSpacing: '2px', color: 'var(--ink-soft)' }}>8AM — 2AM</span>
+        </span>
       </div>
 
       <div
@@ -117,6 +160,13 @@ export function TimeAlignment({ date, day, onChange, onDeleteBlock }: Props) {
         {Array.from({ length: SLOT_COUNT }, (_, i) => (
           <div key={i} style={{ height: slotH, borderTop: `1px solid ${i % 2 === 0 ? 'var(--rule)' : 'var(--rule-half)'}`, position: 'relative' }}>
             <span style={{ position: 'absolute', left: 0, top: -6, font: "500 9px var(--serif)", color: 'var(--ink-soft)', width: 44 }}>{slotLabel(i)}</span>
+            <button
+              type="button"
+              aria-label={`Add a standalone item at ${slotTime(i)}`}
+              title={`Add item at ${slotTime(i)}`}
+              onClick={() => openCreate(i)}
+              style={{ position: 'absolute', inset: '0 0 0 44px', width: 'calc(100% - 44px)', border: 0, background: 'transparent', cursor: 'text', padding: 0 }}
+            />
           </div>
         ))}
 
@@ -125,6 +175,7 @@ export function TimeAlignment({ date, day, onChange, onDeleteBlock }: Props) {
           const src = tokens.source[b.tag];
           const top = b.startSlot * slotH;
           const height = (b.endSlot - b.startSlot) * slotH;
+          const compact = height < 24;
           const gutter = 50;
           const width = `calc((100% - ${gutter}px) / ${cols})`;
           const left = `calc(${gutter}px + (100% - ${gutter}px) / ${cols} * ${col})`;
@@ -136,14 +187,14 @@ export function TimeAlignment({ date, day, onChange, onDeleteBlock }: Props) {
               style={{
                 position: 'absolute',
                 top,
-                height: Math.max(height, slotH),
+                height: Math.max(height, minimumVisualHeight),
                 left,
                 width,
                 background: src.bg,
                 border: b.fixed ? `1.5px solid ${src.edge}` : undefined,
                 borderLeft: `3px solid ${src.edge}`,
                 borderRadius: 3,
-                padding: '2px 8px',
+                padding: compact ? '1px 58px 1px 6px' : '4px 80px 3px 8px',
                 boxSizing: 'border-box',
                 overflow: 'hidden',
                 cursor: b.fixed ? 'default' : 'grab',
@@ -155,16 +206,46 @@ export function TimeAlignment({ date, day, onChange, onDeleteBlock }: Props) {
                 setInteraction({ kind: 'move', id: b.id, startY: e.clientY, origStart: b.startSlot, origEnd: b.endSlot });
               }}
             >
-              <div style={{ display: 'flex', justifyContent: 'space-between', gap: 6, alignItems: 'flex-start' }}>
-                <span style={{ font: `${phone ? 15 : 15}px var(--hand)`, color: b.fixed ? 'var(--navy)' : 'var(--ink)', lineHeight: 1.15 }}>{b.label}</span>
-                <span style={{ display: 'flex', gap: 4, flex: 'none' }}>
+              <div>
+                <span
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`Edit details for ${b.label}`}
+                  onClick={(event) => { event.stopPropagation(); setDetailId(b.id); }}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault();
+                      event.stopPropagation();
+                      setDetailId(b.id);
+                    }
+                  }}
+                  style={{ font: `${phone ? 15 : 15}px var(--hand)`, color: b.fixed ? 'var(--navy)' : 'var(--ink)', lineHeight: 1.15, textDecoration: b.completed ? 'line-through' : undefined, opacity: b.completed ? .65 : 1, cursor: 'pointer' }}
+                >{b.label}</span>
+                {b.note && <BlockNote note={b.note} compact onChange={(note) => onUpdateBlock({ ...b, note })} />}
+                <span style={{ position: 'absolute', right: 2, top: 0, display: 'flex', gap: 1, zIndex: 3 }}>
                   {b.fixed && <span style={{ font: "600 8px var(--serif)", letterSpacing: '1.5px', color: '#8a7648' }}>◆</span>}
+                  <button
+                    type="button"
+                    aria-label={`Edit notes for ${b.label}`}
+                    title="Edit notes"
+                    onPointerDown={(e) => e.stopPropagation()}
+                    onClick={(e) => { e.stopPropagation(); setDetailId(b.id); }}
+                    style={{ width: compact ? 18 : 24, height: compact ? 18 : 24, border: 'none', background: 'rgba(255,255,255,.8)', color: 'var(--ink-soft)', font: `${compact ? 10 : 13}px var(--serif)`, lineHeight: 1, padding: 0, cursor: 'pointer', borderRadius: 3 }}
+                  >✎</button>
+                  <button
+                    type="button"
+                    aria-label={`Mark ${b.label} ${b.completed ? 'not done' : 'done'}`}
+                    aria-pressed={!!b.completed}
+                    onPointerDown={(e) => e.stopPropagation()}
+                    onClick={(e) => { e.stopPropagation(); onToggleBlock(b); }}
+                    style={{ width: compact ? 18 : 24, height: compact ? 18 : 24, border: 'none', background: 'rgba(255,255,255,.8)', color: 'var(--ink)', font: `${compact ? 11 : 14}px var(--serif)`, lineHeight: 1, padding: 0, cursor: 'pointer', borderRadius: 3 }}
+                  >{b.completed ? '✓' : '○'}</button>
                   <button
                     type="button"
                     aria-label={`Remove ${b.label} from schedule`}
                     onPointerDown={(e) => e.stopPropagation()}
-                    onClick={() => onDeleteBlock(b)}
-                    style={{ border: 'none', background: 'transparent', color: 'var(--ink-soft)', font: '12px var(--serif)', lineHeight: 1, padding: 2, cursor: 'pointer' }}
+                    onClick={(e) => { e.stopPropagation(); onDeleteBlock(b); }}
+                    style={{ width: compact ? 18 : 24, height: compact ? 18 : 24, border: 'none', background: 'rgba(255,255,255,.8)', color: 'var(--ink-soft)', font: `${compact ? 11 : 14}px var(--serif)`, lineHeight: 1, padding: 0, cursor: 'pointer', borderRadius: 3 }}
                   >
                     ✕
                   </button>
@@ -183,9 +264,129 @@ export function TimeAlignment({ date, day, onChange, onDeleteBlock }: Props) {
         })}
       </div>
       <p style={{ font: "italic 13px var(--hand)", color: 'var(--placeholder)', marginTop: 10 }}>
-        drag a to-do (⠿) onto a slot · drag a block to move · drag its edges to resize · ◆ fixed blocks are locked
+        tap an empty line to add · click a block for notes · drag to move · drag edges to resize · ◆ fixed blocks are locked
       </p>
+      <Modal open={createStartSlot !== null} onClose={() => setCreateStartSlot(null)} title="Add to Time Alignment">
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+            createStandaloneBlock();
+          }}
+          style={{ display: 'grid', gap: 12 }}
+        >
+          <label htmlFor="standalone-block-label" style={{ display: 'grid', gap: 5, font: '500 12px var(--serif)', color: 'var(--navy)' }}>
+            What are you planning?
+            <input
+              id="standalone-block-label"
+              data-autofocus
+              required
+              maxLength={240}
+              value={createLabel}
+              onChange={(event) => setCreateLabel(event.target.value)}
+              placeholder="Write an appointment, break, errand…"
+              style={{ width: '100%', padding: 10, border: '1px solid var(--rule)', background: 'rgba(255,255,255,.45)', color: 'var(--ink)', font: '16px var(--hand)' }}
+            />
+          </label>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            <label htmlFor="standalone-block-start" style={{ display: 'grid', gap: 5, font: '500 12px var(--serif)', color: 'var(--navy)' }}>
+              Starts at
+              <select
+                id="standalone-block-start"
+                value={createStartSlot ?? 0}
+                onChange={(event) => {
+                  const start = Number(event.target.value);
+                  setCreateStartSlot(start);
+                  setCreateDurationSlots((duration) => Math.min(duration, SLOT_COUNT - start));
+                }}
+                style={{ padding: 9, border: '1px solid var(--rule)', background: 'var(--paper)', color: 'var(--ink)', font: '13px var(--serif)' }}
+              >
+                {Array.from({ length: SLOT_COUNT }, (_, slot) => <option key={slot} value={slot}>{slotTime(slot)}</option>)}
+              </select>
+            </label>
+            <label htmlFor="standalone-block-duration" style={{ display: 'grid', gap: 5, font: '500 12px var(--serif)', color: 'var(--navy)' }}>
+              Duration
+              <select
+                id="standalone-block-duration"
+                value={createDurationSlots}
+                onChange={(event) => setCreateDurationSlots(Number(event.target.value))}
+                style={{ padding: 9, border: '1px solid var(--rule)', background: 'var(--paper)', color: 'var(--ink)', font: '13px var(--serif)' }}
+              >
+                {Array.from({ length: Math.min(8, SLOT_COUNT - (createStartSlot ?? 0)) }, (_, index) => index + 1).map((slots) => (
+                  <option key={slots} value={slots}>{slots * 30} minutes</option>
+                ))}
+              </select>
+            </label>
+          </div>
+          <button type="submit" disabled={!createLabel.trim()} style={{ justifySelf: 'end', border: '1px solid var(--gold)', background: 'var(--navy)', color: 'var(--cream)', padding: '9px 16px', font: '600 11px var(--serif)', letterSpacing: '1.2px', textTransform: 'uppercase', cursor: createLabel.trim() ? 'pointer' : 'not-allowed', opacity: createLabel.trim() ? 1 : .55 }}>
+            Add to schedule
+          </button>
+        </form>
+      </Modal>
+      {(() => {
+        const block = day.blocks.find((candidate) => candidate.id === detailId);
+        return (
+          <Modal open={!!block} onClose={() => setDetailId(null)} title={block ? `${block.label} details` : 'Block details'}>
+            {block && (
+              <div style={{ display: 'grid', gap: 8, font: '500 12px var(--serif)', color: 'var(--navy)' }}>
+                <label htmlFor={`block-note-${block.id}`}>Notes or description</label>
+                <textarea
+                  id={`block-note-${block.id}`}
+                  data-autofocus
+                  value={block.note ?? ''}
+                  maxLength={5000}
+                  rows={5}
+                  onChange={(event) => onUpdateBlock({ ...block, note: event.target.value })}
+                  placeholder="Add small details you want to remember…"
+                  style={{ width: '100%', resize: 'vertical', padding: 10, border: '1px solid var(--rule)', background: 'rgba(255,255,255,.45)', color: 'var(--ink)', font: '15px var(--hand)' }}
+                />
+                <small style={{ color: 'var(--ink-soft)', font: '12px var(--serif)' }}>Type <code>- [ ] task</code> or <code>[ ] task</code> on its own line to create a persistent checkbox.</small>
+                {block.note && <BlockNote note={block.note} onChange={(note) => onUpdateBlock({ ...block, note })} />}
+              </div>
+            )}
+          </Modal>
+        );
+      })()}
     </div>
+  );
+}
+
+function firstAvailableSlot(blocks: TimeBlock[]): number {
+  return Array.from({ length: SLOT_COUNT }, (_, slot) => slot)
+    .find((slot) => !blocks.some((block) => slot >= block.startSlot && slot < block.endSlot)) ?? 0;
+}
+
+const CHECKBOX_LINE = /^(\s*(?:-\s*)?)\[([ xX])\](\s+.*)$/;
+
+function BlockNote({ note, onChange, compact = false }: { note: string; onChange: (note: string) => void; compact?: boolean }) {
+  const lines = note.split('\n');
+  const toggle = (index: number) => {
+    const match = lines[index].match(CHECKBOX_LINE);
+    if (!match) return;
+    const next = lines.slice();
+    next[index] = `${match[1]}[${match[2].toLowerCase() === 'x' ? ' ' : 'x'}]${match[3]}`;
+    onChange(next.join('\n'));
+  };
+  return (
+    <span style={{ display: 'grid', gap: compact ? 1 : 5, marginTop: compact ? 2 : 10, color: 'var(--ink-soft)', font: `${compact ? 11 : 13}px var(--serif)`, lineHeight: 1.25 }}>
+      {lines.map((line, index) => {
+        const match = line.match(CHECKBOX_LINE);
+        if (!match) return line ? <span key={`${index}-${line}`}>{line}</span> : null;
+        const checked = match[2].toLowerCase() === 'x';
+        return (
+          <label key={`${index}-${line}`} style={{ display: 'flex', alignItems: 'flex-start', gap: 5, cursor: 'pointer', textDecoration: checked ? 'line-through' : undefined }}>
+            <input
+              type="checkbox"
+              checked={checked}
+              onPointerDown={(event) => event.stopPropagation()}
+              onClick={(event) => event.stopPropagation()}
+              onChange={() => toggle(index)}
+              style={{ margin: '1px 0 0' }}
+            />
+            <span>{match[3].trim()}</span>
+          </label>
+        );
+      })}
+    </span>
   );
 }
 
@@ -203,7 +404,7 @@ function Handle({ position, onDown }: { position: 'top' | 'bottom'; onDown: (e: 
         left: 0,
         right: 0,
         [position]: 0,
-        height: 10,
+        height: 4,
         cursor: 'ns-resize',
         touchAction: 'none',
       }}
@@ -212,7 +413,7 @@ function Handle({ position, onDown }: { position: 'top' | 'bottom'; onDown: (e: 
 }
 
 /** Assign overlapping blocks to side-by-side columns. */
-function layoutBlocks(blocks: TimeBlock[]): { block: TimeBlock; col: number; cols: number }[] {
+function layoutBlocks(blocks: TimeBlock[], minimumSpan = 0): { block: TimeBlock; col: number; cols: number }[] {
   const sorted = [...blocks].sort((a, b) => a.startSlot - b.startSlot || a.endSlot - b.endSlot);
   const result: { block: TimeBlock; col: number; cols: number }[] = [];
   let cluster: TimeBlock[] = [];
@@ -222,12 +423,13 @@ function layoutBlocks(blocks: TimeBlock[]): { block: TimeBlock; col: number; col
     if (!cluster.length) return;
     const colEnds: number[] = [];
     const placed = cluster.map((b) => {
+      const visualEnd = Math.max(b.endSlot, b.startSlot + minimumSpan);
       let col = colEnds.findIndex((end) => end <= b.startSlot);
       if (col === -1) {
         col = colEnds.length;
-        colEnds.push(b.endSlot);
+        colEnds.push(visualEnd);
       } else {
-        colEnds[col] = b.endSlot;
+        colEnds[col] = visualEnd;
       }
       return { block: b, col };
     });
@@ -240,7 +442,7 @@ function layoutBlocks(blocks: TimeBlock[]): { block: TimeBlock; col: number; col
   for (const b of sorted) {
     if (cluster.length && b.startSlot >= clusterEnd) flush();
     cluster.push(b);
-    clusterEnd = Math.max(clusterEnd, b.endSlot);
+    clusterEnd = Math.max(clusterEnd, Math.max(b.endSlot, b.startSlot + minimumSpan));
   }
   flush();
   return result;

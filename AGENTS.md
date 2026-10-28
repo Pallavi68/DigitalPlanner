@@ -180,6 +180,14 @@ To keep handoffs reliable:
 * Prefer making a Git commit before switching agents.
 * If changes are intentionally left uncommitted, clearly document their state and purpose in the handoff.
 
+## Branch and deployment hygiene
+
+* Start feature work from a clean checkout of the canonical production branch.
+* Use one clean branch per feature. Uncommitted work follows branch switches and is not branch isolation.
+* Keep incomplete feature routes, navigation, and integrations confined to that feature's branch.
+* Do not deploy production from a dirty working tree or from a manually filtered copy of one.
+* Once production is connected to Git, deploy production only from the configured canonical branch after reviewed changes are merged.
+
 ## Git rules
 
 * Inspect `git status` before meaningful work.

@@ -33,9 +33,9 @@ export const tokens = {
   /** Time-block source tint (highlighter feel) + bracket color, by SourceTag. */
   source: {
     goodDay: { bg: 'rgba(233,196,90,.30)', edge: '#c9a23c', label: 'Successful Day' },
-    todo: { bg: 'rgba(120,150,200,.22)', edge: '#5a7ab2', label: 'To Dos' },
-    routine: { bg: 'rgba(140,180,120,.25)', edge: '#6f9a5c', label: 'Routine' },
-    chore: { bg: 'rgba(194,109,79,.18)', edge: '#c26b4a', label: 'Chore' },
+    todo: { bg: 'rgba(233,196,90,.24)', edge: '#b8985a', label: 'To Dos' },
+    routine: { bg: 'rgba(90,122,178,.22)', edge: '#5a7ab2', label: 'Successful Day' },
+    chore: { bg: 'rgba(138,111,174,.22)', edge: '#8a6fae', label: 'Chore' },
     fixed: { bg: '#f6efdf', edge: '#1c2140', label: 'Fixed commitment' },
     manual: { bg: 'rgba(120,150,200,.16)', edge: '#8a94a8', label: 'Manual block' },
   },

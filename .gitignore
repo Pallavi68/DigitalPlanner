@@ -23,6 +23,9 @@ pnpm-debug.log*
 # Local tool settings
 .claude/settings.local.json
 
+# Generated Supabase CLI state
+supabase/.temp/
+
 # Temporary files
 *.tmp
 *.swp

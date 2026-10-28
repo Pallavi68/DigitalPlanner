@@ -1,4 +1,4 @@
-import type { PlannerState, DayState, RoutineHabit, HabitRow, TimeBlock } from '../types';
+import type { PlannerState, DayState, RoutineHabit, HabitRow, TimeBlock, DailyTodoLine } from '../types';
 import { todayISO, SLOT_COUNT } from '../lib/dates';
 
 export function uid(prefix = 'id'): string {
@@ -6,12 +6,12 @@ export function uid(prefix = 'id'): string {
 }
 
 /** Default recurring routine ("Successful Day") — pre-seeded at setup. */
-export const DEFAULT_ROUTINE: Omit<RoutineHabit, 'id' | 'since'>[] = [
+export const DEFAULT_ROUTINE: Array<Pick<RoutineHabit, 'label' | 'period'> & Partial<Pick<RoutineHabit, 'durationMinutes' | 'defaultStartSlot' | 'autoScheduleWeekdays' | 'autoScheduleLabel'>>> = [
   { label: 'Wake by 8', period: 'AM' },
   { label: 'Vitamins', period: 'AM' },
   { label: 'Skincare', period: 'AM' },
-  { label: 'Mobility — 10 min', period: 'AM' },
-  { label: 'Fitness', period: 'AM' },
+  { label: 'Mobility', period: 'PM', durationMinutes: 15, defaultStartSlot: 30, autoScheduleWeekdays: [0, 1, 2, 3, 4, 5, 6], autoScheduleLabel: 'Mobility' },
+  { label: 'Movement', period: 'AM', durationMinutes: 150, defaultStartSlot: 3, autoScheduleWeekdays: [0, 1, 3, 4], autoScheduleLabel: 'Gym' },
   { label: 'Moneymaker', period: 'PM' },
   { label: 'Skincare PM', period: 'PM' },
   { label: 'Read 10 pages', period: 'PM' },
@@ -19,29 +19,54 @@ export const DEFAULT_ROUTINE: Omit<RoutineHabit, 'id' | 'since'>[] = [
 ];
 
 /** Default Two-Week grid rows — recurring habits + day-specific chores. */
-export const DEFAULT_HABIT_ROWS: Omit<HabitRow, 'id' | 'since'>[] = [
-  { label: 'Gym', category: 'Workout' },
-  { label: '$$maker', category: 'Moneymaker' },
-  { label: 'Biki walk', category: 'Walk', weekday: 2 },
-  { label: 'Clean house', category: 'Chores' },
-  { label: 'Oil hair', category: 'Self-care', weekday: 0 },
-  { label: 'Wash hair', category: 'Self-care', weekday: 1 },
-  { label: 'Splitwise', category: 'Finance', weekday: 6 },
-  { label: 'Bingo', category: 'Social' },
+export const TWO_WEEK_CYCLE_ANCHOR = '2026-08-10';
+
+/** Owner-approved two-week pattern. Untimed items surface for manual placement. */
+export const DEFAULT_HABIT_ROWS: Array<Omit<HabitRow, 'since'>> = [
+  { id: 'chore_job_hunt_wed', label: 'Job hunt', category: 'Other', weekday: 2 },
+  { id: 'chore_job_hunt_sat', label: 'Job hunt', category: 'Other', weekday: 5 },
+  { id: 'chore_biki_walk_wed', label: 'Biki walk', category: 'Walk', weekday: 2 },
+  { id: 'chore_biki_walk_sat', label: 'Biki walk', category: 'Walk', weekday: 5 },
+  { id: 'chore_long_walk_thu', label: 'Long walk', category: 'Walk', weekday: 3 },
+  { id: 'chore_badminton_sat', label: 'Badminton', category: 'Workout', weekday: 5 },
+  { id: 'chore_laundry_mon', label: 'Laundry', category: 'Chores', weekday: 0 },
+  { id: 'chore_laundry_thu', label: 'Laundry', category: 'Chores', weekday: 3 },
+  { id: 'chore_oil_hair_mon', label: 'Oil hair', category: 'Self-care', weekday: 0 },
+  { id: 'chore_clean_desk_tue', label: 'Clean desk', category: 'Chores', weekday: 1 },
+  { id: 'chore_wash_hair_tue', label: 'Wash hair', category: 'Self-care', weekday: 1 },
+  { id: 'chore_wash_hair_sat', label: 'Wash hair', category: 'Self-care', weekday: 5 },
+  { id: 'chore_fold_clothes_wed', label: 'Fold clothes', category: 'Chores', weekday: 2 },
+  { id: 'chore_fold_clothes_sat', label: 'Fold clothes', category: 'Chores', weekday: 5 },
+  { id: 'chore_clean_cupboard_sat', label: 'Clean cupboard', category: 'Chores', weekday: 5 },
+  { id: 'chore_expense_tracker_sun', label: 'Expense tracker', category: 'Finance', weekday: 6 },
+  { id: 'chore_bingo_mon', label: 'Bingo', category: 'Social', weekday: 0 },
+  { id: 'chore_bingo_wed', label: 'Bingo', category: 'Social', weekday: 2 },
+  { id: 'chore_bingo_fri', label: 'Bingo', category: 'Social', weekday: 4 },
+  { id: 'chore_bingo_sun', label: 'Bingo', category: 'Social', weekday: 6 },
+  { id: 'chore_bedroom_sheet_w1', label: 'Change bedroom bed sheet', category: 'Chores', weekday: 3, cycleWeeks: [1], cycleAnchorDate: TWO_WEEK_CYCLE_ANCHOR },
+  { id: 'chore_jewellery_w1', label: 'Clean jewellery section', category: 'Chores', weekday: 6, cycleWeeks: [1], cycleAnchorDate: TWO_WEEK_CYCLE_ANCHOR },
+  { id: 'chore_hall_sheet_w2', label: 'Change hall bed sheet', category: 'Chores', weekday: 3, cycleWeeks: [2], cycleAnchorDate: TWO_WEEK_CYCLE_ANCHOR },
+  { id: 'chore_kitchen_w2', label: 'Clean kitchen', category: 'Chores', weekday: 6, cycleWeeks: [2], cycleAnchorDate: TWO_WEEK_CYCLE_ANCHOR },
 ];
 
-export const DEFAULT_WINDDOWN_ITEMS = ['Tidy desk', 'Set out clothes', 'Plan tomorrow'];
+export const DEFAULT_WINDDOWN_ITEMS = ['Vitamins', 'Skincare', 'Clean down'];
+
+export function blankDailyTodo(): DailyTodoLine {
+  return { id: uid('dt'), text: '', done: false };
+}
 
 export function emptyDay(): DayState {
   return {
     routineDone: {},
-    todos: Array.from({ length: 15 }, () => ({ text: '', done: false })),
+    routineInstances: [],
+    todos: Array.from({ length: 15 }, blankDailyTodo),
     blocks: [],
     windDown: {
       checklist: DEFAULT_WINDDOWN_ITEMS.map((label) => ({ id: uid('wd'), label, done: false })),
       tomorrowPlan: '',
       bedtime: '',
     },
+    suppressedAutoBlockIds: [],
   };
 }
 
@@ -49,11 +74,25 @@ export function emptyDay(): DayState {
 export function initialState(): PlannerState {
   const since = todayISO();
   return {
-    version: 1,
+    version: 7,
     setupComplete: false,
-    routineHabits: DEFAULT_ROUTINE.map((h) => ({ ...h, id: uid('rh'), since })),
-    habitRows: DEFAULT_HABIT_ROWS.map((r) => ({ ...r, id: uid('hr'), since })),
+    routineHabits: DEFAULT_ROUTINE.map((h, sortOrder) => ({
+      ...h,
+      id: uid('rh'),
+      since,
+      durationMinutes: h.durationMinutes ?? 30,
+      defaultStartSlot: h.defaultStartSlot,
+      autoScheduleWeekdays: h.autoScheduleWeekdays,
+      autoScheduleLabel: h.autoScheduleLabel,
+      sortOrder,
+      revisions: [{ effectiveFrom: since, label: h.label, period: h.period, durationMinutes: h.durationMinutes ?? 30, defaultStartSlot: h.defaultStartSlot, autoScheduleWeekdays: h.autoScheduleWeekdays, autoScheduleLabel: h.autoScheduleLabel, sortOrder, archived: false }],
+    })),
+    habitRows: DEFAULT_HABIT_ROWS.map((r) => ({ ...r, since: TWO_WEEK_CYCLE_ANCHOR })),
     todos: [],
+    weeklyActions: [],
+    habitCategories: ['Gym', 'Job hunt', 'My cat', 'Organizing my house', 'Sorting my finances', 'Bingo']
+      .map((label, sortOrder) => ({ id: `habit_category_${sortOrder + 1}`, label, sortOrder })),
+    habitPlanItems: [],
     days: {},
     gridMarks: {},
     preferences: {
@@ -64,6 +103,7 @@ export function initialState(): PlannerState {
       breakCadenceMins: 90,
       energyWindows: 'Sharpest 9–12; dip after lunch; second wind ~4pm',
       fixedCommitments: [],
+      windDownSchedule: { startSlot: 30, durationMinutes: 60, autoSchedule: true },
     },
     lastEditedAt: Date.now(),
   };
@@ -91,7 +131,7 @@ export function demoState(): PlannerState {
     'Finish expense tracker',
     '30 min job hunt',
   ];
-  sample.forEach((text, i) => (day.todos[i] = { text, done: i === 0 }));
+  sample.forEach((text, i) => (day.todos[i] = { ...day.todos[i], text, done: i === 0 }));
 
   // Time Alignment blocks
   const demoBlocks: TimeBlock[] = [

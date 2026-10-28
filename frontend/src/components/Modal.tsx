@@ -18,6 +18,25 @@ export function Modal({ open, onClose, title, children }: ModalProps) {
     panelRef.current?.querySelector<HTMLElement>('[data-autofocus], button, input, textarea, select')?.focus();
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
+      if (e.key === 'Tab' && panelRef.current) {
+        const focusable = [...panelRef.current.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])',
+        )].filter((element) => !element.hasAttribute('hidden'));
+        if (!focusable.length) {
+          e.preventDefault();
+          panelRef.current.focus();
+          return;
+        }
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
     };
     document.addEventListener('keydown', onKey);
     return () => {
@@ -46,11 +65,12 @@ export function Modal({ open, onClose, title, children }: ModalProps) {
     >
       <div
         ref={panelRef}
+        tabIndex={-1}
         role="dialog"
         aria-modal="true"
         aria-label={title}
         style={{
-          width: 'min(440px, 100%)',
+          width: 'min(760px, 100%)',
           maxHeight: '86vh',
           overflow: 'auto',
           background: 'var(--paper)',

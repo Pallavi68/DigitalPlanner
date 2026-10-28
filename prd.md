@@ -70,7 +70,7 @@ A responsive web app structured as a **book** you flip through, with these page 
 
 - **Daily Page** (the spread) — the heart of the product. Four zones faithful to the paper:
   1. **"Successful Day" routine checklist** — the recurring AM/PM habits, with bubble checkboxes (filled = done).
-  2. **To Dos** — a numbered list (01–15) for the day's tasks.
+  2. **To Dos** — a numbered ruled list that begins with 01–15 and grows when the owner continues past the last line.
   3. **Time Alignment** — a full-day schedule in 30-minute blocks; the owner **drags items onto it** to time-block, and resizes blocks by dragging edges.
   4. **Evening wind-down** — a small end-of-day checklist + "tomorrow plan" + bedtime.
 - **Two-Week Habit Planner** — a 14-day grid, colored day-spines, each day a stack of habits/chores marked ✓/✗.
@@ -104,7 +104,7 @@ Underneath, a shared data model links these so the checklist, habit grid, and da
 |----|-------------|----------|-----------------------------|
 | FR-1 | **Book shell & navigation** — app presents as a book with page-flip navigation between days and page types. | P0 | Given the app is open, when the user flips forward/back, then the target page renders with the book/paper aesthetic and the flip animation. Builds on existing shell. |
 | FR-2 | **Daily Page — routine checklist** — renders the recurring AM/PM "Successful Day" items as bubble checkboxes; tap toggles done. | P0 | Given today's page, when the user taps a bubble, then it fills (done) with an ink-style mark and state persists + syncs. |
-| FR-3 | **Daily Page — To Dos** — numbered 01–15 ruled list; tap a line to type; items styled as handwriting. | P0 | Given the To Dos zone, when the user taps line N and types, then text saves to that day and renders in handwriting font. Empty lines show ruled paper only. |
+| FR-3 | **Daily Page — To Dos** — numbered ruled list beginning with 01–15; tap a line to type; items styled as handwriting. | P0 | Text saves to that date and renders in handwriting. Enter moves to the next line and creates a new numbered row after the current final row. Deleting a to-do removes its linked Time Alignment blocks; removing only a schedule block preserves the source to-do. |
 | FR-4 | **Daily Page — Time Alignment grid** — full-day 30-min blocks (configurable start/end, default ~8am–2am). | P0 | Grid renders all 30-min slots for the day; scrolls within the page without breaking layout on phone. |
 | FR-5 | **Drag-and-drop time-blocking** — drag any to-do, chore, or checklist item onto a time slot to create a block; drag block edges to resize; drag block body to move. | P0 | Given an item and the grid, when the user drops it on a slot, then a labeled block appears spanning the chosen duration and persists. Resizing changes duration in 30-min (or finer) steps. |
 | FR-6 | **Daily Page — evening wind-down** — small end-of-day checklist + "tomorrow plan" note + bedtime line. | P1 | Renders configurable wind-down items as checkboxes; "tomorrow plan" text persists to that day. |
@@ -155,7 +155,7 @@ Because this is a personal tool, success is adoption-by-one and feel, not scale.
 
 - **Offline / flaky connection:** edits persist locally, sync later; clear-but-subtle sync indicator; never block writing.
 - **Two devices edit the same field:** last-write-wins per field with a non-blocking notice (rare — single user).
-- **Long to-do text / many to-dos:** To Dos zone caps visible at 01–15 like paper; overflow goes to the running lists rather than breaking layout.
+- **Long to-do text / many to-dos:** the Daily To Dos begin with 15 paper-like ruled rows and extend the page with additional numbered rows as required.
 - **Time Alignment overlaps:** two blocks on the same slot render side-by-side or flag a conflict; manual override always allowed (you can double-book yourself on paper too).
 - **Changing a recurring habit:** applies going forward only; historical days stay as they were (a real book doesn't rewrite past pages).
 - **Day-boundary / timezone:** "today" follows the device's local date; traveling across timezones shouldn't duplicate or drop a day.
@@ -209,7 +209,7 @@ Single-user tool, so "launch" = the owner adopting it in stages.
 ## 19. Appendix
 
 **Page-type reference (from the owner's physical planner):**
-- *Daily spread:* "Successful Day" routine checklist (AM/PM bubble habits) · numbered To Dos 01–15 · "Time Alignment" full-day 30-min schedule with hand-drawn blocking brackets · evening wind-down mini-checklist + tomorrow plan + bedtime.
+- *Daily spread:* "Successful Day" routine checklist (AM/PM bubble habits) · numbered To Dos beginning at 01–15 and growing as needed · "Time Alignment" full-day 30-min schedule with hand-drawn blocking brackets · evening wind-down mini-checklist + tomorrow plan + bedtime.
 - *Two-Week Habit Planner:* 14-day grid, rainbow day-spines, recurring habits (Gym, Moneymaker, Job hunt, walks, Bingo) + day-specific chores (Clean desk, Fold clothes, Clean cupboard, Expense tracker, Clean kitchen…), each marked ✓/✗.
 - *Running Short To-Do List (new):* to be designed — small, quick items.
 - *Running Long To-Do List (new):* to be designed — bigger, multi-step items.

@@ -1,0 +1,54 @@
+.habit-sheet { width: min(1500px, 100%); min-height: 720px; padding: 18px; color: var(--ink); background: var(--paper); box-shadow: 0 8px 28px rgba(28,33,64,.22); overflow-x: auto; }
+.habit-sheet-heading { display: flex; align-items: center; justify-content: space-between; min-width: 1020px; padding-bottom: 12px; border-bottom: 1px solid var(--gold); text-align: center; }
+.habit-sheet-heading button { width: 44px; height: 44px; border: 0; background: transparent; color: var(--navy); font: 32px var(--serif); }
+.habit-sheet-heading p { margin: 0; font: 600 10px var(--serif); letter-spacing: 2.5px; text-transform: uppercase; }
+.habit-sheet-heading h1 { margin: 4px 0 0; color: var(--navy); font: italic 28px var(--serif); }
+.habit-category-toolbar { min-width: 1020px; display: flex; justify-content: flex-end; padding-top: 8px; }
+.habit-category-toolbar button { min-height: 40px; border: 0; background: transparent; color: var(--terracotta); font: 600 11px var(--serif); letter-spacing: .8px; text-decoration: underline; text-underline-offset: 3px; }
+.habit-category-manager { min-width: 1020px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; margin: 4px 0 14px; padding: 12px; border: 1px solid var(--gold); background: rgba(239,210,199,.2); }
+.habit-category-manager > div { display: grid; grid-template-columns: minmax(0,1fr) 36px 36px; }
+.habit-category-manager input { min-width: 0; border: 0; border-bottom: 1px solid var(--rule); background: transparent; padding: 7px; font: 15px var(--hand); }
+.habit-category-manager button { border: 0; background: transparent; color: var(--navy); font-size: 17px; }
+.habit-category-manager button:disabled { opacity: .22; }
+.habit-week { min-width: 1020px; margin-top: 20px; }
+.habit-week-label { margin-bottom: 4px; color: var(--terracotta); font: 600 10px var(--serif); letter-spacing: 2px; text-transform: uppercase; }
+.habit-grid { display: grid; grid-template-columns: 170px repeat(7, minmax(118px, 1fr)); }
+.habit-grid > * { border-right: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+.habit-grid > :first-child { border-left: 1px solid var(--rule); }
+.habit-grid-head > * { min-height: 48px; display: grid; place-items: center; color: var(--navy); text-decoration: none; }
+.habit-grid-head > :first-child { background: #dce5ef; }
+.habit-grid-head > :nth-child(4n + 2) { background: #d8e5ef; }
+.habit-grid-head > :nth-child(4n + 3) { background: #efd7d0; }
+.habit-grid-head > :nth-child(4n + 4) { background: #e8deee; }
+.habit-grid-head > :nth-child(4n + 5) { background: #e8e2c7; }
+.habit-grid-head span { font: 600 9px var(--serif); letter-spacing: 1px; text-transform: uppercase; }
+.habit-grid-head strong { font: 18px var(--serif); }
+.habit-category-name { padding: 10px 8px; color: var(--navy); font: 600 13px/1.25 var(--serif); }
+.habit-category-row:nth-child(4n + 3) .habit-category-name { background: #dce8f1; }
+.habit-category-row:nth-child(4n + 4) .habit-category-name { background: #f0ddd8; }
+.habit-category-row:nth-child(4n + 5) .habit-category-name { background: #e8e0ee; }
+.habit-category-row:nth-child(4n + 6) .habit-category-name { background: #ece7cf; }
+.habit-cell { position: relative; min-height: 42px; padding: 4px; background: linear-gradient(transparent calc(100% - 1px),var(--rule-faint) 1px); }
+.habit-cell form input { width: 100%; min-height: 32px; border: 0; background: transparent; color: var(--ink); text-align: center; font: 16px var(--hand); }
+.habit-cell form input::placeholder { color: var(--placeholder); }
+.habit-activity { display: grid; grid-template-columns: 23px minmax(0,1fr) 43px; align-items: center; min-height: 32px; }
+.habit-activity button { min-height: 32px; border: 0; padding: 0; background: transparent; color: var(--ink); }
+.habit-mark-controls { display: flex; justify-content: flex-end; }
+.habit-mark-controls button { width: 21px; color: var(--ink-soft); font: 16px var(--hand); }
+.habit-mark-controls button[aria-pressed="true"].habit-check { border-radius: 50%; background: var(--navy); color: var(--paper); }
+.habit-mark-controls button[aria-pressed="true"].habit-cross { border-radius: 50%; background: var(--terracotta); color: var(--paper); }
+.habit-activity-text { overflow-wrap: anywhere; text-align: center; font: 16px/1.25 var(--hand); }
+.habit-remove { opacity: 0; color: var(--cross) !important; font-size: 17px; }
+.habit-activity:hover .habit-remove, .habit-remove:focus-visible { opacity: 1; }
+.habit-activity input { width: 100%; border: 0; border-bottom: 1px solid var(--terracotta); background: transparent; text-align: center; font: 16px var(--hand); }
+.habit-activity.is-check .habit-activity-text { color: var(--ink-soft); text-decoration: line-through; }
+.habit-activity.is-cross .habit-activity-text { color: var(--cross); text-decoration: line-through; text-decoration-style: wavy; }
+.habit-add-item { position: absolute; z-index: 2; top: -13px; right: -13px; width: 26px; min-height: 26px; border: 1px solid var(--rule); border-radius: 50%; background: var(--paper); color: var(--terracotta); opacity: 0; font: 20px var(--serif); transition: opacity .15s ease, background .15s ease; }
+.habit-cell:hover .habit-add-item, .habit-cell:focus-within .habit-add-item, .habit-add-item:focus-visible { opacity: 1; }
+.habit-add-item:hover, .habit-add-item:focus-visible { background: rgba(194,107,74,.12); }
+.habit-add-category { min-width: 1020px; display: flex; align-items: center; gap: 8px; padding: 18px 0 4px; }
+.habit-add-category label { font: 600 11px var(--serif); letter-spacing: 1px; text-transform: uppercase; }
+.habit-add-category input { min-width: 220px; border: 0; border-bottom: 1px solid var(--gold); background: transparent; padding: 8px; font: 16px var(--hand); }
+.habit-add-category button { min-height: 40px; border: 0; background: transparent; color: var(--terracotta); font: 600 12px var(--serif); }
+@media (hover: none) { .habit-add-item { opacity: 1; } }
+@media (max-width: 720px) { .habit-sheet { padding: 12px; } .habit-remove { opacity: 1; } .habit-category-manager { grid-template-columns: 1fr 1fr; } }
