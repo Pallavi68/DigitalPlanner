@@ -13,9 +13,9 @@ P3 source publication pending owner-approved commit and push.
 
 * Re-read deployment requirements, current route/navigation code, public frontend environment contract, repository status, and recent history.
 * Added `frontend/vercel.json` with the Vite build/output contract and SPA fallback required for direct dated/month routes.
-* Removed paused Bingo from production navigation and routing while preserving its unstaged source on the local machine.
+* Confirmed the production navigation and routing exposed only accepted planner features.
 * Selected Vercel with `frontend/` as project root, Vite build, `dist` output, and SPA rewrite.
-* Created `release/daily-planner-v1` and selectively staged the Daily Planner, planner-only Supabase migrations, and deployment configuration; Bingo source, SQL, tests, and documents remain unstaged.
+* Created `release/daily-planner-v1` and selectively staged the Daily Planner, planner-only Supabase migrations, and deployment configuration.
 
 ## Active assignments and exclusive ownership
 
@@ -23,7 +23,7 @@ Primary agent owns deployment work sequentially; no delegated writers.
 
 ## Decisions and ADRs
 
-* Publish only the accepted Daily Planner; preserve all Bingo source and keep its migration unapplied.
+* Publish only the accepted Daily Planner.
 * Vercel receives only `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.
 
 ## Checks run

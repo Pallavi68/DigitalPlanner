@@ -13,7 +13,7 @@ Implement the approved Weekly Action Planner as a Monday-anchored book spread wh
 
 V1 excludes time-block creation, action hierarchy, recurring actions, automatic carry-forward, weekly review, external imports, and identity inference after arbitrary text cut-and-paste. The Month Overview remains navigation-first. Existing Daily Page behavior and the approved cream/navy physical-planner direction must be preserved.
 
-The implementation run must preserve unrelated uncommitted Vision Action Bingo work. No agent may modify `frontend/src/features/bingo/**`, Bingo migrations/tests, or Bingo planning artifacts.
+The implementation run must preserve unrelated uncommitted work.
 
 ## 2. Repository and architecture baseline
 
@@ -107,7 +107,7 @@ P2A and P2B are the only planned write-enabled parallel branch. P6 reviews may r
 - **Mode:** Sequential; Tier A domain/store implementer.
 - **Dependencies:** Phase 0 gate.
 - **Tasks:** add weekly action types/default migration; implement week validation, multiline normalization, stable ordering, CRUD, assign/move/no-op, daily append-at-bottom, daily completion propagation, weekly edit propagation, and delete/unschedule reconciliation as atomic state transitions; expose narrow context methods.
-- **Exclusive ownership:** the domain/store paths listed in Section 3. No `App.tsx`, CSS, backend, or Bingo edits.
+- **Exclusive ownership:** the domain/store paths listed in Section 3. No `App.tsx`, CSS, or backend edits.
 - **Deliverables:** tested feature-domain API usable without UI.
 - **Validation:** `cd frontend && npm test -- src/store/weeklyPlanner.test.ts`; `npm run typecheck`.
 - **Gate:** tests prove exactly one assignment, stable IDs, no duplicates, cross-month weeks, blank-line paste handling, append after written items, move cleanup, completion sync, source deletion, surfaced-line deletion, and migration from state without `weeklyActions`.
@@ -176,7 +176,7 @@ P2A and P2B are the only planned write-enabled parallel branch. P6 reviews may r
 
 - **Mode:** Sequential; primary assigns one isolated owner per finding group.
 - **Dependencies:** Phase 6 findings.
-- **Tasks:** apply scoped fixes; rerun focused then full checks; inspect final diff for accidental/Bingo changes; update `PROJECT_STATUS.md` only after implementation is complete and only when that file is explicitly assigned to the primary; update `decision-list.md` only for a genuinely durable adopted decision.
+- **Tasks:** apply scoped fixes; rerun focused then full checks; inspect final diff for accidental unrelated changes; update `PROJECT_STATUS.md` only after implementation is complete and only when that file is explicitly assigned to the primary; update `decision-list.md` only for a genuinely durable adopted decision.
 - **Exclusive ownership:** assigned per finding; never overlap. Status remains primary-owned.
 - **Gate:** P0 quality matrix complete, all checks recorded, no unresolved high findings, and remaining limitations clearly stated. No commit, push, migration application, or deployment without separate user authorization.
 
@@ -186,7 +186,6 @@ P2A and P2B are the only planned write-enabled parallel branch. P6 reviews may r
 - Read-only Phase 6 reviews may run concurrently.
 - `frontend/src/types.ts`, `frontend/src/store/PlannerContext.tsx`, `frontend/src/App.tsx`, `frontend/src/index.css`, lockfiles, and status artifacts are merge points and therefore sequential.
 - No two agents may edit the same file or directory concurrently. Shared imports are integrated by the designated downstream owner, not by upstream agents reaching outside ownership.
-- No implementation agent may edit `frontend/src/features/bingo/**`, `supabase/migrations/20260727000100_vision_action_bingo.sql`, `supabase/tests/bingo_*`, or Vision Action Bingo artifacts.
 - A subagent may not commit, push, deploy, apply migrations, alter production data, or install dependencies.
 - If an agent discovers an ownership need outside its contract, it stops and returns the request. The primary reassigns the path sequentially.
 - On collision or unexpected dirty content, stop the affected writer, inspect the actual diff, preserve user work, and re-sequence. Never reset or discard.
@@ -222,7 +221,7 @@ Cross-cutting gates:
 - **Offline/conflict:** existing local unsaved recovery and optimistic conflict behavior remain intact; UI must not display `synced` before verified save.
 - **Accessibility:** semantic buttons/labels, visible focus, keyboard assignment, non-color state, reasonable 44×44 targets.
 - **Regression:** Daily Page editing, deletion, completion, Time Alignment linking, Month navigation, authentication gate, and existing tests remain green.
-- **Repository safety:** final diff contains no PDF, secret, generated `dist`, dependency, design-handoff, or Bingo changes caused by this feature.
+- **Repository safety:** final diff contains no PDF, secret, generated `dist`, dependency, design-handoff, or unrelated changes caused by this feature.
 
 ## 8. Session continuity
 
@@ -244,7 +243,7 @@ An incomplete session has any ungated phase, unmapped P0 evidence, unresolved cr
 ## 9. Exact kickoff/resume prompt
 
 ```text
-Implement WEEKLY-PLANNER-V1 using AGENTS.md, weekly-planner-feature-prd.md, weekly-planner-orchestration.md, and weekly-planner-implementation-status.md as the canonical sources. First inspect repository status/diff and actual code, preserve all unrelated Vision Action Bingo work, and infer the first incomplete gate from the status file. Update the status with the protected dirty paths and Phase 0 architecture decisions before writing product code. Delegate only the bounded workstreams authorized by the orchestration document, give every writer exclusive paths, and never overlap shared files. Run each phase's checks, inspect repository evidence yourself, and advance only when its acceptance gate passes. Maintain weekly-planner-implementation-status.md after every phase and before stopping. Do not commit, push, deploy, apply migrations, or alter production data without separate user approval.
+Implement WEEKLY-PLANNER-V1 using AGENTS.md, weekly-planner-feature-prd.md, weekly-planner-orchestration.md, and weekly-planner-implementation-status.md as the canonical sources. First inspect repository status/diff and actual code, preserve all unrelated uncommitted work, and infer the first incomplete gate from the status file. Update the status with the protected dirty paths and Phase 0 architecture decisions before writing product code. Delegate only the bounded workstreams authorized by the orchestration document, give every writer exclusive paths, and never overlap shared files. Run each phase's checks, inspect repository evidence yourself, and advance only when its acceptance gate passes. Maintain weekly-planner-implementation-status.md after every phase and before stopping. Do not commit, push, deploy, apply migrations, or alter production data without separate user approval.
 ```
 
 ### Copyable implementation-agent contract
@@ -255,7 +254,7 @@ Goal: [one bounded phase deliverable]
 Read first: AGENTS.md; weekly-planner-feature-prd.md; weekly-planner-orchestration.md; weekly-planner-implementation-status.md; [relevant source files]
 Exclusive write ownership: [exact files/directories]
 Read-only dependencies: [exact files/directories]
-Must not change: all files outside ownership; frontend/src/features/bingo/**; Bingo migrations/tests/artifacts; requirements/status docs unless assigned; dependencies; .env files
+Must not change: all files outside ownership; requirements/status docs unless assigned; dependencies; .env files
 Acceptance criteria: [phase gate and FR IDs]
 Checks to run: [focused commands]
 Return: files changed; checks/results; decisions; risks; remaining work; no commit/push/deploy/migration application

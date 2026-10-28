@@ -1,5 +1,5 @@
 import type { DailyTodoLine, DayState, HabitCategory, HabitPlanItem, PlannerState, RoutineHabit, WeeklyAction } from '../types';
-import { DEFAULT_HABIT_CATEGORIES } from './habitPlanner';
+import { DEFAULT_HABIT_CATEGORIES, ensureHabitPlanItemsAreSurfaced } from './habitPlanner';
 import { DEFAULT_HABIT_ROWS, DEFAULT_WINDDOWN_ITEMS, TWO_WEEK_CYCLE_ANCHOR } from './seed';
 
 /**
@@ -216,7 +216,7 @@ export function migratePlannerState(input: PlannerState): PlannerState {
   const choreCompletions = state.choreCompletions
     ? Object.fromEntries(Object.entries(state.choreCompletions).filter(([key]) => keepActiveChoreKey(key)))
     : undefined;
-  return { ...state, version: 7, weeklyActions, habitCategories, habitPlanItems, routineHabits, habitRows, gridMarks, choreCompletions, preferences, days };
+  return ensureHabitPlanItemsAreSurfaced({ ...state, version: 7, weeklyActions, habitCategories, habitPlanItems, routineHabits, habitRows, gridMarks, choreCompletions, preferences, days });
 }
 
 export const storage: StorageAdapter = new LocalStorageAdapter();

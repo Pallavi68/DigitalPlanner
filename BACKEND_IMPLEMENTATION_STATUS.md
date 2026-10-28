@@ -19,7 +19,6 @@ Phase 4 fixes are complete locally. The approved Digital Planner migrations are 
 * Phase 2: email magic-link auth, cloud/cache adapter, authenticated PlannerContext integration, migration confirmation/backup, offline unsaved restore, conflict recovery, and honest sync UI implemented.
 * Independent QA identified offline durability, loading overwrite, direct-DML, conflict, migration-decline, auto-balancing, running-list, and chore-date defects; all critical/high findings were addressed in the local implementation.
 * Linked project `Digital-Planner` is provisioned and the four `DIGITAL-PLANNER-SUPABASE-V1` migrations (`20260723000100` through `20260723000300`) are present in remote migration history.
-* The paused, unapproved Bingo migration `20260727000100` remains local-only and was not applied.
 * `frontend/.env.local` contains both required Vite variables; values were not printed or added to tracked documentation.
 * Live unauthenticated checks returned `401` for planner tables and `get_planner_state()`, confirming anonymous clients cannot read planner data or execute the owner RPC.
 * Supabase Auth settings report that the email provider is enabled.
@@ -43,7 +42,7 @@ No active write assignment. Independent QA was read-only.
 * SQL static security/contract assertions — passed by inspection/script; Supabase CLI and `psql` unavailable, so migrations were not executed.
 * `git status --short --branch` — branch `feature/runnable-daily-foundation`, ahead of origin by one commit; no pre-existing working-tree changes were reported before orchestration artifacts.
 * `git log --oneline -8` — inspected.
-* 2026-07-27 `supabase migration list --linked` — passed; all four planner migrations match locally/remotely and the Bingo migration is pending locally only.
+* 2026-07-27 `supabase migration list --linked` — passed; all four planner migrations match locally/remotely.
 * 2026-07-27 `supabase db lint --linked --level warning` — passed; no schema errors found.
 * 2026-07-27 `npm run typecheck` — passed.
 * 2026-07-27 `npm test` — passed: 8 files, 38 tests.
@@ -53,7 +52,6 @@ No active write assignment. Independent QA was read-only.
 
 ## Blockers / authority needed
 
-* The current uncommitted frontend includes the paused, unapproved Bingo prototype. Before production deployment, hide/disable its routes and navigation while preserving all Bingo code and data work.
 * Hosting requires an exact committed and pushed source state. Per repository and Git-skill rules, prepare and verify the deployment diff first, then obtain explicit owner approval before staging, committing, or pushing.
 * Completing the authenticated checklist requires the owner to submit an email address, open the received magic link, and use a second browser/device.
 * Allowed production redirect URLs still require an owner-confirmed deployed app URL; localhost verification can use the local development origin once it is present in Supabase Auth URL configuration.
@@ -61,4 +59,4 @@ No active write assignment. Independent QA was read-only.
 
 ## Next exact action
 
-Prepare the existing frontend for production hosting with the current magic-link sign-in unchanged. Hide/disable the paused Bingo routes and navigation without deleting or redesigning Bingo work; add the required hosting configuration; run typecheck, tests, build, and browser checks; review the complete deployment diff and scan it for sensitive data; then request explicit approval to stage, commit, and push. After deployment, add the permanent production URL to Supabase Auth redirects and execute the authenticated/two-device checklist in `supabase/README.md`. Keep `20260727000100_vision_action_bingo.sql` unapplied.
+Prepare the existing frontend for production hosting with the current magic-link sign-in unchanged; add the required hosting configuration; run typecheck, tests, build, and browser checks; review the complete deployment diff and scan it for sensitive data; then request explicit approval to stage, commit, and push. After deployment, add the permanent production URL to Supabase Auth redirects and execute the authenticated/two-device checklist in `supabase/README.md`.

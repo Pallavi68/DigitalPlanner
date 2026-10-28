@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { initialState } from './seed';
 import { addHabitPlanItem, editHabitPlanItem, moveHabitCategory, reconcileHabitItemsFromDailyPatch, renameHabitCategory, setHabitPlanItemMark } from './habitPlanner';
+import { migratePlannerState } from './storage';
 
 describe('two-week habit planner daily synchronization', () => {
   it('surfaces every added activity directly in the matching Daily To Dos', () => {
@@ -35,6 +36,18 @@ describe('two-week habit planner daily synchronization', () => {
     state = setHabitPlanItemMark(state, 'habit-1', 'cross', 2);
     expect(state.habitPlanItems[0]).toMatchObject({ mark: 'cross', done: false });
     expect(state.days['2026-08-11'].todos.find((item) => item.id === 'daily-1')?.done).toBe(false);
+  });
+
+  it('repairs a missing Daily To Do surface when an existing habit sheet is hydrated', () => {
+    const base = initialState();
+    const state = addHabitPlanItem(base, base.habitCategories[0].id, '2026-10-12', 'Clean desk', { itemId: 'habit-1', dailyTodoId: 'daily-1' }, 1);
+    const day = state.days['2026-10-12'];
+    const migrated = migratePlannerState({
+      ...state,
+      days: { ...state.days, '2026-10-12': { ...day, todos: day.todos.filter((item) => item.id !== 'daily-1') } },
+    });
+
+    expect(migrated.days['2026-10-12'].todos).toContainEqual({ id: 'daily-1', text: 'Clean desk', done: false, sourceRefId: 'habit-1' });
   });
 
   it('renames and rearranges category labels', () => {

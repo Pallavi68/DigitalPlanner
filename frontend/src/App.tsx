@@ -1,12 +1,11 @@
-import { useEffect, useState } from 'react';
-import { Link, Navigate, Route, Routes, useNavigate, useParams } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
+import { Link, Navigate, Route, Routes, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { BookShell } from './components/BookShell';
 import { Spread } from './components/Spread';
 import { DateHeader } from './components/ui';
 import { RoutineChecklist } from './pages/daily/RoutineChecklist';
 import { TimeAlignment } from './pages/daily/TimeAlignment';
 import { ToDos } from './pages/daily/ToDos';
-import { ChoreChecklist } from './pages/daily/ChoreChecklist';
 import { WeeklyPlannerPage } from './pages/weekly';
 import { TwoWeekHabitPage } from './pages/habits/TwoWeekHabitPage';
 import { usePlanner } from './store/PlannerContext';
@@ -63,22 +62,6 @@ function DailyPage() {
     if (endSlot - startSlot < item.durationMinutes / 30) window.alert('The block was shortened to fit at the end of the day.');
     updateBlocks([...day.blocks, { id: uid('blk'), date, startSlot, endSlot, label: item.label, tag: 'routine', sourceRefId: item.id, completed: item.done }]);
   };
-  const scheduleChore = (item: typeof choreItems[number]) => {
-    if (day.blocks.some((block) => block.sourceRefId === item.id) && !window.confirm(`“${item.label}” is already on this day. Add it again?`)) return;
-    const span = Math.max(1, Math.ceil((item.durationMinutes ?? 60) / 30));
-    const startSlot = item.defaultStartSlot ?? Array.from({ length: Math.max(1, SLOT_COUNT - span + 1) }, (_, slot) => slot)
-      .find((slot) => !day.blocks.some((block) => slot < block.endSlot && slot + span > block.startSlot)) ?? 0;
-    updateBlocks([...day.blocks, {
-      id: uid('blk'),
-      date,
-      startSlot,
-      endSlot: Math.min(SLOT_COUNT, startSlot + span),
-      label: item.label,
-      tag: 'chore',
-      sourceRefId: item.id,
-      completed: item.completed,
-    }]);
-  };
 
   return (
     <Spread
@@ -104,7 +87,6 @@ function DailyPage() {
             habits={state.routineHabits}
             onSave={(habits) => saveRoutine(habits, todayISO())}
           />
-          <ChoreChecklist items={choreItems} onToggle={(item) => toggleChore(date, item)} onSchedule={scheduleChore} />
           <ToDos
             day={day}
             onEdit={(id, text) =>
@@ -334,6 +316,24 @@ function MonthOverview() {
 }
 
 export default function App({ userId: _userId }: { userId: string }) {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const initialPath = useRef(location.pathname);
+  const initialDailyRouteHandled = useRef(false);
+
+  // A reopened browser tab can retain an old daily URL indefinitely. Daily
+  // navigation within an open planner remains untouched; only the initial
+  // page load is reset to the device-local date.
+  useEffect(() => {
+    if (initialDailyRouteHandled.current) return;
+    initialDailyRouteHandled.current = true;
+    const initialDate = initialPath.current.match(/^\/day\/(\d{4}-\d{2}-\d{2})$/)?.[1];
+    const today = todayISO();
+    if (initialDate && isValidISODate(initialDate) && initialDate !== today) {
+      navigate(`/day/${today}`, { replace: true });
+    }
+  }, [navigate]);
+
   return (
     <BookShell>
       <Routes>

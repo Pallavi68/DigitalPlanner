@@ -8,11 +8,11 @@
 
 ## 1. Objective and boundaries
 
-Plan-and-run deployment of the accepted Daily Planner to one stable HTTPS Vercel URL with existing Supabase magic-link authentication and cloud sync. Hide but preserve paused Bingo. Weekly/monthly agenda implementation, scheduler expansion, and Bingo redesign are excluded.
+Plan-and-run deployment of the accepted Daily Planner to one stable HTTPS Vercel URL with existing Supabase magic-link authentication and cloud sync. Weekly/monthly agenda implementation and scheduler expansion are excluded.
 
 ## 2. Repository and architecture baseline
 
-The maintained app is React 18/TypeScript/Vite under `frontend/`, with React Router SPA routes and Supabase browser authentication. There is no hosting configuration. The working tree contains substantial intentional uncommitted backend, recurring-schedule, acceptance-fix, and paused Bingo work; no destructive cleanup or history rewrite is allowed.
+The maintained app is React 18/TypeScript/Vite under `frontend/`, with React Router SPA routes and Supabase browser authentication. There is no hosting configuration. The working tree contains substantial intentional uncommitted backend, recurring-schedule, and acceptance-fix work; no destructive cleanup or history rewrite is allowed.
 
 ## 3. Agent/model assignment
 
@@ -44,7 +44,7 @@ production magic-link + two-device acceptance
 
 ### P1 — Production surface
 
-Sequential. Remove Bingo navigation/routes while preserving all feature files and migrations. Add Vercel configuration with Vite build/output settings and SPA rewrite. Gate: local deep links and production build pass.
+Sequential. Confirm the production route/navigation surface contains only accepted planner features. Add Vercel configuration with Vite build/output settings and SPA rewrite. Gate: local deep links and production build pass.
 
 ### P2 — Source and security review
 
@@ -60,7 +60,7 @@ Update Supabase Auth Site URL and exact redirect allowlist after URL is known. V
 
 ## 6. Parallelization rules
 
-No concurrent writes or production mutations. Bingo code/migration is preserved and unapplied. `.env.local`, database passwords, access tokens, and service-role keys are never staged or copied to Vercel.
+No concurrent writes or production mutations. `.env.local`, database passwords, access tokens, and service-role keys are never staged or copied to Vercel.
 
 ## 7. Quality and safety gates
 
@@ -80,4 +80,4 @@ Canonical status is `PRODUCTION_DEPLOYMENT_STATUS.md`; repository summary remain
 
 ## 9. Exact kickoff/resume prompt
 
-> Resume `DIGITAL-PLANNER-PRODUCTION-DEPLOY-V1`. Read `AGENTS.md`, `production-deployment-orchestration.md`, `PRODUCTION_DEPLOYMENT_STATUS.md`, `PROJECT_STATUS.md`, backend/acceptance status, and current repository evidence. Continue at the first incomplete gate, preserve paused Bingo but keep it hidden/unapplied, use the Git skill for every Git command, never expose secrets, and update deployment status before stopping.
+> Resume `DIGITAL-PLANNER-PRODUCTION-DEPLOY-V1`. Read `AGENTS.md`, `production-deployment-orchestration.md`, `PRODUCTION_DEPLOYMENT_STATUS.md`, `PROJECT_STATUS.md`, backend/acceptance status, and current repository evidence. Continue at the first incomplete gate, preserve unrelated work, use the Git skill for every Git command, never expose secrets, and update deployment status before stopping.

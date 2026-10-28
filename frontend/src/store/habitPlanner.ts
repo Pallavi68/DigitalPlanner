@@ -12,7 +12,7 @@ export const DEFAULT_HABIT_CATEGORIES = [
 
 function appendDailyLine(state: PlannerState, item: HabitPlanItem): PlannerState {
   const day = state.days[item.date] ?? emptyDay();
-  if (day.todos.some((line) => line.sourceRefId === item.id)) return state;
+  if (day.todos.some((line) => line.sourceRefId === item.id || line.id === item.linkedDailyTodoId)) return state;
   const todos = day.todos.slice();
   let insertAt = 0;
   todos.forEach((line, index) => { if (line.text.trim()) insertAt = index + 1; });
@@ -20,6 +20,13 @@ function appendDailyLine(state: PlannerState, item: HabitPlanItem): PlannerState
   if (insertAt < todos.length && !todos[insertAt].text.trim()) todos[insertAt] = line;
   else todos.splice(insertAt, 0, line);
   return { ...state, days: { ...state.days, [item.date]: { ...day, todos } } };
+}
+
+/** Restores the daily To Do surface for any durable habit-sheet activity.
+ * This protects existing entries created while an earlier save was interrupted.
+ */
+export function ensureHabitPlanItemsAreSurfaced(state: PlannerState): PlannerState {
+  return state.habitPlanItems.reduce(appendDailyLine, state);
 }
 
 export function addHabitCategory(state: PlannerState, label: string, id = uid('hc')): PlannerState {

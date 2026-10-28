@@ -21,7 +21,7 @@ P1–P3 implementation and remote schema gates are complete. Awaiting owner-auth
 * Automatic Gym/evening blocks can be removed for one date without regeneration; Time Alignment blocks open an accessible notes editor and render notes as subordinate grey text.
 * Note lines using `- [ ] item` or `[ ] item` render as interactive checkboxes; checking rewrites the persisted note to `[x]` and therefore round-trips through the existing note field.
 * Every Time Alignment block now retains a visible pencil control so its details dialog can be reopened after notes or checkboxes have been added; label click remains supported.
-* Isolated Supabase dry run listed only `20260804000100_daily_acceptance_fixes.sql`; Bingo was absent. Migration application passed, follow-up dry run reported up to date, and live schema lint found no errors.
+* Isolated Supabase dry run listed only `20260804000100_daily_acceptance_fixes.sql`. Migration application passed, follow-up dry run reported up to date, and live schema lint found no errors.
 * Owner screenshot exposed the exact remaining save error: `canceling statement due to statement timeout`. Added a function-scoped 30-second timeout to `save_planner_state` per Supabase guidance; isolated dry run/application passed and retry confirms remote up to date.
 * Follow-up screenshot exposed intermittent `canceling statement due to lock timeout` during rapid note/checkbox edits. Root cause was concurrent aggregate saves sharing the same planner-row lock. PlannerContext now permits one save at a time and coalesces edits made in flight into the next serialized save.
 
@@ -47,7 +47,7 @@ Primary agent owns all scoped work sequentially; no delegated writers.
 
 ## Blockers / authority needed
 
-Owner-session browser verification is required for the real save/uncheck/reload path. Bingo remains excluded and unapplied.
+Owner-session browser verification is required for the real save/uncheck/reload path.
 
 ## Next exact action
 

@@ -21,7 +21,7 @@ The owner chose `Moneymaker` as a Successful Day-only item on 2026-08-04. The fo
 * Night wind-down auto-slots daily from 11:00 PM–12:00 AM with Vitamins, Skincare, and Clean down.
 * Applicable untimed chores surface in a daily `Today's Chores` section for drag or keyboard/button placement.
 * Chore blocks use purple; ordinary to-dos have a separate treatment.
-* Stable occurrence/source IDs support deduplication, linked completion, persisted history, and future Bingo mapping.
+* Stable occurrence/source IDs support deduplication, linked completion, and persisted history.
 * New recurrence metadata is normalized through the existing aggregate Supabase state boundary.
 * Legacy/default planner state is upgraded to the approved schedule model.
 
@@ -57,17 +57,12 @@ Run after Moneymaker source resolution on 2026-08-04:
 ## Supabase and migration safety
 
 * New planner migration: `supabase/migrations/20260803000100_daily_recurring_schedule.sql`, applied successfully on 2026-08-04 from an isolated migration directory.
-* Paused Bingo migration: `supabase/migrations/20260727000100_vision_action_bingo.sql`.
-* The Bingo migration remains unapplied.
-* Do not run a broad migration command that would apply the earlier pending Bingo migration.
 * Determine a deliberate safe migration strategy before touching the linked project.
 * Do not print or commit values from `frontend/.env.local`.
 
 ## Working-tree protection
 
-Current branch at handoff: `feature/vision-action-bingo-v1`.
-
-The working tree contains substantial pre-existing, uncommitted Supabase/backend and paused Bingo work in addition to this feature. Preserve all of it. Do not clean, reset, stage, commit, push, deploy, or claim unrelated files. No commit was made in this session.
+The working tree contained substantial pre-existing, uncommitted Supabase/backend work in addition to this feature. Preserve unrelated work. Do not clean, reset, stage, commit, push, deploy, or claim unrelated files. No commit was made in this session.
 
 Feature-specific new/modified areas include:
 
@@ -93,14 +88,14 @@ Feature-specific new/modified areas include:
 * `PROJECT_STATUS.md`
 * `decision-list.md`
 
-Some listed files also contain protected earlier backend/Bingo work; inspect actual contents and history before editing.
+Some listed files also contain protected earlier backend work; inspect actual contents and history before editing.
 
 ## Exact next-session prompt
 
 ```text
 Resume DAILY-RECURRING-SCHEDULE-V1 in the repository root.
 
-First read AGENTS.md, DAILY_RECURRING_SCHEDULE_HANDOFF.md, planner-schedule-seed.md, daily-recurring-schedule-orchestration.md, DAILY_RECURRING_SCHEDULE_STATUS.md, PROJECT_STATUS.md, BACKEND_IMPLEMENTATION_STATUS.md, and decision-list.md. Inspect the actual working tree and preserve all uncommitted backend and paused Bingo work.
+First read AGENTS.md, DAILY_RECURRING_SCHEDULE_HANDOFF.md, planner-schedule-seed.md, daily-recurring-schedule-orchestration.md, DAILY_RECURRING_SCHEDULE_STATUS.md, PROJECT_STATUS.md, BACKEND_IMPLEMENTATION_STATUS.md, and decision-list.md. Inspect the actual working tree and preserve all unrelated uncommitted work.
 
-The Moneymaker decision is complete: Successful Day only. Recheck the working tree, review the focused diff, and plan safe execution of the recurring-schedule Supabase migration without applying the paused Bingo migration. Do not commit, push, deploy, or apply remote migrations without explicit approval.
+The Moneymaker decision is complete: Successful Day only. Recheck the working tree, review the focused diff, and plan safe execution of the recurring-schedule Supabase migration. Do not commit, push, deploy, or apply remote migrations without explicit approval.
 ```

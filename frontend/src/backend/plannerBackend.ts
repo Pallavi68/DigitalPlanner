@@ -64,9 +64,13 @@ export class SupabasePlannerBackend {
     let result: SavePlannerResult;
     try {
       result = await this.saveDocument(input.state, input.expectedRevision);
-      const verified = await this.load();
-      if (!verified || verified.revision !== result.revision || !plannerStatesMatch(verified.state, input.state)) {
-        throw new BackendError('remote', 'Supabase saved the request but read-back verification did not match. Your device copy is preserved for retry.', { retryable: true });
+      for (let attempt = 0; attempt < 2; attempt += 1) {
+        const verified = await this.load();
+        if (verified && verified.revision === result.revision && plannerStatesMatch(verified.state, input.state)) break;
+        if (attempt === 1) {
+          throw new BackendError('remote', 'Supabase saved the request but read-back verification did not match. Your device copy is preserved for retry.', { retryable: true });
+        }
+        await new Promise((resolve) => window.setTimeout(resolve, 300));
       }
     } catch (error) {
       if (error instanceof BackendError) throw error;

@@ -8,7 +8,7 @@
 
 ## 1. Objective and boundaries
 
-Plan-and-run a focused repair of Daily Planner cloud persistence and accepted scheduling behavior: reliable uncheck persistence, three individually timed evening actions with no left-page Wind-down section, deletable per-day automatic blocks, `Movement` checklist wording with `Gym` schedule wording, and persisted notes on Time Alignment blocks. Weekly/monthly agenda work, standalone chore/to-do pages, deployment, and Bingo remain excluded.
+Plan-and-run a focused repair of Daily Planner cloud persistence and accepted scheduling behavior: reliable uncheck persistence, three individually timed evening actions with no left-page Wind-down section, deletable per-day automatic blocks, `Movement` checklist wording with `Gym` schedule wording, and persisted notes on Time Alignment blocks. Weekly/monthly agenda work, standalone chore/to-do pages, and deployment remain excluded.
 
 ## 2. Repository and architecture baseline
 
@@ -46,11 +46,11 @@ Sequential. Remove the left Wind-down surface; materialize Vitamins 11:00–11:0
 
 ### P3 — Verification and live repair
 
-Run typecheck, all tests, build, focused browser checks, and read-only review. Use an isolated migration set that excludes Bingo; dry-run before requesting/applying remote schema changes. Gate: no critical/high findings, remote save/uncheck/reload round trip passes.
+Run typecheck, all tests, build, focused browser checks, and read-only review. Use an isolated planner-only migration set; dry-run before requesting/applying remote schema changes. Gate: no critical/high findings, remote save/uncheck/reload round trip passes.
 
 ## 6. Parallelization rules
 
-No concurrent writes. `types.ts`, `PlannerContext.tsx`, storage migration, RPC contracts, and SQL are shared merge points. Bingo files and migration remain untouched and unapplied.
+No concurrent writes. `types.ts`, `PlannerContext.tsx`, storage migration, RPC contracts, and SQL are shared merge points.
 
 ## 7. Quality and safety gates
 
@@ -63,7 +63,7 @@ No concurrent writes. `types.ts`, `PlannerContext.tsx`, storage migration, RPC c
 | Deleted auto block stays deleted for that day | suppression regression and reload test |
 | Movement/Gym wording | date-effective migration and recurrence test |
 | Notes persist and remain subordinate visually | contract test, accessible modal test, browser check |
-| Bingo excluded | isolated migration dry run lists only the new approved migration |
+| Migration scope isolated | isolated migration dry run lists only the new approved migration |
 
 ## 8. Session continuity
 
@@ -71,4 +71,4 @@ Canonical status is `DAILY_PLANNER_ACCEPTANCE_FIXES_STATUS.md`; repository summa
 
 ## 9. Exact kickoff/resume prompt
 
-> Resume `DAILY-PLANNER-ACCEPTANCE-FIXES-V1`. Read `AGENTS.md`, `daily-planner-acceptance-fixes-orchestration.md`, `DAILY_PLANNER_ACCEPTANCE_FIXES_STATUS.md`, `PROJECT_STATUS.md`, `decision-list.md`, and the current implementation. Continue at the first incomplete gate, preserve all uncommitted backend/Bingo work, keep Bingo unapplied, run relevant checks, and update status before stopping.
+> Resume `DAILY-PLANNER-ACCEPTANCE-FIXES-V1`. Read `AGENTS.md`, `daily-planner-acceptance-fixes-orchestration.md`, `DAILY_PLANNER_ACCEPTANCE_FIXES_STATUS.md`, `PROJECT_STATUS.md`, `decision-list.md`, and the current implementation. Continue at the first incomplete gate, preserve all unrelated uncommitted work, run relevant checks, and update status before stopping.

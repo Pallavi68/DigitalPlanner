@@ -10,7 +10,7 @@
 
 Plan-and-run a durable cross-device sync repair. Protect the laptop's authoritative planner data before mutation; replace slow full normalized rewrites with a fast owner-scoped document transaction; retain existing normalized rows as rollback evidence; make foreground/reconnect/poll convergence explicit; and prove laptop/phone-equivalent convergence through repeated authenticated production tests.
 
-Excluded: Bingo, visual redesign, unrelated planner features, destructive cleanup of legacy normalized tables, and Git publication.
+Excluded: visual redesign, unrelated planner features, destructive cleanup of legacy normalized tables, and Git publication.
 
 ## 2. Repository and architecture baseline
 
@@ -94,4 +94,4 @@ Resume from `PLANNER_SYNC_RELIABILITY_STATUS.md`, then inspect this orchestratio
 
 ## 9. Exact kickoff/resume prompt
 
-Resume `PLANNER-SYNC-RELIABILITY-V1` from `planner-sync-reliability-orchestration.md` and `PLANNER_SYNC_RELIABILITY_STATUS.md`. Reinspect repository and remote evidence, preserve the pre-change laptop data snapshot and all unrelated Bingo work, continue from the first incomplete gate, and do not declare completion until repeated authenticated production convergence passes.
+Resume `PLANNER-SYNC-RELIABILITY-V1` from `planner-sync-reliability-orchestration.md` and `PLANNER_SYNC_RELIABILITY_STATUS.md`. Reinspect repository and remote evidence, preserve the pre-change laptop data snapshot and all unrelated work, continue from the first incomplete gate, and do not declare completion until repeated authenticated production convergence passes.

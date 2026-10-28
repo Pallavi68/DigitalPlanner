@@ -34,8 +34,7 @@ Supabase project and should be verified before production deployment.
 
 ## Live planner verification checklist
 
-Keep the paused `20260727000100_vision_action_bingo.sql` migration unapplied until its
-product direction is approved. For `DIGITAL-PLANNER-SUPABASE-V1`, verify:
+For `DIGITAL-PLANNER-SUPABASE-V1`, verify:
 
 1. `supabase migration list --linked` shows migrations `20260723000100` through
    `20260723000300` on both local and remote.
@@ -60,37 +59,3 @@ product direction is approved. For `DIGITAL-PLANNER-SUPABASE-V1`, verify:
 Completion dates are interpreted as owner-local SQL `date` values. Historical guards
 use `preferences.timeZone` only when it matches PostgreSQL's timezone catalog, and
 otherwise default to `Asia/Kolkata` for the current single owner.
-
-## Vision-to-Action Bingo
-
-`20260727000100_vision_action_bingo.sql` adds the owner-scoped action hierarchy,
-date-effective cadence revisions, persisted month previews, frozen boards and
-occurrences, line claims, durable reward tokens, an empty future execution-link seam,
-idempotency receipts, and late-edit audit records.
-
-The browser may select its own rows under forced RLS, but all mutations go through
-fixed-`search_path` `SECURITY DEFINER` RPCs:
-
-* `save_bingo_settings` appends immutable action revisions and applies prospective
-  hierarchy/action changes with an optimistic settings version.
-* `preview_bingo_month` persists a deterministic client-domain preview by fingerprint.
-* `confirm_bingo_board` transactionally validates geometry, shuffles deterministically,
-  freezes occurrence snapshots, and refuses regeneration after progress.
-* `update_bingo_occurrence` and `update_bingo_reward` use optimistic versions and
-  idempotency keys. Line claims and reward creation are idempotent; reversing a square
-  can make a line incomplete but never deletes its earned reward.
-* `close_bingo_month` preserves incomplete/partial squares as `not_completed`.
-
-Run the local SQL gates after a reset:
-
-```sh
-supabase db reset
-psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f supabase/tests/bingo_schema_contract.sql
-psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f supabase/tests/bingo_rls_behavior.sql
-psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f supabase/tests/bingo_data_durability.sql
-```
-
-These tests include static RLS, grants, contract, and durability assertions. Live
-two-identity denial, Realtime, transaction-failure, replay, and cross-device behavior
-must still be verified against a non-production Supabase project before any production
-or cross-device claim.

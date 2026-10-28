@@ -18,7 +18,6 @@ Phase 7 — implementation, automated verification, independent review, targeted
 - All P0 requirements (FR-1 through FR-11, FR-14 through FR-16, FR-18, and FR-19) are mapped to evidence/checks in the orchestration quality matrix.
 - Runtime model selection is unavailable; the plan assigns Tier A/B/C capability and effort, with actual model resolved at runtime.
 - Phase 0 architecture gate completed against the current aggregate planner store, Daily To Do implementation, migration/default path, and pointer-drag seam.
-- Protected pre-existing dirty scope recorded from the latest repository evidence: `PRODUCTION_LAUNCH_HANDOFF.md`, `VISION_ACTION_BINGO_HANDOFF.md`, `VISION_ACTION_BINGO_IMPLEMENTATION_STATUS.md`, `frontend/src/features/**` (including Bingo), `research/vision-action-bingo-behavioral-design.html`, `supabase/.temp/`, `supabase/migrations/20260727000100_vision_action_bingo.sql`, `supabase/tests/bingo_*`, and `vision-action-bingo-*`. Weekly Planner agents must not edit these paths.
 - Phase 1 complete: schema v6 weekly action contract, backward-compatible hydration, atomic weekly/daily mutations, Daily Page reconciliation, and invariant tests.
 - Phases 2A/2B complete: weekly spread UI, multiline paste, drag and accessible Assign/Move controls, and aggregate persistence compatibility.
 - Phase 3 complete: `/week/:monday`, Month Overview entry points, week navigation, weekly BookShell chrome, and Daily Page integration.
@@ -33,8 +32,6 @@ Planning-run ownership was limited to:
 
 - `weekly-planner-orchestration.md`
 - `weekly-planner-implementation-status.md`
-
-Unrelated uncommitted Vision Action Bingo work is known to exist and must be enumerated from repository status/diff at implementation kickoff. It remains protected and out of scope.
 
 ## Decisions and ADRs
 

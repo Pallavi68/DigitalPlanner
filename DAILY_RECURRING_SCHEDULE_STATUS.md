@@ -14,11 +14,11 @@ Local implementation, owner-source resolution, and remote schema application are
 
 * Owner schedule and two-week anchor are recorded.
 * Repository instructions, product/design/status sources, existing frontend model, backend normalizer, and working-tree state were inspected.
-* Protected paused Bingo and existing backend work identified.
+* Protected existing backend work identified.
 * Dependency graph, exclusive ownership, acceptance gates, and independent QA requirement recorded.
 * P1 shared TypeScript recurrence/timing contract completed.
 * P2 deterministic recurrence engine completed with six focused tests.
-* P2 Supabase migration and static schema/security assertions completed without touching or applying Bingo.
+* P2 Supabase migration and static schema/security assertions completed.
 * P3 daily integration completed: anchored chores, automatic Gym/wind-down blocks, completion linkage, blue/purple source treatments, legacy-state upgrade, and backend normalization.
 * Independent QA ran and found one product-source conflict plus three implementation issues.
 * QA implementation issues fixed: chore duplicate confirmation, keyboard quick-add, and preservation of the auto-generated Gym label after setup edits.
@@ -43,14 +43,13 @@ No delegated writer remains active. Local verification is complete; remote migra
 * Supabase migration/schema security assertions — passed static review; not executed because the migration was not applied and sandboxed CLI telemetry prevented local execution.
 * Focused follow-up review — locally clear; the prior code defects and owner product decision are resolved.
 * Linked-project migration status check — attempted twice on 2026-08-04, including with network approval; the Supabase CLI timed out while creating its temporary login role, so no remote state changed.
-* Planner-only dry-run directory — created outside the repository with the four applied planner migrations plus `20260803000100`; the paused Bingo migration was absent. Remote dry-run still stopped at Supabase temporary-login creation, and the linked pooler configuration contains no database password for direct fallback.
+* Planner-only dry-run directory — created outside the repository with the four applied planner migrations plus `20260803000100`. Remote dry-run still stopped at Supabase temporary-login creation, and the linked pooler configuration contains no database password for direct fallback.
 * After the owner successfully relinked the project, the isolated dry run listed only `20260803000100_daily_recurring_schedule.sql`; it was applied successfully on 2026-08-04.
 * Post-apply isolated dry run reported the remote database is up to date; linked schema lint passed with no errors.
 
 ## Blockers / authority needed
 
 * Do not deploy, commit, or push without separate owner authorization.
-* Keep the paused Bingo migration unapplied.
 * Browser integration and live Supabase round-trip verification remain.
 
 ## Next exact action

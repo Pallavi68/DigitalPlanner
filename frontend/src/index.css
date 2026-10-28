@@ -172,12 +172,6 @@ textarea.hand-input {
 .routine-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 0 24px; }
 .routine-period { font: 500 10px var(--serif); letter-spacing: 2px; color: var(--ink-soft); margin-bottom: 6px; }
 .routine-row { display: flex; align-items: center; gap: 8px; min-height: 32px; border-bottom: 1px solid var(--rule-half); position: relative; }
-.daily-chores { margin: 18px 0 22px; }
-.chore-row { display: flex; align-items: center; gap: 8px; min-height: 36px; border-bottom: 1px solid var(--rule-half); }
-.chore-label { flex: 1; font: 16px var(--hand); color: var(--ink); }
-.chore-drag, .chore-quick-add { width: 32px; min-height: 32px; border: 0; background: transparent; color: #8a6fae; cursor: pointer; font-size: 18px; }
-.chore-drag { cursor: grab; }
-.chore-drag:focus-visible, .chore-quick-add:focus-visible { outline: 2px solid #8a6fae; outline-offset: 2px; }
 .routine-label { font: 17px var(--hand); color: var(--ink); flex: 1; min-width: 0; overflow-wrap: anywhere; }
 .routine-drag { width: 30px; min-height: 30px; border: 0; background: transparent; color: var(--ink-soft); touch-action: none; cursor: grab; }
 .routine-quick-add { width: 26px; min-height: 30px; border: 0; background: transparent; padding: 0; color: var(--ink-soft); font: 20px/1 var(--serif); }

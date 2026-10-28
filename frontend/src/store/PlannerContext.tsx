@@ -164,6 +164,7 @@ interface PlannerContextValue {
   status: SyncStatus;
   online: boolean;
   retrySave: () => void;
+  downloadRecoveryBackup: () => void;
   signOut: () => void;
   syncDetail?: string;
   cloudReady: boolean;
@@ -291,8 +292,13 @@ export function PlannerProvider({ children, userId, onSignOut }: { children: Rea
       })
       .catch((error) => {
         if (!alive) return;
-        hydrated.current = !!(cached || unsaved);
-        if (unsaved && !navigator.onLine) setCloudReady(true);
+        // A previously confirmed cloud snapshot is safe to keep reading and
+        // editing against while the next live request is retried. Do not turn
+        // a temporary auth/network/RPC failure into a blank, inaccessible
+        // planner page; unsaved changes remain journaled for recovery.
+        const hasLocalRecovery = !!(cached || unsaved);
+        hydrated.current = hasLocalRecovery;
+        if (hasLocalRecovery) setCloudReady(true);
         setStatus(navigator.onLine ? 'failed' : 'offline');
         setSyncDetail(error instanceof Error ? error.message : 'Cloud planner data could not be loaded.');
       });
@@ -608,6 +614,26 @@ export function PlannerProvider({ children, userId, onSignOut }: { children: Rea
           suppressSave.current = false;
         }
         setSaveAttempt((attempt) => attempt + 1);
+      },
+      downloadRecoveryBackup: () => {
+        const unsaved = plannerCache.readUnsaved(userId);
+        const cached = plannerCache.read(userId);
+        const backup = {
+          exportedAt: new Date().toISOString(),
+          purpose: 'Digital Planner recovery backup',
+          visiblePlannerState: latestState.current,
+          ...(unsaved ? { protectedUnsavedRecoveryState: unsaved } : {}),
+          ...(cached ? { lastConfirmedCloudState: cached.state, lastConfirmedCloudRevision: cached.revision } : {}),
+        };
+        const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `digital-planner-recovery-${new Date().toISOString().replace(/[:.]/g, '-')}.json`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.setTimeout(() => URL.revokeObjectURL(url), 0);
       },
       getDay,
       patchDay,

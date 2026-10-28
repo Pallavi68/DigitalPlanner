@@ -12,7 +12,7 @@ Complete. Emergency data recovery and stale-device overwrite prevention are depl
 ## Completed gates and evidence
 
 - Read required product, design, decision, status, backend, production, code, migration, and test sources.
-- Inspected repository structure, working-tree state, and recent history; unrelated uncommitted Bingo work is protected.
+- Inspected repository structure, working-tree state, and recent history; unrelated uncommitted work is protected.
 - Copied the laptop Chrome Local Storage database and preferences to a permission-restricted `/tmp` snapshot before mutation.
 - Read-only isolated-browser audit found no laptop unsaved payload.
 - Laptop cache and Supabase match revision `1786540949567`, timestamp `2026-08-12T13:22:46.877797+00:00`, 24 dated pages, 50 written Daily To Dos, 64 Time Alignment blocks, and 180 routine instances.
@@ -42,7 +42,7 @@ Primary agent owns sync-specific migration, backend/context, tests, and status s
 - `npm run typecheck` — passed.
 - `npm test -- --run` — passed: 10 files, 50 tests.
 - `npm run build` — passed: 108 modules.
-- Isolated linked migration dry run — passed; only `20260812000100_planner_document_sync.sql` listed and Bingo was excluded.
+- Isolated linked migration dry run — passed; only `20260812000100_planner_document_sync.sql` was listed.
 - Linked migration application — passed.
 - Linked schema lint at warning level — passed with no errors.
 - Production URL — serves the new `index-Bb2UCh0y.js` build.

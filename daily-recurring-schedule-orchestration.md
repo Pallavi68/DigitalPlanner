@@ -13,7 +13,7 @@ Plan-and-run implementation of the approved repeating two-week chore pattern, da
 
 In scope: recurrence/domain rules, seed data, daily materialization, deduplication, blue Successful Day/Gym blocks, purple chore blocks, aggregate Supabase serialization, migrations/contracts where required, unit/contract tests, and status documentation.
 
-Out of scope: production deployment, applying a new migration remotely, the paused Bingo implementation/migration, the full editable Two-Week Habit Planner UI, intelligent scheduling, calendar-capacity UI, and arbitrary chore-time editing. Untimed chores surface for manual placement.
+Out of scope: production deployment, applying a new migration remotely, the full editable Two-Week Habit Planner UI, intelligent scheduling, calendar-capacity UI, and arbitrary chore-time editing. Untimed chores surface for manual placement.
 
 ## 2. Repository and architecture baseline
 
@@ -21,7 +21,7 @@ Out of scope: production deployment, applying a new migration remotely, the paus
 * `PlannerContext` owns aggregate planner state; `save_planner_state` and `get_planner_state` map it to normalized forced-RLS Supabase tables.
 * Daily routines already use date-effective definitions/snapshots and stable links to Time Alignment blocks.
 * Chore definitions/occurrences exist in the schema, but two-week cadence, default timing, daily occurrence materialization, and daily-page UI are missing.
-* Existing uncommitted Supabase/backend and paused Bingo work is protected. The Bingo migration remains unapplied.
+* Existing uncommitted Supabase/backend work is protected.
 * Architecture decision for this feature: deterministic client materialization from persisted definitions, saved through the existing transactional aggregate RPC. Stable occurrence IDs are derived from chore definition and date; reopening a date is idempotent.
 
 ## 3. Agent/model assignment
@@ -61,7 +61,7 @@ Parallel after P1. Implement pure deterministic helpers for cycle-week calculati
 
 ### P2B — Supabase persistence
 
-Parallel after P1. Add a new forward-only planner migration if normalized columns/tables are required, update planner SQL contract tests, preserve forced RLS, and do not change/apply the Bingo migration. Gate: static SQL contract and repository migration ordering pass; local reset only if available and non-destructive to approved remote state.
+Parallel after P1. Add a new forward-only planner migration if normalized columns/tables are required, update planner SQL contract tests, and preserve forced RLS. Gate: static SQL contract and repository migration ordering pass; local reset only if available and non-destructive to approved remote state.
 
 ### P3 — Integration
 
@@ -73,7 +73,7 @@ Sequential. Run typecheck, full tests, build, relevant SQL checks, and browser v
 
 ### P5 — Independent QA
 
-Read-only agent review for acceptance compliance, data durability, recurrence/date correctness, duplication, RLS/RPC safety, legacy migration, accessibility, regressions, and paused-Bingo isolation. Gate: no unresolved critical/high findings.
+Read-only agent review for acceptance compliance, data durability, recurrence/date correctness, duplication, RLS/RPC safety, legacy migration, accessibility, regressions, and unrelated-change isolation. Gate: no unresolved critical/high findings.
 
 ### P6 — Fixes and handoff
 
@@ -83,7 +83,6 @@ Primary fixes findings sequentially, reruns affected gates, updates `PROJECT_STA
 
 * Only new recurrence module/tests and new SQL migration/tests may be written in parallel.
 * `types.ts`, `PlannerContext.tsx`, `App.tsx`, backend normalizers, seed data, shared CSS/tokens, and status documents remain primary-owned.
-* No agent may edit, apply, stage, or delete `20260727000100_vision_action_bingo.sql`.
 * Collisions stop the affected workstream and are resequenced through the primary.
 
 ## 7. Quality and safety gates
@@ -96,7 +95,7 @@ Primary fixes findings sequentially, reruns affected gates, updates `PROJECT_STA
 * Blue Successful Day/Gym and purple chores: token assertions plus browser inspection.
 * Supabase persistence/RLS: schema contract and RPC mapping review/tests.
 * Legacy planner state remains loadable: migration/contract regression tests.
-* Paused Bingo remains isolated and its migration unapplied.
+* Unrelated work remains isolated.
 
 ## 8. Session continuity
 
@@ -107,5 +106,5 @@ Completion requires all steps 1–4 implemented, relevant checks passing, no cri
 ## 9. Exact kickoff/resume prompt
 
 ```text
-Resume DAILY-RECURRING-SCHEDULE-V1 in the repository root. Read AGENTS.md, planner-schedule-seed.md, daily-recurring-schedule-orchestration.md, DAILY_RECURRING_SCHEDULE_STATUS.md, PROJECT_STATUS.md, and BACKEND_IMPLEMENTATION_STATUS.md. Inspect repository evidence and continue from the first incomplete gate. Preserve all uncommitted backend/Bingo work, do not apply the Bingo migration, delegate only non-overlapping approved workstreams, run the recorded gates, and maintain the feature status file.
+Resume DAILY-RECURRING-SCHEDULE-V1 in the repository root. Read AGENTS.md, planner-schedule-seed.md, daily-recurring-schedule-orchestration.md, DAILY_RECURRING_SCHEDULE_STATUS.md, PROJECT_STATUS.md, and BACKEND_IMPLEMENTATION_STATUS.md. Inspect repository evidence and continue from the first incomplete gate. Preserve all unrelated uncommitted work, delegate only non-overlapping approved workstreams, run the recorded gates, and maintain the feature status file.
 ```

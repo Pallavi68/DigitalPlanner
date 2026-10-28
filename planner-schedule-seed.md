@@ -60,7 +60,7 @@ Source image: owner-provided reference image (not committed to this repository)
 * The daily Successful Day movement item remains visible seven days per week. Monday, Tuesday, Thursday, and Friday additionally receive the linked 9:30 AM–12:00 PM Gym block; other days retain an unscheduled movement commitment such as 10k steps.
 * A recurring item is materialized at most once per source occurrence and date.
 * Auto-scheduled blocks retain a stable link to their daily checklist/chore occurrence so completion stays synchronized.
-* Dated completion history must retain stable source identity so a future Bingo mapping can backfill eligible occurrences.
+* Dated completion history must retain stable source identity.
 * Moneymaker is excluded from the chore seed and retains one completion source in Successful Day.
 
 ## Future refinements (not blockers)

@@ -5,7 +5,7 @@ import { usePlanner } from '../store/PlannerContext';
  * writes confirmed by Supabase.
  */
 export function SyncIndicator() {
-  const { status, online, retrySave, signOut, syncDetail } = usePlanner();
+  const { status, online, retrySave, downloadRecoveryBackup, signOut, syncDetail } = usePlanner();
 
   const label =
     status === 'failed'
@@ -50,6 +50,7 @@ export function SyncIndicator() {
       />
       {label}
       {status === 'failed' && <button type="button" onClick={retrySave} style={{ border: 0, background: 'transparent', color: 'var(--cream)', textDecoration: 'underline', cursor: 'pointer', font: 'inherit', letterSpacing: 'inherit', padding: 4 }}>Retry</button>}
+      {status === 'failed' && <button type="button" onClick={downloadRecoveryBackup} style={{ border: 0, background: 'transparent', color: 'var(--cream)', textDecoration: 'underline', cursor: 'pointer', font: 'inherit', letterSpacing: 'inherit', padding: 4 }}>Back up</button>}
       <button type="button" onClick={signOut} aria-label="Sign out of cloud planner" title="Sign out" style={{ border: 0, background: 'transparent', color: 'var(--cream)', cursor: 'pointer', font: 'inherit', padding: 4 }}>↪</button>
     </span>
   );

@@ -8,7 +8,7 @@
 
 ## 1. Objective and boundaries
 
-Plan-and-run a focused Daily To Dos UX completion: retain the initial 01–15 paper rows, allow unlimited persisted rows, keep rows after 15 collapsed by default, and provide an explicit button that adds and reveals an overflow row. Navigation, persistence contracts, scheduling, and unrelated Bingo work are excluded.
+Plan-and-run a focused Daily To Dos UX completion: retain the initial 01–15 paper rows, allow unlimited persisted rows, keep rows after 15 collapsed by default, and provide an explicit button that adds and reveals an overflow row. Navigation, persistence contracts, scheduling, and unrelated work are excluded.
 
 ## 2. Repository and architecture baseline
 
@@ -54,4 +54,4 @@ No parallel writes. Read-only review may occur only after implementation if risk
 
 ## 9. Exact kickoff/resume prompt
 
-> Resume `DAILY-TODO-OVERFLOW-V1`. Read `AGENTS.md`, `daily-todo-overflow-orchestration.md`, `prd.md`, `design-brief.md`, `decision-list.md`, and `PROJECT_STATUS.md`; inspect the current diff, continue from the first incomplete gate, avoid unrelated Bingo files, and keep status evidence current.
+> Resume `DAILY-TODO-OVERFLOW-V1`. Read `AGENTS.md`, `daily-todo-overflow-orchestration.md`, `prd.md`, `design-brief.md`, `decision-list.md`, and `PROJECT_STATUS.md`; inspect the current diff, continue from the first incomplete gate, avoid unrelated files, and keep status evidence current.
