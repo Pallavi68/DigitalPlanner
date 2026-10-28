@@ -2,6 +2,33 @@
 
 Last updated: 2026-10-28
 
+## Repository cleanup and production binding — 2026-10-28
+
+* Repository-cleanup P5 is complete through GitHub PR #2. Canonical
+  `origin/main` is normal merge commit
+  `0c119003a8cd3342a98cc107aa9a4f4f9b38f694`, with prior `main`
+  `b27c719c05cee0a93fcdc543c50d38a8db8b9fbf` and exact verified cleanup tip
+  `ecfd0bdce6149a074d59d3af4c984ee051a78b37` as parents. Both parent lineages
+  are ancestors of the merge; the cleanup branch is retained.
+* P6 is active at the deliberate first Git-deployment gate on local branch
+  `chore/planner-production-binding`, created without an upstream at exact
+  `origin/main` `0c119003a8cd3342a98cc107aa9a4f4f9b38f694`.
+* The existing Vercel project `digital-planner` is connected to
+  `Pallavi68/DigitalPlanner`, with Root Directory `frontend`, Production Branch
+  Tracking `main`, and automatic production-domain assignment enabled.
+* Production keys `VITE_SUPABASE_URL` and
+  `VITE_SUPABASE_PUBLISHABLE_KEY` are present as hidden Secrets. Their values
+  were not accessed. `.vercel/` and `.env*` remain ignored.
+* Connection did not create a Git-sourced deployment. The permanent alias still
+  serves Ready rollback deployment `dpl_FniJVXZmKruBNDPLc92R8y4HbbS4`; no
+  deployment, promotion, manual alias change, rollback, environment-value access,
+  or Supabase action occurred during verification.
+* P6 remains incomplete. Next, under separate Git approvals, review, commit, and
+  push these two status documents from `chore/planner-production-binding`, then
+  merge a PR to `main` as the deliberate first Git-triggered deployment gate.
+  Completion still requires a Ready Git deployment, automatic permanent-alias
+  movement, automated production checks, and owner acceptance.
+
 ## Latest planner reliability update — 2026-10-11
 
 * Daily-page startup now replaces a stale, restored `/day/YYYY-MM-DD` browser URL with the device-local current date. In-session page turns and direct navigation still work normally.
@@ -17,6 +44,15 @@ Last updated: 2026-10-28
 
 ## Current objective
 
+The current objective is cleanup phase P6: review and publish the two prepared
+status-document changes from `chore/planner-production-binding` under separate
+Git approvals, then merge them through a PR to `main` as the deliberate first
+Git-triggered production-deployment gate. P6 remains incomplete until that
+deployment is Ready, the permanent alias moves automatically, automated
+production checks pass, and the owner accepts authenticated planner load,
+save/reload, and representative cross-device sync. The existing Ready deployment
+`dpl_FniJVXZmKruBNDPLc92R8y4HbbS4` remains the rollback target.
+
 `DAILY-TODO-OVERFLOW-V1` is implemented locally. The Daily To Dos still open with the paper-like 01–15 rows, while an explicit `+ Add another to-do` control now creates, reveals, and focuses row 16 and later rows. Extra rows are collapsed by default and can be shown or collapsed without deleting their persisted content. The existing Enter-to-continue behavior, stable IDs, linked Time Alignment behavior, and planner persistence contracts are unchanged. See `daily-todo-overflow-orchestration.md`.
 
 `PLANNER-SYNC-RELIABILITY-V1` has replaced the slow per-edit normalized aggregate rewrite with a fast owner-scoped planner document while preserving all existing normalized rows as rollback evidence. Before any mutation, the laptop cache and Supabase were audited at the same revision with no unsaved laptop payload: 24 dated pages, 50 written Daily To Dos, 64 Time Alignment blocks, and 180 routine instances. A protected browser-storage snapshot was created outside the repository.
@@ -29,7 +65,7 @@ Owner acceptance on 2026-08-12: after the emergency restoration and prevention d
 
 Production RPC verification passed six alternating client cycles (three each direction), with saves in 211–377 ms and reads in 168–297 ms; the reversible test edit was removed and the final content counts remain unchanged. Local typecheck, 50 tests, build, isolated migration dry run/application, and linked schema lint all pass. Physical-device acceptance also passed. See `PLANNER_SYNC_RELIABILITY_STATUS.md`.
 
-The Daily Planner is live at `https://digital-planner-plum.vercel.app` from the pushed `release/daily-planner-v1` baseline plus two currently uncommitted launch fixes. Vercel production environment variables and Supabase Auth Site URL/redirect URLs are configured. Email magic-link authentication, production writes, reload persistence, and cross-device persistence were owner-verified.
+Historical production record from August 2026: the Daily Planner was deployed at `https://digital-planner-plum.vercel.app` from the pushed `release/daily-planner-v1` baseline plus two launch fixes that were uncommitted at that time and are now included in the planner baseline merged to `main`. Vercel production environment variables and Supabase Auth Site URL/redirect URLs were configured, and email magic-link authentication, production writes, reload persistence, and cross-device persistence were owner-verified. P6 has now verified the current repository connection, `main` production-branch tracking, permanent production-domain assignment, and required production environment-key names/presence. The first Git-sourced deployment and source commit, automated production checks, and post-deployment owner acceptance remain pending.
 
 Production testing exposed two launch defects. Missing Realtime publication membership was fixed by `20260805000100_enable_planner_realtime.sql`, which is applied to the linked Supabase project; the post-apply dry run reports the database up to date and linked schema lint passes. A laptop tab later failed with `InvalidJWTToken: Token has expired`; `frontend/src/backend/auth.ts` and `frontend/src/backend/plannerBackend.ts` now explicitly refresh sessions that are expired or within 60 seconds of expiry before planner loads/saves. That frontend fix is deployed and locally verified, but the owner paused before repeating the final no-refresh laptop-to-phone Realtime test.
 
@@ -43,14 +79,19 @@ Resume remote validation from `DAILY_RECURRING_SCHEDULE_HANDOFF.md`; do not redo
 
 The Supabase backend and planner migrations are applied to the linked `Digital-Planner` project. The exact resume checklist and protected working-tree state are in `PRODUCTION_LAUNCH_HANDOFF.md`.
 
-For the next separate chat, the prior Supabase backend thread is the intended workstream. Start from `BACKEND_IMPLEMENTATION_STATUS.md` and `digital-planner-backend-orchestration.md`, preserve every existing uncommitted file, and re-inspect actual repository state before taking action.
+Historical Supabase handoff, superseded as the current next action by P6: when
+that deferred backend validation work resumes, start from
+`BACKEND_IMPLEMENTATION_STATUS.md` and
+`digital-planner-backend-orchestration.md`, preserve existing work, and inspect
+actual repository state before taking action.
 
-The next session should resume in this order:
+The deferred Supabase/live-validation work was recorded in this order; it is not
+the current P6 next action:
 
 1. Refresh/sign in on laptop and phone, confirm both show `Synced`, then repeat a no-refresh laptop-to-phone edit and record latency.
 2. If Realtime succeeds, run offline/reconnect/conflict, historical-boundary, and representative Week 1/Week 2 recurring-schedule checks from `PRODUCTION_LAUNCH_HANDOFF.md` and `supabase/README.md`.
 3. Update status with results, review the focused launch-fix diff, scan it for sensitive data, and request approval before staging/committing/pushing it.
-4. Connect Vercel to GitHub after the owner adds a GitHub Login Connection in Vercel; the production deployment is live but future GitHub auto-deploy is not configured.
+4. Historical deployment follow-up: connect Vercel to GitHub after the owner adds a GitHub Login Connection. P6 has now verified that connection, `main` production tracking, Root Directory `frontend`, permanent-domain assignment, and required environment-key presence; only the first Git-sourced deployment/source and post-deployment acceptance remain pending.
 
 ## Current working state
 
@@ -326,7 +367,7 @@ Backend implementation source of truth:
 
 * The permanent production URL and Auth redirects are configured. Realtime publication and expired-session recovery fixes are live, but their combined no-refresh two-device behavior needs the final fresh-session retest.
 * Phone persistence works but saves were noticeably slow, and the owner deferred phone UI refinement to a later milestone.
-* Vercel is not connected to GitHub because the Vercel account needs a GitHub Login Connection; deployments currently use the authenticated CLI.
+* Historical deployment limitation recorded in August 2026: Vercel was not connected to GitHub because the account needed a GitHub Login Connection, and deployments used the authenticated CLI. P6 has now verified the repository connection, Root Directory `frontend`, `main` production tracking, permanent-domain assignment, and required environment-key presence. The first Git-sourced deployment/source commit, production verification, and owner acceptance remain pending.
 * Owner-local historical guards use a validated timezone with an Asia/Kolkata fallback, but midnight-boundary behavior still needs live verification.
 * The Time Alignment window is still fixed at its approved default of 8:00 AM–2:00 AM until Settings is implemented.
 * The recurring checklist has an editor, but the broader first-run setup flow is not implemented; unavailable pages are not linked.
