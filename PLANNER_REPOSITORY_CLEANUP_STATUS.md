@@ -7,22 +7,27 @@
 
 ## Current phase
 
-P4 is complete. The reviewed 32-path planner baseline was committed on
-`chore/planner-repository-cleanup` as
-`3efa7a8cf3c9288b0df03f14079964106ad2cad5` with message
-`Consolidate clean Digital Planner production baseline` and pushed to upstream
-`origin/chore/planner-repository-cleanup`. The local and remote branch tips matched
-exactly after the push, ahead/behind was `0/0`, and the working tree was clean at
-the P4 phase boundary. All staged-scope, sensitive-data, diff, typecheck, test,
-build, route, retired-feature, and read-only database checks required by P4 passed.
-P4 made no `main`, deployment, or Supabase changes.
+P5 is complete. GitHub PR #2 merged the exact verified cleanup tip
+`ecfd0bdce6149a074d59d3af4c984ee051a78b37` into canonical `main` as the normal
+merge commit `0c119003a8cd3342a98cc107aa9a4f4f9b38f694`. Its parents are prior
+`main` `b27c719c05cee0a93fcdc543c50d38a8db8b9fbf` and the cleanup tip
+`ecfd0bdce6149a074d59d3af4c984ee051a78b37`. Both parent lineages are ancestors
+of the merge commit, and the retained cleanup branch has no commit missing from
+`origin/main` (`origin/main...origin/chore/planner-repository-cleanup` was `1 0`).
 
-P5 has started in preflight only. The next gate is owner approval for an exact,
-read-only Git command batch that fetches current remote refs without pruning and
-then establishes merge-base, ahead/behind, and unique-commit evidence. P5
-reconciliation is not complete, and no reconciliation strategy may be selected
-until fresh divergence evidence is available and the owner separately approves
-that later strategy.
+P6 is active in preflight only. Local branch
+`chore/planner-production-binding` was created without an upstream directly from
+verified `origin/main` and is at
+`0c119003a8cd3342a98cc107aa9a4f4f9b38f694`. The existing Vercel project
+`digital-planner` is now connected to `Pallavi68/DigitalPlanner`, with Root
+Directory `frontend`, Production Branch Tracking `main`, and automatic production
+domain assignment enabled. Production environment keys `VITE_SUPABASE_URL` and
+`VITE_SUPABASE_PUBLISHABLE_KEY` are present as hidden Secrets; no value was
+accessed. Connecting the repository did not create a Git-sourced deployment, so
+`digital-planner-plum.vercel.app` still serves the preserved rollback deployment
+`dpl_FniJVXZmKruBNDPLc92R8y4HbbS4`. P6 remains incomplete pending the first
+Ready Git deployment, permanent-alias movement, automated production checks, and
+owner acceptance.
 
 ## Completed gates and evidence
 
@@ -32,7 +37,7 @@ that later strategy.
 * Confirmed local `feature/vision-action-bingo-v1` and `release/daily-planner-v1` both point to `39998b8` with zero commit divergence.
 * Confirmed no remote Bingo branch exists.
 * Confirmed Bingo implementation and migration are uncommitted/untracked, while shared files contain mixed Bingo and planner changes.
-* Confirmed Vercel Git integration is not configured and production deployments have been manual.
+* Historical pre-P6 evidence recorded that Vercel Git integration was not configured and production deployments were manual. That earlier state is superseded by the current P6 binding and read-only verification evidence recorded below.
 * Reproduced the current local TypeScript-check stall and stopped it cleanly; this must be resolved or pass before any commit/deployment gate.
 * Created `/tmp/digital-planner-cleanup-recovery-20261028-vMkeck.tar.gz` from the pre-branch mixed working tree. Its SHA-256 is `2c6aeaa54d578f70d14798a6da61e105e09bad110059c4e75c136c0048fab81e`.
 * Recovery verification passed after extraction to a separate temporary directory: the outer checksum and all 12 inner artifact checksums verified, and the archive contains all 54 Git-nonignored untracked files except the explicitly excluded `supabase/.temp/**` paths.
@@ -63,11 +68,22 @@ that later strategy.
 * Completed P4 on `chore/planner-repository-cleanup`: committed all and only the 32 reviewed paths as `3efa7a8cf3c9288b0df03f14079964106ad2cad5` with message `Consolidate clean Digital Planner production baseline`.
 * Pushed P4 to upstream `origin/chore/planner-repository-cleanup`; the local and remote tips matched exactly, ahead/behind was `0/0`, and the working tree was clean at the phase boundary.
 * P4 staged-scope, sensitive-data, diff, typecheck, test, build, route, retired-feature, and read-only database checks passed. P4 did not fetch, switch branches, merge, rebase, cherry-pick, change `main`, deploy, or alter Supabase.
+* Completed P5 through GitHub PR #2: `origin/main` is the normal merge commit `0c119003a8cd3342a98cc107aa9a4f4f9b38f694` with parents `b27c719c05cee0a93fcdc543c50d38a8db8b9fbf` and `ecfd0bdce6149a074d59d3af4c984ee051a78b37`; the cleanup branch is retained.
+* Proved both P5 parents are ancestors of `origin/main`. The comparison `origin/main...origin/chore/planner-repository-cleanup` returned `1 0`, so the cleanup branch has no commit absent from canonical `main`.
+* Created local `chore/planner-production-binding` without an upstream at exact verified `origin/main` `0c119003a8cd3342a98cc107aa9a4f4f9b38f694`; no remote branch was created.
+* Inspected safe ignored local Vercel link metadata without opening credentials or environment values: project `digital-planner`, project ID `prj_KVVRCCiuvM2N1IUjpDE9dbpBlE1T`, and owner/team ID `team_Ncu2hd9I5WowSK4KWGWnA5cC`.
+* Confirmed `frontend/.vercel/` and `frontend/.env.local` are ignored. `frontend/vercel.json` retains the Vite build, `dist` output, and SPA rewrite; the package build script remains `tsc --noEmit && vite build`.
+* Verified authenticated Vercel account/team and the existing `digital-planner` project without changing deployment or environment state.
+* Verified production environment key presence only: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` are hidden Secrets scoped to Production; no value was retrieved or exposed.
+* Owner-completed dashboard setup connected the existing project to `Pallavi68/DigitalPlanner`, set Root Directory `frontend`, set Production Branch Tracking to `main`, and enabled automatic production-domain assignment.
+* Post-connection inspection confirmed no new Git-sourced deployment was created. The permanent alias remains on Ready production deployment `dpl_FniJVXZmKruBNDPLc92R8y4HbbS4`, which is retained as the rollback target.
 
 ## Active assignments and exclusive ownership
 
-P5 preflight is active under the primary cleanup/integration agent. Work remains
-sequential and evidence-gated; no subagents or parallel writers are planned.
+P6 preflight is assigned to a separate dedicated P6 agent, with exclusive
+sequential ownership for each approved P6 batch. The primary cleanup/integration
+agent retains coordination and approval-gate responsibility. No parallel writer
+may overlap the P6 agent's owned files or external-state checks.
 
 ## Decisions and ADRs
 
@@ -118,19 +134,32 @@ sequential and evidence-gated; no subagents or parallel writers are planned.
 * P4 commit — passed on `chore/planner-repository-cleanup` as `3efa7a8cf3c9288b0df03f14079964106ad2cad5` with message `Consolidate clean Digital Planner production baseline`.
 * P4 push/upstream verification — passed: upstream is `origin/chore/planner-repository-cleanup`, the remote tip matched the local commit exactly, ahead/behind was `0/0`, and the working tree was clean at the phase boundary.
 * P4 scope boundary — passed: no fetch, branch switch, merge, rebase, cherry-pick, `main` change, deployment, or Supabase change occurred.
+* P5 merge identity — passed: `origin/main` is `0c119003a8cd3342a98cc107aa9a4f4f9b38f694`, with exact parents `b27c719c05cee0a93fcdc543c50d38a8db8b9fbf` and `ecfd0bdce6149a074d59d3af4c984ee051a78b37`, and PR #2 is recorded in the merge subject.
+* P5 ancestor proof — passed for both parent lineages; ahead/behind against the retained cleanup branch was `1/0` from `origin/main`'s perspective.
+* P6 local branch creation — passed: clean precondition, unused branch name, local `chore/planner-production-binding` at exact `origin/main`, and no upstream or remote push.
+* P6 safe local Vercel preflight — passed for ignored link identifiers, ignore rules, hosting configuration, and package scripts; no credential or environment value was opened.
+* P6 authenticated Vercel inventory — passed: expected account/team/project, Vite settings, Ready production deployments, permanent alias target, rollback deployment, aliases, and zero custom domains were identified read-only.
+* P6 production environment inventory — passed for required key names, Secret type, Production scope, and hidden-value state; no value was accessed.
+* P6 Git binding settings — owner-completed and evidenced: repository `Pallavi68/DigitalPlanner`, Root Directory `frontend`, Production Branch Tracking `main`, and automatic production-domain assignment enabled.
+* P6 post-connection deployment check — no Git-sourced deployment exists yet; `digital-planner-plum.vercel.app` still points to `dpl_FniJVXZmKruBNDPLc92R8y4HbbS4`.
+* P6 mutation boundary — no deployment, promotion, manual alias change, rollback, environment-value access, or Supabase action occurred during verification.
 
 ## Blockers / authority needed
 
-* No P4 blocker remains.
-* P5 requires owner approval for the exact first Git batch that fetches current remote refs without pruning and performs read-only divergence analysis.
-* Any later PR, merge, fast-forward, merge commit, branch switch, push, or other reconciliation strategy requires fresh divergence evidence and a separate explicit approval. No strategy is approved yet.
+* No P5 blocker remains.
+* P6 documentation must be reviewed, committed, and pushed from `chore/planner-production-binding` under separate Git approvals, then merged through an approved PR to `main` as the deliberate first Git-triggered deployment gate.
+* P6 does not complete merely because the Git binding settings exist. The resulting Git-sourced deployment must become Ready, expose the expected `main` source/commit where available, and receive the permanent alias automatically.
+* Automated production route and retired-feature checks must pass after alias movement.
+* Owner-authenticated planner load, save/reload, and representative cross-device acceptance remain required.
+* Any rollback to `dpl_FniJVXZmKruBNDPLc92R8y4HbbS4`, manual alias action, deployment retry, settings/environment change, or branch cleanup requires its own approval.
 
 ## Next exact action
 
-Obtain owner approval for the exact first P5 Git command batch: fetch current
-remote refs without pruning, then establish the merge-base, ahead/behind counts,
-and unique commits between `origin/main` and
-`origin/chore/planner-repository-cleanup`. Stop after presenting that evidence.
-Do not switch, merge, rebase, cherry-pick, commit, push, open a PR, change `main`,
-deploy, delete refs, or touch Supabase. Any reconciliation strategy comes only
-after the fresh evidence and a separate approval.
+Review and sensitive-data scan only the P6 documentation changes in
+`PLANNER_REPOSITORY_CLEANUP_STATUS.md` and `PROJECT_STATUS.md`. Under separate
+Git approvals, commit and push them from `chore/planner-production-binding`, then
+open and merge a PR to `main`. That merge is the deliberate first Git-triggered
+production-deployment gate. Afterward, verify the resulting deployment is Ready,
+is sourced from connected `main` at the expected commit, and receives
+`digital-planner-plum.vercel.app` automatically before running production checks
+and requesting owner acceptance. Do not advance to P7 until every P6 gate passes.
