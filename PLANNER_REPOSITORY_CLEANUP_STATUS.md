@@ -7,17 +7,22 @@
 
 ## Current phase
 
-P3 complete and P4 is owner-approved for sequential execution. Local correctness, build, route, source/bundle, diff, and
-sensitive-data verification passed on `chore/planner-repository-cleanup` at
-`39998b8a6d7f3b79ab3025fe13f5b12bef17e16f`, and public production routes remain
-healthy. The automated publishable-key OpenAPI request could not access schema
-metadata, but the owner manually ran the approved read-only production catalog
-checks in the Supabase SQL Editor and attested that the expected planner table/RPCs
-exist and that the public schema contains zero table/function names beginning
-`bingo_`. The owner approved the exact reviewed 32-path stage/commit/push batch and
-commit message `Consolidate clean Digital Planner production baseline`. At the time
-this status entry was prepared, no P4 Git mutation had occurred; staged-scope and
-sensitive-data checks must pass before the commit is created or pushed.
+P4 is complete. The reviewed 32-path planner baseline was committed on
+`chore/planner-repository-cleanup` as
+`3efa7a8cf3c9288b0df03f14079964106ad2cad5` with message
+`Consolidate clean Digital Planner production baseline` and pushed to upstream
+`origin/chore/planner-repository-cleanup`. The local and remote branch tips matched
+exactly after the push, ahead/behind was `0/0`, and the working tree was clean at
+the P4 phase boundary. All staged-scope, sensitive-data, diff, typecheck, test,
+build, route, retired-feature, and read-only database checks required by P4 passed.
+P4 made no `main`, deployment, or Supabase changes.
+
+P5 has started in preflight only. The next gate is owner approval for an exact,
+read-only Git command batch that fetches current remote refs without pruning and
+then establishes merge-base, ahead/behind, and unique-commit evidence. P5
+reconciliation is not complete, and no reconciliation strategy may be selected
+until fresh divergence evidence is available and the owner separately approves
+that later strategy.
 
 ## Completed gates and evidence
 
@@ -55,11 +60,14 @@ sensitive-data checks must pass before the commit is created or pushed.
 * Removed stale retired-feature references from active planner status, handoff, decision, Supabase, schedule, weekly-planner, deployment, backend, reliability, and acceptance documents. D20/D21 were removed; D22 and the schedule seed retain their planner semantics without future feature coupling.
 * Preserved plain recurring planner activity references named `Bingo` in the PRD, design brief, schedule seed, maintained seed/habit/storage code, and archival design material.
 * Preserved all planner reliability/recovery/sync changes, the pending planner timeout migration, and the deletion of `frontend/src/pages/daily/ChoreChecklist.tsx`.
+* Completed P4 on `chore/planner-repository-cleanup`: committed all and only the 32 reviewed paths as `3efa7a8cf3c9288b0df03f14079964106ad2cad5` with message `Consolidate clean Digital Planner production baseline`.
+* Pushed P4 to upstream `origin/chore/planner-repository-cleanup`; the local and remote tips matched exactly, ahead/behind was `0/0`, and the working tree was clean at the phase boundary.
+* P4 staged-scope, sensitive-data, diff, typecheck, test, build, route, retired-feature, and read-only database checks passed. P4 did not fetch, switch branches, merge, rebase, cherry-pick, change `main`, deploy, or alter Supabase.
 
 ## Active assignments and exclusive ownership
 
-No assignment remains active after this P3 verification return. No subagents or
-parallel writers are planned.
+P5 preflight is active under the primary cleanup/integration agent. Work remains
+sequential and evidence-gated; no subagents or parallel writers are planned.
 
 ## Decisions and ADRs
 
@@ -106,15 +114,23 @@ parallel writers are planned.
 * Manual read-only Supabase production catalog follow-up — passed as user-attested evidence. The owner reports running the approved checks in the Supabase SQL Editor with exact results `planner_documents_exists=true`, `get_planner_document_exists=true`, and `save_planner_document_exists=true`. The separate public-schema catalog query across `pg_class` and `pg_proc` for names beginning `bingo_` returned zero rows. This follow-up inspected catalog metadata only; it did not read planner rows or mutate the database.
 * Live production read-only recheck — passed without authentication: the same six root/direct routes returned HTTP 200, `text/html`, and the identical 994-byte SPA shell (SHA-256 `a09ec6001f52bc98fcc484acb867554769e85d15cea94394ebc375754d00238c`) serving unchanged asset `assets/index-VY8G-8Mt.js`.
 * No dependency installation/update, authentication, row-data read, database mutation, Vercel/GitHub mutation, staging, commit, push, fetch, merge, branch switch, deployment, or P4 action occurred during P3.
+* P4 exact 32-path staged-scope review and repeated Git-skill sensitive-data scan — passed.
+* P4 commit — passed on `chore/planner-repository-cleanup` as `3efa7a8cf3c9288b0df03f14079964106ad2cad5` with message `Consolidate clean Digital Planner production baseline`.
+* P4 push/upstream verification — passed: upstream is `origin/chore/planner-repository-cleanup`, the remote tip matched the local commit exactly, ahead/behind was `0/0`, and the working tree was clean at the phase boundary.
+* P4 scope boundary — passed: no fetch, branch switch, merge, rebase, cherry-pick, `main` change, deployment, or Supabase change occurred.
 
 ## Blockers / authority needed
 
-* No P3 verification blocker remains. The automated OpenAPI access limitation is resolved for this gate by the owner's manually run, read-only, user-attested production catalog results recorded above.
-* No P4 authority blocker remains. Execution must stop if staged scope, diff checks, or the repeated sensitive-data scan does not match the reviewed preflight.
+* No P4 blocker remains.
+* P5 requires owner approval for the exact first Git batch that fetches current remote refs without pruning and performs read-only divergence analysis.
+* Any later PR, merge, fast-forward, merge commit, branch switch, push, or other reconciliation strategy requires fresh divergence evidence and a separate explicit approval. No strategy is approved yet.
 
 ## Next exact action
 
-Run the exact owner-approved P4 stage/check/commit/push batch. Verify the staged
-32-path scope before committing and verify the remote cleanup ref matches the new
-local commit after pushing. Do not fetch, merge, change `main`, deploy, mutate
-Supabase, delete branches, or start P5 as part of this batch.
+Obtain owner approval for the exact first P5 Git command batch: fetch current
+remote refs without pruning, then establish the merge-base, ahead/behind counts,
+and unique commits between `origin/main` and
+`origin/chore/planner-repository-cleanup`. Stop after presenting that evidence.
+Do not switch, merge, rebase, cherry-pick, commit, push, open a PR, change `main`,
+deploy, delete refs, or touch Supabase. Any reconciliation strategy comes only
+after the fresh evidence and a separate approval.
